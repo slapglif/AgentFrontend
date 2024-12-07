@@ -28,7 +28,7 @@ export default function Agents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Orchestrator connection logic
+  // Orchestrator connection logic with exponential backoff
   const connectToOrchestrator = useCallback(async () => {
     try {
       setOrchestratorState(prev => ({
@@ -36,38 +36,72 @@ export default function Agents() {
         status: "connecting"
       }));
 
-      const res = await fetch("/api/orchestrator/connect");
-      if (!res.ok) throw new Error("Failed to connect to orchestrator");
+      // Add backoff delay based on retry count
+      const backoffDelay = Math.min(1000 * Math.pow(2, orchestratorState.retryCount), 30000);
+      if (orchestratorState.retryCount > 0) {
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+      }
 
+      const res = await fetch("/api/orchestrator/connect", {
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) throw new Error(`Failed to connect to orchestrator: ${res.statusText}`);
+
+      const data = await res.json();
+      
       setOrchestratorState({
         status: "connected",
         lastConnected: new Date(),
-        retryCount: 0
+        retryCount: 0,
+        version: data.version,
+        capabilities: data.capabilities
       });
 
-      // Initialize agents with mock data on first connection
+      // Initialize agents with mock data and real-time status
       if (agents.length === 0) {
         const initialAgents = DEFAULT_AGENTS.map(agent => ({
           ...agent,
           realTimeStatus: {
             isOnline: true,
             lastSeen: new Date(),
-            currentLoad: 0,
-            errorCount: 0
+            currentLoad: Math.random() * 30, // Initial load between 0-30%
+            errorCount: 0,
+            memoryUsage: {
+              used: Math.floor(Math.random() * 512),
+              total: 1024
+            }
           }
         }));
         setAgents(initialAgents);
         setIsLoading(false);
+
+        toast({
+          title: "Connected to Orchestrator",
+          description: `Successfully connected to orchestrator v${data.version}`,
+        });
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      
       setOrchestratorState(prev => ({
         status: "error",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: errorMessage,
         retryCount: prev.retryCount + 1,
         lastConnected: prev.lastConnected
       }));
+
+      toast({
+        title: "Connection Error",
+        description: `Failed to connect: ${errorMessage}. Retrying in ${Math.round(backoffDelay/1000)}s...`,
+        variant: "destructive",
+      });
     }
-  }, [agents.length]);
+  }, [agents.length, orchestratorState.retryCount, toast]);
 
   // Orchestrator connection effect
   useEffect(() => {
@@ -76,39 +110,39 @@ export default function Agents() {
     return () => clearInterval(interval);
   }, [connectToOrchestrator]);
 
-  // Agent status polling effect
+  // Agent status polling effect - Moved inside component
+  const pollAgentStatus = useCallback(async () => {
+    try {
+      setAgents(prevAgents => 
+        prevAgents.map(agent => ({
+          ...agent,
+          realTimeStatus: {
+            ...agent.realTimeStatus!,
+            currentLoad: Math.random() * 100,
+            lastSeen: new Date(),
+            isOnline: Math.random() > 0.1,
+            errorCount: (agent.realTimeStatus?.errorCount || 0) + (Math.random() > 0.95 ? 1 : 0)
+          }
+        }))
+      );
+    } catch (error) {
+      console.error('Failed to update agent status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update agent status. Retrying...",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   useEffect(() => {
     if (orchestratorState.status !== "connected") return;
-
-    const pollAgentStatus = async () => {
-      try {
-        setAgents(prevAgents => 
-          prevAgents.map(agent => ({
-            ...agent,
-            realTimeStatus: {
-              ...agent.realTimeStatus!,
-              currentLoad: Math.random() * 100,
-              lastSeen: new Date(),
-              isOnline: Math.random() > 0.1,
-              errorCount: (agent.realTimeStatus?.errorCount || 0) + (Math.random() > 0.95 ? 1 : 0)
-            }
-          }))
-        );
-      } catch (error) {
-        console.error('Failed to update agent status:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update agent status. Retrying...",
-          variant: "destructive",
-        });
-      }
-    };
 
     const statusInterval = setInterval(pollAgentStatus, 5000);
     pollAgentStatus(); // Initial poll
 
     return () => clearInterval(statusInterval);
-  }, [orchestratorState.status, toast]);
+  }, [orchestratorState.status, pollAgentStatus]);
 
   // Filter agents based on search query
   const filteredAgents = agents.filter((agent) =>
