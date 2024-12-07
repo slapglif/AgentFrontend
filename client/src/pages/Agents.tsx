@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Search, Filter, Plus, AlertCircle, Loader2 } from "lucide-react";
+import { Search, Filter, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { mockAnalytics } from "@/lib/mockAnalytics";
@@ -137,55 +137,6 @@ export default function Agents() {
               </span>
             </div>
           </div>
-          <Button 
-            className="gap-2"
-            disabled={orchestratorState.status !== "connected"}
-            onClick={async () => {
-              if (orchestratorState.status === "connected") {
-                try {
-                  const newAgentTemplate = {
-                    ...DEFAULT_AGENTS[0],
-                    id: agents.length + 1,
-                    name: `New Agent ${agents.length + 1}`,
-                    status: "idle" as const
-                  };
-                  
-                  const res = await fetch("/api/orchestrator/agents", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ agent: newAgentTemplate })
-                  });
-
-                  if (!res.ok) throw new Error("Failed to create agent");
-
-                  setAgents(prev => [...prev, {
-                    ...newAgentTemplate,
-                    realTimeStatus: {
-                      isOnline: true,
-                      lastSeen: new Date(),
-                      currentLoad: 0,
-                      errorCount: 0
-                    }
-                  }]);
-
-                  toast({
-                    title: "Success",
-                    description: "New agent created successfully",
-                  });
-                } catch (error) {
-                  console.error("Failed to create agent:", error);
-                  toast({
-                    title: "Error",
-                    description: error instanceof Error ? error.message : "Failed to create agent",
-                    variant: "destructive",
-                  });
-                }
-              }
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            New Agent
-          </Button>
         </div>
 
         {orchestratorState.status === "error" && (
