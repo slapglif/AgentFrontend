@@ -70,12 +70,34 @@ export function MemoryCard({ memory }: MemoryCardProps) {
           </div>
         )}
       </div>
-      <div className="mt-4">
+      <div className="mt-4 space-y-3">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Confidence</span>
-          <Progress value={memory.confidence} className="flex-1" />
-          <span className="text-sm">{memory.confidence}%</span>
+          <Progress 
+            value={memory.confidence} 
+            className="flex-1 transition-all duration-500" 
+            style={{
+              background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 2s linear infinite'
+            }}
+          />
+          <span className="text-sm font-medium">{memory.confidence}%</span>
         </div>
+
+        {memory.metadata && (
+          <div className="space-y-2 pt-2 border-t border-primary/10">
+            <div className="text-sm font-medium">Metadata</div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              {Object.entries(memory.metadata).map(([key, value]) => (
+                <div key={key} className="flex items-center gap-2 p-1 rounded bg-primary/5">
+                  <span className="text-muted-foreground">{key}:</span>
+                  <span className="font-medium">{JSON.stringify(value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -18,17 +18,34 @@ export function AgentTimeline() {
       <h2 className="text-xl font-semibold mb-4">Memory Timeline</h2>
       <ScrollArea className="h-[calc(100%-2rem)]">
         <div className="space-y-4 p-4">
-          {memories?.map((memory: any) => (
+          {memories?.map((memory: any, index: number) => (
             <div 
               key={memory.id} 
-              className="relative animate-fadeIn transition-all duration-300 hover:translate-x-1"
+              className="relative animate-staggered-fade-in transition-all duration-500 hover:translate-x-2"
+              style={{
+                animationDelay: `${index * 150}ms`,
+                transformStyle: 'preserve-3d',
+                perspective: '1000px'
+              }}
             >
-              <div className="absolute left-0 w-0.5 h-full bg-gradient-to-b from-primary via-primary/50 to-transparent animate-pulse" 
+              <div 
+                className="absolute left-0 w-0.5 h-full"
                 style={{
+                  background: 'linear-gradient(180deg, var(--primary), var(--primary-50), transparent)',
+                  backgroundSize: '200% 200%',
+                  animation: 'gradientShift 3s ease infinite',
                   boxShadow: '0 0 8px var(--primary), 0 0 12px var(--primary)',
-                  animation: 'gradient-flow 3s linear infinite'
                 }}
-              />
+              >
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, var(--primary-50), transparent)',
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 3s linear infinite',
+                  }}
+                />
+              </div>
               <div 
                 className="absolute left-0 w-2 h-2 -translate-x-[3px] rounded-full bg-primary"
                 style={{
