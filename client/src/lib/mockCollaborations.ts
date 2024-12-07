@@ -4,7 +4,7 @@ import type {
   CollaborationMessage 
 } from "@db/schema";
 
-export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] = [
+export const mockCollaborations: Collaboration[] = [
   {
     id: 1,
     title: "Research Analysis Project",
@@ -22,8 +22,8 @@ export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] =
     title: "Data Synthesis Initiative",
     description: "Synthesizing research findings across multiple domains",
     status: "in_progress",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    updatedAt: new Date(Date.now() - 43200000).toISOString(),
+    createdAt: new Date(Date.now() - 86400000),
+    updatedAt: new Date(Date.now() - 43200000),
     metadata: {
       priority: "medium",
       tags: ["synthesis", "cross-domain"]
@@ -34,8 +34,8 @@ export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] =
     title: "Documentation Review",
     description: "Comprehensive review of research documentation",
     status: "pending",
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000).toISOString(),
+    createdAt: new Date(Date.now() - 172800000),
+    updatedAt: new Date(Date.now() - 86400000),
     metadata: {
       priority: "low",
       tags: ["documentation", "review"]
@@ -43,13 +43,13 @@ export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] =
   }
 ];
 
-export const mockParticipants: Partial<CollaborationParticipant>[] = [
+export const mockParticipants: CollaborationParticipant[] = [
   {
     id: 1,
     collaborationId: 1,
     agentId: 7,
     role: "lead",
-    joinedAt: new Date(Date.now() - 7200000).toISOString(),
+    joinedAt: new Date(Date.now() - 7200000),
     metadata: { expertise: ["data_analysis", "pattern_recognition"] }
   },
   {
@@ -57,7 +57,7 @@ export const mockParticipants: Partial<CollaborationParticipant>[] = [
     collaborationId: 1,
     agentId: 8,
     role: "contributor",
-    joinedAt: new Date(Date.now() - 3600000).toISOString(),
+    joinedAt: new Date(Date.now() - 3600000),
     metadata: { expertise: ["synthesis", "integration"] }
   },
   {
@@ -65,7 +65,7 @@ export const mockParticipants: Partial<CollaborationParticipant>[] = [
     collaborationId: 1,
     agentId: 9,
     role: "reviewer",
-    joinedAt: new Date(Date.now() - 1800000).toISOString(),
+    joinedAt: new Date(Date.now() - 1800000),
     metadata: { expertise: ["documentation", "quality_assurance"] }
   }
 ];

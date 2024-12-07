@@ -60,74 +60,42 @@ export function CollaborationPanel() {
   const [inviteAgentId, setInviteAgentId] = useState("");
 
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const websocket = new WebSocket(`${protocol}//${window.location.host}`);
-    
-    websocket.onopen = () => {
-      setWs(websocket);
-      setLoading(false);
-    };
-
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      switch (data.type) {
+    setLoading(false);
+    return simulateRealTimeEvents((event) => {
+      switch (event.type) {
         case 'participant_joined':
-          setParticipants(prev => [...prev, data.data.participant]);
+          setParticipants(prev => [...prev, event.data.participant]);
           toast({
             title: "New Participant",
-            description: `Agent ${data.data.participant.agentId} joined as ${data.data.participant.role}`,
+            description: `Agent ${event.data.participant.agentId} joined as ${event.data.participant.role}`,
           });
           break;
           
         case 'new_message':
-          setMessages(prev => [...prev, data.data.message]);
+          setMessages(prev => [...prev, event.data.message]);
           toast({
             title: "New Message",
-            description: `From Agent ${data.data.message.fromAgentId}`,
+            description: `From Agent ${event.data.message.fromAgentId}`,
           });
           break;
           
         case 'status_update':
-          queryClient.setQueryData<typeof collaborations.$inferSelect[]>(
+          queryClient.setQueryData<Collaboration[]>(
             ["collaborations"],
             (prev) =>
               prev?.map((collab) =>
-                collab.id === data.data.collaborationId
-                  ? { ...collab, status: data.data.status }
+                collab.id === event.data.collaborationId
+                  ? { ...collab, status: event.data.status }
                   : collab
               ) ?? []
           );
           toast({
             title: "Status Update",
-            description: `Collaboration ${data.data.collaborationId} status: ${data.data.status}`,
-          });
-          break;
-          
-        case 'error':
-          toast({
-            title: "Error",
-            description: data.message,
-            variant: "destructive",
+            description: `Collaboration ${event.data.collaborationId} status: ${event.data.status}`,
           });
           break;
       }
-    };
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to collaboration server",
-        variant: "destructive",
-      });
-    };
-
-    return () => {
-      if (websocket) {
-        websocket.close();
-      }
-    };
+    });
   }, []);
 
   useEffect(() => {
