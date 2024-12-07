@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, ChevronDown, ChevronUp } from "lucide-react";
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 import "prismjs/components/prism-typescript";
@@ -13,6 +13,7 @@ interface CodeBlockProps {
 
 export function CodeBlock({ code, language }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(code);
@@ -28,20 +29,48 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
 
   return (
     <div className="relative group">
-      <pre className="rounded-lg bg-gradient-to-br from-muted to-muted/90 p-4 shadow-inner transition-all duration-300 group-hover:shadow-md">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={copyCode}
-        >
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-        </Button>
-        <code
-          className={`language-${language}`}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      </pre>
+      <div
+        className={`rounded-lg bg-gradient-to-br from-muted to-muted/90 transition-all duration-500 ease-in-out ${
+          isCollapsed ? "max-h-16" : "max-h-[2000px]"
+        } overflow-hidden`}
+      >
+        <div className="p-4 relative">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">{language}</span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10"
+                onClick={copyCode}
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+              >
+                {isCollapsed ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronUp className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          <pre className="transition-all duration-500 ease-in-out">
+            <code
+              className={`language-${language}`}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          </pre>
+        </div>
+      </div>
+      {isCollapsed && (
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-muted/90 pointer-events-none" />
+      )}
     </div>
   );
 }
