@@ -24,25 +24,82 @@ import type { Agent } from "@/lib/agents";
 export default function AgentDetails() {
   const { toast } = useToast();
   const { id } = useParams();
-  const { data: agent } = useQuery<Agent>({
+  const { data: agent, isLoading, isError, error } = useQuery<Agent>({
     queryKey: ["agent", id],
     queryFn: async () => {
-      const res = await fetch(`/api/agents/${id}`);
-      if (!res.ok) throw new Error("Failed to load agent");
-      return res.json();
+      try {
+        const res = await fetch(`/api/agents/${id}`);
+        if (res.status === 404) {
+          // If agent not found, try to get from mock data
+          const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
+          if (mockAgent) return mockAgent;
+          throw new Error("Agent not found");
+        }
+        if (!res.ok) throw new Error("Failed to load agent");
+        return res.json();
+      } catch (err) {
+        // If API fails, try to get from mock data
+        const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
+        if (mockAgent) return mockAgent;
+        throw err;
+      }
     },
   });
 
-  const { data: memories } = useQuery({
+  const { data: memories, isLoading: isLoadingMemories } = useQuery({
     queryKey: ["memories", id],
     queryFn: async () => {
       const res = await fetch(`/api/memories?agentId=${id}`);
-      if (!res.ok) throw new Error("Failed to load memories");
+      if (!res.ok) return []; // Return empty array if API fails
       return res.json();
     },
+    enabled: !!agent, // Only fetch memories if we have an agent
   });
 
-  if (!agent) return null;
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading agent details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="max-w-md p-4 text-center">
+          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+          <h2 className="text-lg font-semibold mb-2">Error Loading Agent</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            {error instanceof Error ? error.message : "Failed to load agent details"}
+          </p>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!agent) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="max-w-md p-4 text-center">
+          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+          <h2 className="text-lg font-semibold mb-2">Agent Not Found</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            The requested agent could not be found.
+          </p>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col">

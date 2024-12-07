@@ -112,13 +112,47 @@ export default function Agents() {
         <Button 
           className="gap-2"
           disabled={orchestratorState.status !== "connected"}
-          onClick={() => {
+          onClick={async () => {
             if (orchestratorState.status === "connected") {
-              fetch("/api/orchestrator/agents", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "create" })
-              });
+              try {
+                const newAgentTemplate = {
+                  ...DEFAULT_AGENTS[0],
+                  id: agents.length + 1,
+                  name: `New Agent ${agents.length + 1}`,
+                  status: "idle",
+                };
+                
+                const res = await fetch("/api/orchestrator/agents", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ agent: newAgentTemplate })
+                });
+
+                if (!res.ok) throw new Error("Failed to create agent");
+
+                // Add the new agent to the local state
+                setAgents(prev => [...prev, {
+                  ...newAgentTemplate,
+                  realTimeStatus: {
+                    isOnline: true,
+                    lastSeen: new Date(),
+                    currentLoad: 0,
+                    errorCount: 0
+                  }
+                }]);
+
+                toast({
+                  title: "Success",
+                  description: "New agent created successfully",
+                });
+              } catch (error) {
+                console.error("Failed to create agent:", error);
+                toast({
+                  title: "Error",
+                  description: error instanceof Error ? error.message : "Failed to create agent",
+                  variant: "destructive",
+                });
+              }
             }
           }}
         >
