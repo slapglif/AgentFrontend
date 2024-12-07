@@ -15,7 +15,7 @@ export const DEFAULT_MEMORIES: Partial<Memory>[] = [
     return results`,
       language: "python"
     },
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    timestamp: new Date(Date.now() - 3600000),
     confidence: 85,
     metadata: {
       sources: ["PubMed", "ChEMBL"],
@@ -35,7 +35,7 @@ export const DEFAULT_MEMORIES: Partial<Memory>[] = [
 };`,
       language: "typescript"
     },
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    timestamp: new Date(Date.now() - 7200000),
     confidence: 92,
     metadata: {
       proteins_analyzed: 50,
@@ -58,7 +58,7 @@ export const DEFAULT_MEMORIES: Partial<Memory>[] = [
 }`,
       language: "javascript"
     },
-    timestamp: new Date(Date.now() - 1800000).toISOString(),
+    timestamp: new Date(Date.now() - 1800000),
     confidence: 88,
     metadata: {
       conclusion_type: "compound_recommendation",

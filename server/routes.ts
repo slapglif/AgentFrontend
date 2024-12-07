@@ -18,6 +18,15 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.get("/api/messages", async (req, res) => {
+    try {
+      const result = await db.select().from(messages).orderBy(messages.timestamp);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
   app.get("/api/memories", async (req, res) => {
     try {
       const result = await db.select().from(memories).orderBy(memories.timestamp);
