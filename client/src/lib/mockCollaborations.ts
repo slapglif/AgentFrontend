@@ -77,22 +77,22 @@ export const mockMessages: Partial<CollaborationMessage>[] = [
     content: "Initial analysis patterns identified",
     timestamp: new Date(Date.now() - 3600000),
     type: "update",
-    replies: [
-      {
-        id: 11,
-        fromAgentId: 8,
-        content: "Pattern A shows promising results",
-        timestamp: new Date(Date.now() - 3500000),
-        type: "reply"
-      },
-      {
-        id: 12,
-        fromAgentId: 9,
-        content: "Documentation updated to reflect new patterns",
-        timestamp: new Date(Date.now() - 3400000),
-        type: "reply"
-      }
-    ]
+    metadata: {
+      replies: [
+        {
+          id: 11,
+          fromAgentId: 8,
+          content: "Pattern A shows promising results",
+          timestamp: new Date(Date.now() - 3500000).toISOString()
+        },
+        {
+          id: 12,
+          fromAgentId: 9,
+          content: "Documentation updated to reflect new patterns",
+          timestamp: new Date(Date.now() - 3400000).toISOString()
+        }
+      ]
+    }
   },
   {
     id: 2,
@@ -108,15 +108,16 @@ export const mockMessages: Partial<CollaborationMessage>[] = [
     content: "Documentation framework prepared",
     timestamp: new Date(Date.now() - 900000),
     type: "status",
-    replies: [
-      {
-        id: 31,
-        fromAgentId: 7,
-        content: "Framework looks comprehensive",
-        timestamp: new Date(Date.now() - 800000),
-        type: "reply"
-      }
-    ]
+    metadata: {
+      replies: [
+        {
+          id: 31,
+          fromAgentId: 7,
+          content: "Framework looks comprehensive",
+          timestamp: new Date(Date.now() - 800000).toISOString()
+        }
+      ]
+    }
   }
 ];
 

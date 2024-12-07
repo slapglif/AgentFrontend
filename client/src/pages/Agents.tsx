@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Search, Filter, Plus } from "lucide-react";
 import { DEFAULT_AGENTS } from "@/lib/agents";
+import { cn } from "@/lib/utils";
 
 export default function Agents() {
   const [searchQuery, setSearchQuery] = useState("");

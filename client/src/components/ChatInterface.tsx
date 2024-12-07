@@ -8,15 +8,22 @@ import { formatDistance } from "date-fns";
 import type { Message } from "@db/schema";
 import { useEffect } from "react";
 
-interface OrchestratorMessage extends Message {
+interface OrchestratorMessage extends Omit<Message, 'metadata'> {
   metadata: {
     replies?: Array<{
       id: number;
       content: string;
       fromAgentId: number;
-      timestamp: Date;
+      timestamp: string;
     }>;
-    context?: Record<string, unknown>;
+    context?: {
+      timestamp: string;
+      clientInfo?: {
+        type: string;
+        isConnected: boolean;
+      };
+      [key: string]: unknown;
+    };
   };
 }
 
