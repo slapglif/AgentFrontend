@@ -1,0 +1,1816 @@
+Directives for Building a Multi-Agent Research System
+These directives aim to recreate the multi-agent interaction demonstrated in the provided Discord chat within a newly released agentic framework. The focus is on identifying relevant code sections within this framework to achieve the desired functionalities.
+
+Overall Architecture:
+
+The system should be designed around a central "Research Lead" agent that delegates tasks to specialized agents and collates their responses. The framework should support asynchronous communication between agents, allowing them to work concurrently. A "Supervisor" agent (or a function within the Research Lead) should monitor progress, evaluate responses, and issue further directives based on intermediate results.
+
+Agent Specialization and Code Mapping:
+
+The framework should include (or allow the creation of) agents with the following specializations. Alongside each, potential code locations or functionalities within the framework to investigate are suggested:
+
+Research Lead/APP: This agent manages the overall research process. Look for:
+
+Task decomposition and delegation functions.
+
+Inter-agent communication protocols.
+
+Response aggregation and synthesis mechanisms.
+
+Looping/iteration structures for continuous refinement.
+
+Bioinformatics Agent: Focuses on biological data analysis and literature reviews. Investigate:
+
+Bio-entity recognition and relationship extraction functions.
+
+Integration with biological databases (e.g., PubMed, NCBI).
+
+Text summarization and analysis tools.
+
+Chemoinformatics Agent: Deals with chemical information and analysis. Explore:
+
+Chemical structure representation and manipulation.
+
+Molecular property prediction and drug-likeness assessment.
+
+Integration with chemical databases (e.g., PubChem, ChEMBL).
+
+Neuroprotection Agent: Specializes in neuroprotective strategies. Search for:
+
+Functions related to neurological disease pathways.
+
+Drug target identification and validation tools.
+
+Mechanistic Modeling Agent: Builds and analyzes biological models. Look into:
+
+Simulation frameworks and libraries.
+
+Model parameter estimation and optimization tools.
+
+Wellness Agent: Focuses on general wellness practices. Investigate:
+
+Integration with wellness-related data sources.
+
+Data analysis functions for evaluating wellness interventions.
+
+Ayurvedic Agent: Specializes in Ayurvedic medicine. Explore:
+
+Integration with Ayurvedic knowledge bases.
+
+Natural product compound analysis and property prediction.
+
+Immunology Agent: Deals with immunological processes. Look for:
+
+Immune system pathway analysis tools.
+
+Immunomodulatory drug target identification.
+
+Quantitative & Systems Pharmacology Agent: Focuses on drug action and interaction modeling. Investigate:
+
+Pharmacokinetic/pharmacodynamic (PK/PD) modeling tools.
+
+Drug interaction prediction functions.
+
+Network Pharmacology Agent (NPA): Analyzes drug-target networks. Explore:
+
+Network analysis and visualization libraries.
+
+Pathway enrichment analysis tools.
+
+Biophotonics Agent (BPA): Specializes in biophotonics applications. Investigate:
+
+Light-tissue interaction modeling tools.
+
+Biophotonic data analysis functions.
+
+Mitochondrial Medicine Agent (MMMA): Focuses on mitochondrial function and health. Explore:
+
+Mitochondrial pathway analysis tools.
+
+Mitochondrial dysfunction modeling and analysis.
+
+Circadian Biology Agent (CBLA): Deals with circadian rhythms and their impact on health. Investigate:
+
+Circadian rhythm modeling and analysis tools.
+
+Chronopharmacology-related functions.
+
+Key Functionalities and Code Focus:
+
+Search and Information Retrieval: Agents should be able to perform targeted searches using keywords and filters. Examine the framework's search API and integration with external search engines (e.g., Searx).
+
+Collaboration and Communication: Implement inter-agent communication protocols for requests, responses, and collaboration. Look for message passing mechanisms or shared memory functionalities within the framework.
+
+Chain-of-Thought (CoT) Reasoning: Integrate CoT reasoning to enable agents to break down complex tasks into smaller steps and justify their actions. Investigate the framework's support for CoT prompting and reasoning.
+
+Pharmacovigilance Assessment: Agents should be able to assess the safety profile of treatments. Explore integration with drug safety databases and toxicity prediction models.
+
+Natural Product Compound (NPC) Analysis: Implement functions for analyzing NPCs, including mechanism of action, dosage, and potential interactions. Look for chemical property prediction and drug interaction analysis tools within the framework.
+
+Treatment Pathway Generation: Agents should be able to generate detailed treatment pathways. Investigate the framework's support for workflow management and plan generation.
+
+Iterative Refinement and Supervisor Feedback:
+
+The system should support iterative refinement of research based on the supervisor's feedback. The supervisor agent (or function) should analyze agent responses, identify gaps or inconsistencies, and issue new directives for further investigation. Examine the framework's support for conditional logic and dynamic task generation.
+
+By following these directives and focusing on the suggested code areas within the new framework, you can effectively build a multi-agent system capable of performing complex medical research tasks, similar to the interaction demonstrated in the provided Discord chat. Remember to adapt these instructions to the specific features and structure of your chosen framework.
+
+
+I. Core System Architecture & Design Principles:
+
+Asynchronous Communication: Prioritize asynchronous communication between agents to maximize parallelism. Instead of blocking while waiting for responses, agents should continue working on other tasks. Look into the framework's support for message queues (e.g., RabbitMQ, Kafka), or asynchronous programming paradigms (e.g., asyncio in Python).
+
+Centralized Task Management (Research Lead): The Research Lead agent acts as the orchestrator. It receives the initial user query, decomposes it into sub-tasks, assigns these sub-tasks to specialized agents, and then aggregates their responses. This requires:
+
+Task Queue: A mechanism to hold and prioritize sub-tasks. This could be a simple list, a priority queue, or a more sophisticated task management system within the framework.
+
+Agent Directory: The Research Lead needs a way to know which agents are available and their specializations. This might involve a registry or lookup service.
+
+Result Aggregation: Functions to combine results from different agents, resolving conflicts or inconsistencies.
+
+Supervisor Agent/Function: The Supervisor monitors agent performance, checks for completion criteria, and provides feedback. This could be a separate agent or a module within the Research Lead. It should be able to:
+
+Track Progress: Monitor the status of sub-tasks.
+
+Evaluate Responses: Assess the quality and relevance of agent responses.
+
+Dynamic Task Generation: Issue new directives based on intermediate findings. This requires conditional logic and the ability to modify the task queue dynamically.
+
+Data Serialization: Define clear data formats for communication between agents (e.g., JSON). This ensures interoperability and simplifies data processing. Investigate the framework's data serialization capabilities.
+
+II. Enhanced Agent Capabilities & Code Focus:
+
+Search and Information Retrieval:
+
+Advanced Search Strategies: Go beyond keyword searches. Implement semantic search, natural language queries, or filters based on publication date, author, or journal.
+
+Source Prioritization: Agents should be able to prioritize information sources based on reliability and relevance (e.g., peer-reviewed journals over preprints). Implement scoring or ranking mechanisms.
+
+Caching: Cache search results to avoid redundant queries and improve performance.
+
+Collaboration and Communication:
+
+Negotiation Protocols: Enable agents to negotiate task assignments and resource allocation.
+
+Conflict Resolution: Develop mechanisms for resolving conflicts between agents (e.g., differing conclusions).
+
+Chain-of-Thought (CoT) Reasoning:
+
+Intermediate Steps Logging: Log the intermediate steps of the CoT reasoning process for debugging and transparency.
+
+Prompt Engineering: Develop effective prompts to guide the CoT reasoning process.
+
+Pharmacovigilance Assessment:
+
+Drug Interaction Prediction: Integrate with drug interaction databases and prediction models.
+
+Adverse Event Reporting: Implement mechanisms for reporting and analyzing potential adverse events.
+
+Natural Product Compound (NPC) Analysis:
+
+Structure-Activity Relationship (SAR) Analysis: Implement SAR analysis tools to understand the relationship between NPC structure and activity.
+
+Dosage Optimization: Develop models for predicting optimal dosages of NPCs.
+
+Treatment Pathway Generation:
+
+Personalized Treatment Plans: Generate personalized treatment pathways based on individual patient characteristics.
+
+Visualization: Visualize treatment pathways for better understanding and communication.
+
+```https://awslabs.github.io/multi-agent-orchestrator/classifiers/custom-classifier/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom classifier
+
+This guide explains how to create a custom classifier for the Multi-Agent Orchestrator by extending the abstract Classifier class. Custom classifiers allow you to implement your own logic for intent classification and agent selection.
+
+Overview
+
+To create a custom classifier, you need to:
+
+Extend the abstract Classifier class
+Implement the required process_request method
+Optionally override other methods for additional customization
+Step-by-Step Guide
+1. Extend the Classifier Class
+
+Create a new class that extends the abstract Classifier class:
+
+TypeScript
+Python
+import { Classifier } from './path-to-classifier';
+import { ClassifierResult, ConversationMessage } from './path-to-types';
+
+
+export class MyCustomClassifier extends Classifier {
+  // Implementation will go here
+}
+2. Implement the process_request Method
+
+The process_request method is the core of your custom classifier. It should analyze the input and return a ClassifierResult:
+
+TypeScript
+Python
+export class MyCustomClassifier extends Classifier {
+  async processRequest(
+    inputText: string,
+    chatHistory: ConversationMessage[]
+  ): Promise<ClassifierResult> {
+    // Your custom classification logic goes here
+
+
+    return {
+      selectedAgent: firstAgent,
+      confidence: 1.0
+    };
+  }
+}
+Using Your Custom Classifier
+
+To use your custom classifier with the Multi-Agent Orchestrator:
+
+TypeScript
+Python
+import { MultiAgentOrchestrator } from './path-to-multi-agent-orchestrator';
+import { MyCustomClassifier } from './path-to-my-custom-classifier';
+
+
+const customClassifier = new MyCustomClassifier();
+const orchestrator = new MultiAgentOrchestrator({ classifier: customClassifier });
+Best Practices
+Robust Analysis: Implement thorough analysis of the input text and chat history to make informed classification decisions.
+Error Handling: Include proper error handling in your process_request method to gracefully handle unexpected inputs or processing errors.
+Extensibility: Design your custom classifier to be easily extensible for future improvements or adaptations.
+Performance: Consider the performance implications of your classification logic, especially for high-volume applications.
+Example: Keyword-Based Classifier
+
+Here’s an example of a simple keyword-based classifier:
+
+TypeScript
+Python
+import { Classifier } from './path-to-classifier';
+import { ClassifierResult, ConversationMessage, Agent } from './path-to-types';
+
+
+export class KeywordClassifier extends Classifier {
+  private keywordMap: { [keyword: string]: string };
+
+
+  constructor(keywordMap: { [keyword: string]: string }) {
+    super();
+    this.keywordMap = keywordMap;
+  }
+
+
+  async processRequest(
+    inputText: string,
+    chatHistory: ConversationMessage[]
+  ): Promise<ClassifierResult> {
+    const lowercaseInput = inputText.toLowerCase();
+
+
+    for (const [keyword, agentId] of Object.entries(this.keywordMap)) {
+      if (lowercaseInput.includes(keyword)) {
+        const selectedAgent = this.getAgentById(agentId);
+        return {
+          selectedAgent,
+          confidence: 0.8 // Simple fixed confidence
+        };
+      }
+    }
+
+
+    // Default to the first agent if no keyword matches
+    const defaultAgent = Object.values(this.agents)[0];
+    return {
+      selectedAgent: defaultAgent,
+      confidence: 0.5
+    };
+  }
+}
+
+
+// Usage
+const keywordMap = {
+  'technical': 'tech-support-agent',
+  'billing': 'billing-agent',
+  'sales': 'sales-agent'
+};
+const keywordClassifier = new KeywordClassifier(keywordMap);
+const orchestrator = new MultiAgentOrchestrator({ classifier: keywordClassifier });
+
+This example demonstrates a basic keyword-based classification strategy. You can expand on this concept to create more sophisticated custom classifiers based on your specific needs.
+
+Conclusion
+
+Creating a custom classifier allows you to implement specialized logic for intent classification and agent selection in the Multi-Agent Orchestrator. By extending the Classifier class and implementing the process_request method, you can tailor the classification process to your specific use case and requirements.
+
+Remember to thoroughly test your custom classifier to ensure it performs well across a wide range of inputs and scenarios.
+
+Previous
+OpenAI Classifier
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/storage/custom/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom storage
+
+The Multi-Agent Orchestrator System provides flexibility in how conversation data is stored through its abstract ChatStorage class. This guide will walk you through the process of creating a custom storage solution by extending this class.
+
+Understanding the ChatStorage Abstract Class
+
+The ChatStorage class defines the interface for all storage solutions in the system. It includes three main methods and two helper methods:
+
+TypeScript
+Python
+import { ConversationMessage } from "../types";
+
+
+export abstract class ChatStorage {
+  protected isConsecutiveMessage(conversation: ConversationMessage[], newMessage: ConversationMessage): boolean {
+    if (conversation.length === 0) return false;
+    const lastMessage = conversation[conversation.length - 1];
+    return lastMessage.role === newMessage.role;
+  }
+
+
+  protected trimConversation(conversation: ConversationMessage[], maxHistorySize?: number): ConversationMessage[] {
+    if (maxHistorySize === undefined) return conversation;
+    // Ensure maxHistorySize is even to maintain complete binoms
+    const adjustedMaxHistorySize = maxHistorySize % 2 === 0 ? maxHistorySize : maxHistorySize - 1;
+    return conversation.slice(-adjustedMaxHistorySize);
+  }
+
+
+  abstract saveChatMessage(
+    userId: string,
+    sessionId: string,
+    agentId: string,
+    newMessage: ConversationMessage,
+    maxHistorySize?: number
+  ): Promise<ConversationMessage[]>;
+
+
+  abstract fetchChat(
+    userId: string,
+    sessionId: string,
+    agentId: string,
+    maxHistorySize?: number
+  ): Promise<ConversationMessage[]>;
+
+
+  abstract fetchAllChats(
+    userId: string,
+    sessionId: string
+  ): Promise<ConversationMessage[]>;
+}
+
+The ChatStorage class now includes two helper methods:
+
+isConsecutiveMessage (TypeScript) / is_consecutive_message (Python): Checks if a new message is consecutive to the last message in the conversation.
+trimConversation (TypeScript) / trim_conversation (Python): Trims the conversation history to the specified maximum size, ensuring an even number of messages.
+
+The three main abstract methods are:
+
+saveChatMessage (TypeScript) / save_chat_message (Python): Saves a new message to the storage.
+fetchChat (TypeScript) / fetch_chat (Python): Retrieves messages for a specific conversation.
+fetchAllChats (TypeScript) / fetch_all_chats (Python): Retrieves all messages for a user’s session.
+Creating a Custom Storage Solution
+
+To create a custom storage solution, follow these steps:
+
+Create a new class that extends ChatStorage.
+Implement all the abstract methods.
+Utilize the helper methods isConsecutiveMessage and trimConversation in your implementation.
+Add any additional methods or properties specific to your storage solution.
+
+Here’s an example of a simple custom storage solution using an in-memory dictionary:
+
+TypeScript
+Python
+import { ChatStorage, ConversationMessage } from 'multi-agent-orchestrator';
+
+
+class SimpleInMemoryStorage extends ChatStorage {
+  private storage: { [key: string]: ConversationMessage[] } = {};
+
+
+  async saveChatMessage(
+    userId: string,
+    sessionId: string,
+    agentId: string,
+    newMessage: ConversationMessage,
+    maxHistorySize?: number
+  ): Promise<ConversationMessage[]> {
+    const key = `${userId}:${sessionId}:${agentId}`;
+    if (!this.storage[key]) {
+      this.storage[key] = [];
+    }
+
+
+    if (!this.isConsecutiveMessage(this.storage[key], newMessage)) {
+      this.storage[key].push(newMessage);
+    }
+
+
+    this.storage[key] = this.trimConversation(this.storage[key], maxHistorySize);
+    return this.storage[key];
+  }
+
+
+  async fetchChat(
+    userId: string,
+    sessionId: string,
+    agentId: string,
+    maxHistorySize?: number
+  ): Promise<ConversationMessage[]> {
+    const key = `${userId}:${sessionId}:${agentId}`;
+    const conversation = this.storage[key] || [];
+    return this.trimConversation(conversation, maxHistorySize);
+  }
+
+
+  async fetchAllChats(
+    userId: string,
+    sessionId: string
+  ): Promise<ConversationMessage[]> {
+    const allMessages: ConversationMessage[] = [];
+    for (const key in this.storage) {
+      if (key.startsWith(`${userId}:${sessionId}`)) {
+        allMessages.push(...this.storage[key]);
+      }
+    }
+    return allMessages;
+  }
+}
+Using Your Custom Storage
+
+To use your custom storage with the Multi-Agent Orchestrator:
+
+TypeScript
+Python
+const customStorage = new SimpleInMemoryStorage();
+const orchestrator = new MultiAgentOrchestrator({
+  storage: customStorage
+});
+
+By extending the ChatStorage class, you can create custom storage solutions tailored to your specific needs, whether it’s integrating with a particular database system, implementing caching mechanisms, or adapting to unique architectural requirements.
+
+Remember to consider factors such as scalability, persistence, and error handling when implementing your custom storage solution for production use. The helper methods isConsecutiveMessage and trimConversation can be particularly useful for managing conversation history effectively.
+
+Previous
+DynamoDB
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```
+
+```https://awslabs.github.io/multi-agent-orchestrator/agents/custom-agents/
+Skip to content
+Multi-Agent Orchestrator
+Search
+GitHub
+Select theme
+Dark
+Light
+Auto
+Introduction
+Introduction
+How it works
+Quickstart
+FAQ
+Orchestrator
+Overview
+Classifier
+Overview
+Built-in classifiers
+Bedrock Classifier
+Anthropic Classifier
+OpenAI Classifier
+Custom Classifier
+Agents
+Overview
+Built-in Agents
+Bedrock LLM Agent
+Amazon Bedrock Agent
+Amazon Lex Bot Agent
+AWS Lambda Agent
+OpenAI Agent
+Anthropic Agent
+Chain Agent
+Comprehend Filter Agent
+Amazon Bedrock Translator Agent
+Amazon Bedrock Inline Agent
+Bedrock Flows Agent
+Custom Agents
+Conversation Storage
+Overview
+Built-in storage
+In-Memory
+DynamoDB
+Custom Storage
+Retrievers
+Overview
+Built-in retrievers
+Bedrock Knowledge Base
+Custom Retriever
+Cookbook
+Examples
+Chat Chainlit App
+Chat Demo App
+E-commerce Support Simulator
+Fast API Streaming
+Typescript Local Demo
+Python Local Demo
+Api Agent
+Ollama Agent
+Ollama Classifier
+Lambda Implementations
+Python Lambda
+NodeJs Lambda
+Tool Integration
+Weather API Integration
+Math Operations
+Routing Patterns
+Cost-Efficient Routing
+Multi-lingual Routing
+Optimization & Monitoring
+Agent Overlap Analysis
+Logging and Monitoring
+On this page
+Overview
+Custom Agents
+
+The Agent abstract class provides a flexible foundation for creating various types of agents. When implementing a custom agent, you can:
+
+Call Language Models: Integrate with LLMs like GPT-3, BERT, or custom models.
+API Integration: Make calls to external APIs or services.
+Data Processing: Implement data analysis, transformation, or generation logic.
+Rule-Based Systems: Create agents with predefined rules and responses.
+Hybrid Approaches: Combine multiple techniques for more complex behaviors.
+
+Example of a simple custom agent:
+
+TypeScript
+Python
+class SimpleGreetingAgent extends Agent {
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    return {
+      role: "assistant",
+      content: [{ text: `Hello! You said: ${inputText}` }]
+    };
+  }
+}
+Basic Structure of a Custom Agent
+
+To create a custom agent, you need to extend the base Agent class or one of its subclasses. Here’s the basic structure:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+
+
+class CustomAgent extends Agent {
+  constructor(options: AgentOptions) {
+    super(options);
+    // Additional initialization if needed
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[],
+    additionalParams?: Record<string, any>
+  ): Promise<Message> {
+    // Implement your custom logic here
+  }
+}
+Example: OpenAI Agent
+
+Here’s an example of a custom agent that uses the OpenAI API:
+
+TypeScript
+Python
+import { Agent, AgentOptions, Message } from './path-to-agent-module';
+import { Configuration, OpenAIApi } from 'openai';
+
+
+class OpenAIAgent extends Agent {
+  private openai: OpenAIApi;
+
+
+  constructor(options: AgentOptions & { apiKey: string }) {
+    super(options);
+    const configuration = new Configuration({ apiKey: options.apiKey });
+    this.openai = new OpenAIApi(configuration);
+  }
+
+
+  async processRequest(
+    inputText: string,
+    userId: string,
+    sessionId: string,
+    chatHistory: Message[]
+  ): Promise<Message> {
+    const response = await this.openai.createCompletion({
+      model: 'text-davinci-002',
+      prompt: inputText,
+      max_tokens: 150
+    });
+
+
+    return {
+      role: 'assistant',
+      content: [{ text: response.data.choices[0].text || 'No response' }]
+    };
+  }
+}
+
+To use this OpenAI agent:
+
+TypeScript
+Python
+const openAIAgent = new OpenAIAgent({
+  name: 'OpenAI Agent',
+  description: 'An agent that uses OpenAI API for responses',
+  apiKey: 'your-openai-api-key'
+});
+
+
+orchestrator.addAgent(openAIAgent);
+
+By creating custom agents, you can extend the capabilities of the Multi-Agent Orchestrator to meet your specific needs, whether that’s integrating with external AI services like OpenAI, implementing specialized business logic, or interfacing with other systems and APIs.
+
+Previous
+Bedrock Flows Agent
+Next
+Overview
+```Enhanced Memory Explorer:
+
+Advanced search and filtering capabilities
+Sortable by timestamp or relevance
+Rich metadata display including sources and tags
+Visual confidence indicators
+Improved memory node categorization
+Detailed Agent Management:
+
+Configuration panel for each agent
+Model settings (temperature, max tokens)
+Tool management interface
+Memory statistics
+Enable/disable tools
+Visual status indicators
+Improved Layout:
+
+Toggle between split and full view
+Better space utilization
+Responsive design for all screen sizes
+Enhanced Data Model:
+
+Extended agent configuration options
+Rich metadata for memory nodes
+Tool configuration support
+Team-level settingsno rather than configuring an agent like that, it should let me see the tools and add tools, but tools are code blocks, and i should be able to see the agents code also add tools and interacttions, animations etc for the user to be able to add to, and itneract with all of this through an agentic chat flow tooEnhanced Code Management:
+
+Code blocks are now first-class citizens with syntax highlighting
+Support for tools, interactions, and animations as code
+Real-time code editing with execution capabilities
+Metadata visualization for inputs/outputs
+Interactive Chat Interface:
+
+Direct communication with agents
+Tool execution results displayed in chat
+Support for code snippets and evidence in messages
+Real-time interaction with the agent's capabilities
+Agent Code View:
+
+Visual representation of all code blocks
+Easy addition/removal of capabilities
+Execution controls for testing
+Statistics for different types of code blocks
+Improved Types:
+
+Structured code block definitions
+Enhanced agent code management
+Better chat message handling
+Support for tool execution resultsvisually enhance all interactions with aniamtions etc ensure all interactions are buttosuper cuoo, ,make the whole ui darkmode and seem super nice, enhance all tags, vuttonas clicks etc with in depth interactoons, add like 2-3 layers od depth for each just so you can borwser, explore and understand everything possible - add sample data to everythingDark Mode & Visual Depth:
+
+Rich dark theme with multiple shades
+Layered card components with hover effects
+Smooth animations for all interactions
+Custom scrollbars and transitions
+Enhanced Components:
+
+Reusable Button, Card, and Tag components
+Animated memory timeline with visual connections
+Interactive code blocks with syntax highlighting
+Rich chat messages with metadata display
+Micro-interactions:
+
+Hover and click animations on all interactive elements
+Loading states and transitions
+Progress indicators and confidence meters
+Expandable/collapsible sections
+Visual Hierarchy:
+
+Clear distinction between different types of content
+Consistent spacing and typography
+Color coding for different memory types
+Visual feedback for all interactions
