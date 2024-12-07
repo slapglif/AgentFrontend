@@ -28,86 +28,42 @@ export default function Agents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Orchestrator connection logic with exponential backoff
-  const connectToOrchestrator = useCallback(async () => {
-    try {
-      setOrchestratorState(prev => ({
-        ...prev,
-        status: "connecting"
-      }));
+  // Mock orchestrator connection
+  const connectToOrchestrator = useCallback(() => {
+    setOrchestratorState({
+      status: "connected",
+      lastConnected: new Date(),
+      retryCount: 0,
+      version: "1.0.0",
+      capabilities: ["task_delegation", "monitoring", "coordination"]
+    });
 
-      // Add backoff delay based on retry count
-      const backoffDelay = Math.min(1000 * Math.pow(2, orchestratorState.retryCount), 30000);
-      if (orchestratorState.retryCount > 0) {
-        await new Promise(resolve => setTimeout(resolve, backoffDelay));
-      }
-
-      const res = await fetch("/api/orchestrator/connect", {
-        signal: AbortSignal.timeout(5000), // 5 second timeout
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+    // Initialize agents with mock data and real-time status
+    const initialAgents = DEFAULT_AGENTS.map(agent => ({
+      ...agent,
+      realTimeStatus: {
+        isOnline: true,
+        lastSeen: new Date(),
+        currentLoad: Math.random() * 30, // Initial load between 0-30%
+        errorCount: 0,
+        memoryUsage: {
+          used: Math.floor(Math.random() * 512),
+          total: 1024
         }
-      });
-
-      if (!res.ok) throw new Error(`Failed to connect to orchestrator: ${res.statusText}`);
-
-      const data = await res.json();
-      
-      setOrchestratorState({
-        status: "connected",
-        lastConnected: new Date(),
-        retryCount: 0,
-        version: data.version,
-        capabilities: data.capabilities
-      });
-
-      // Initialize agents with mock data and real-time status
-      if (agents.length === 0) {
-        const initialAgents = DEFAULT_AGENTS.map(agent => ({
-          ...agent,
-          realTimeStatus: {
-            isOnline: true,
-            lastSeen: new Date(),
-            currentLoad: Math.random() * 30, // Initial load between 0-30%
-            errorCount: 0,
-            memoryUsage: {
-              used: Math.floor(Math.random() * 512),
-              total: 1024
-            }
-          }
-        }));
-        setAgents(initialAgents);
-        setIsLoading(false);
-
-        toast({
-          title: "Connected to Orchestrator",
-          description: `Successfully connected to orchestrator v${data.version}`,
-        });
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      
-      setOrchestratorState(prev => ({
-        status: "error",
-        error: errorMessage,
-        retryCount: prev.retryCount + 1,
-        lastConnected: prev.lastConnected
-      }));
+    }));
+    setAgents(initialAgents);
+    setIsLoading(false);
 
-      toast({
-        title: "Connection Error",
-        description: `Failed to connect: ${errorMessage}. Retrying in ${Math.round(backoffDelay/1000)}s...`,
-        variant: "destructive",
-      });
-    }
-  }, [agents.length, orchestratorState.retryCount, toast]);
+    toast({
+      title: "Connected to Orchestrator",
+      description: "Successfully connected to mock orchestrator v1.0.0",
+    });
+  }, [toast]);
 
-  // Orchestrator connection effect
+  // Initialize mock orchestrator connection immediately
   useEffect(() => {
     connectToOrchestrator();
-    const interval = setInterval(connectToOrchestrator, 30000);
-    return () => clearInterval(interval);
   }, [connectToOrchestrator]);
 
   // Agent status polling effect - Moved inside component

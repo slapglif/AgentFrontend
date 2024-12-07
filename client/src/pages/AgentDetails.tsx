@@ -8,25 +8,15 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { 
-  Settings, 
-  Activity, 
-  Clock, 
-  Database,
-  ChevronLeft,
-  Users,
-  BarChart2,
-  ListTodo,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { AlertCircle, Settings, Activity, Clock, Database, ChevronLeft, Users, BarChart2, ListTodo } from "lucide-react";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Agent } from "@/lib/agents";
 
 export default function AgentDetails() {
-  const [setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { id } = useParams();
 
@@ -146,29 +136,41 @@ export default function AgentDetails() {
             </TabsTrigger>
           </TabsList>
 
-          <ErrorBoundary>
-            <TabsContent value="overview" className="flex-1 mt-4">
+          <div className="flex-1 mt-4">
+            <TabsContent value="overview">
               <div className="grid grid-cols-2 gap-4">
+                {/* Performance Metrics Card */}
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Performance Metrics</h3>
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between mb-2">
                         <span className="text-sm">Success Rate</span>
-                        <span className="text-sm font-medium">92%</span>
+                        <span className="text-sm font-medium">
+                          {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      <Progress value={92} className="animate-progress" />
+                      <Progress 
+                        value={agent.performance_metrics.success_rate * 100} 
+                        className="animate-progress" 
+                      />
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
                         <span className="text-sm">Response Time</span>
-                        <span className="text-sm font-medium">45ms</span>
+                        <span className="text-sm font-medium">
+                          {agent.performance_metrics.avg_response_time}ms
+                        </span>
                       </div>
-                      <Progress value={85} className="animate-progress" />
+                      <Progress 
+                        value={100 - (agent.performance_metrics.avg_response_time / 5000) * 100} 
+                        className="animate-progress" 
+                      />
                     </div>
                   </div>
                 </Card>
 
+                {/* Capabilities Card */}
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Capabilities</h3>
                   <div className="grid grid-cols-2 gap-2">
@@ -182,7 +184,7 @@ export default function AgentDetails() {
               </div>
             </TabsContent>
 
-            <TabsContent value="configuration" className="flex-1 mt-4">
+            <TabsContent value="configuration">
               <div className="space-y-4">
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Agent Configuration</h3>
@@ -209,180 +211,73 @@ export default function AgentDetails() {
                         </span>
                       </div>
                     </div>
-                    <div>
-                      <label className="text-sm mb-2 block">Response Time Limit (ms)</label>
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="range"
-                          min="1000"
-                          max="10000"
-                          step="100"
-                          value={agent.configuration.response_time_limit}
-                          className="flex-1"
-                          onChange={(e) => {
-                            toast({
-                              title: "Configuration Updated",
-                              description: `Response time limit set to ${e.target.value}ms`,
-                            });
-                          }}
-                        />
-                        <span className="text-sm font-mono w-16">
-                          {agent.configuration.response_time_limit}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Capabilities</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {agent.capabilities.map((capability) => (
-                      <div
-                        key={capability}
-                        className="flex items-center justify-between p-2 bg-muted rounded-lg"
-                      >
-                        <span className="text-sm">{capability}</span>
-                        <Switch
-                          checked={true}
-                          onCheckedChange={(checked) => {
-                            toast({
-                              title: checked ? "Capability Enabled" : "Capability Disabled",
-                              description: `${capability} has been ${checked ? "enabled" : "disabled"}`,
-                            });
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Memory Allocation</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary transition-all"
-                            style={{
-                              width: `${(agent.memory_allocation.used / agent.memory_allocation.total) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-sm font-mono">
-                        {agent.memory_allocation.used}/{agent.memory_allocation.total} MB
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2 bg-muted rounded-lg">
-                        <p className="text-sm text-muted-foreground">Reserved</p>
-                        <p className="text-lg font-semibold">{agent.memory_allocation.reserved} MB</p>
-                      </div>
-                      <div className="p-2 bg-muted rounded-lg">
-                        <p className="text-sm text-muted-foreground">Available</p>
-                        <p className="text-lg font-semibold">
-                          {agent.memory_allocation.total - agent.memory_allocation.used} MB
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </Card>
               </div>
             </TabsContent>
 
-            <TabsContent value="history" className="flex-1 mt-4">
-              <Card className="p-4">
-                <h3 className="font-medium mb-4">Activity History</h3>
-                {/* Activity timeline will be added here */}
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="memory" className="flex-1 mt-4">
+            <TabsContent value="memory">
               <ScrollArea className="h-full">
                 <div className="space-y-4 p-4">
-                  {memories?.map((memory: any) => (
-                    <MemoryCard key={memory.id} memory={memory} />
-                  ))}
+                  {isLoadingMemories ? (
+                    <div className="flex items-center justify-center h-32">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : memories?.length > 0 ? (
+                    memories.map((memory: any) => (
+                      <MemoryCard key={memory.id} memory={memory} />
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      No memories found
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="collaboration" className="flex-1 mt-4">
+            <TabsContent value="history">
+              <Card className="p-4">
+                <h3 className="font-medium mb-4">Activity History</h3>
+                <div className="space-y-4">
+                  {agent.current_tasks.map((task) => (
+                    <div 
+                      key={task.id}
+                      className="flex items-center justify-between p-2 bg-muted rounded-lg"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ListTodo className="h-4 w-4" />
+                        <span className="text-sm">{task.type}</span>
+                      </div>
+                      <Badge>{task.status}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="collaboration">
               <div className="grid grid-cols-2 gap-4">
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Collaboration Metrics</h3>
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm">Collaboration Success Rate</span>
-                        <span className="text-sm font-medium">88%</span>
-                      </div>
-                      <Progress value={88} className="animate-progress" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
                         <span className="text-sm">Team Contribution</span>
-                        <span className="text-sm font-medium">92%</span>
+                        <span className="text-sm font-medium">
+                          {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      <Progress value={92} className="animate-progress" />
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Active Collaborations</h3>
-                  <div className="space-y-2">
-                    {[
-                      { name: "Research Analysis", progress: 75 },
-                      { name: "Data Synthesis", progress: 45 },
-                      { name: "Documentation Review", progress: 90 }
-                    ].map((collab) => (
-                      <div key={collab.name} className="p-2 bg-muted rounded-lg">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">{collab.name}</span>
-                          <span className="text-sm font-medium">{collab.progress}%</span>
-                        </div>
-                        <Progress value={collab.progress} className="animate-progress" />
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Task History</h3>
-                  <ScrollArea className="h-[200px]">
-                    <div className="space-y-2">
-                      {[
-                        { task: "Data Analysis", status: "completed", date: "2024-12-07" },
-                        { task: "Research Review", status: "in_progress", date: "2024-12-07" },
-                        { task: "Documentation", status: "pending", date: "2024-12-06" }
-                      ].map((task) => (
-                        <div key={task.task} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <ListTodo className="h-4 w-4" />
-                            <span className="text-sm">{task.task}</span>
-                          </div>
-                          <Badge>{task.status}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Performance Chart</h3>
-                  <div className="h-[200px] flex items-center justify-center border rounded-lg">
-                    <div className="text-sm text-muted-foreground">
-                      <BarChart2 className="h-8 w-8 mb-2 mx-auto" />
-                      Performance metrics visualization will be implemented here
+                      <Progress 
+                        value={agent.performance_metrics.success_rate * 100} 
+                        className="animate-progress" 
+                      />
                     </div>
                   </div>
                 </Card>
               </div>
             </TabsContent>
-          </ErrorBoundary>
+          </div>
         </Tabs>
       </div>
     </div>
