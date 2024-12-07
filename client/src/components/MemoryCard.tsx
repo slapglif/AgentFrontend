@@ -30,7 +30,27 @@ export function MemoryCard({ memory }: MemoryCardProps) {
   };
 
   return (
-    <Card className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50">
+    <Card 
+      className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-500 hover:shadow-xl hover:scale-[1.02] hover:translate-y-[-2px] border-l-4 border-l-primary/50 group"
+      style={{
+        transformStyle: 'preserve-3d',
+        perspective: '1000px'
+      }}
+      onMouseMove={(e) => {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      }}
+    >
       <div className="flex items-start justify-between">
         <Badge className={getTypeColor(memory.type)}>{memory.type}</Badge>
         <span className="text-sm text-muted-foreground">
