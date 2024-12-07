@@ -54,10 +54,20 @@ export function CollaborationPanel() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const websocket = new WebSocket(`ws://${window.location.host}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const websocket = new WebSocket(`${protocol}//${window.location.host}`);
     
     websocket.onopen = () => {
       console.log('Connected to WebSocket');
+    };
+
+    websocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to establish real-time connection",
+        variant: "destructive",
+      });
     };
 
     websocket.onmessage = (event) => {
