@@ -35,11 +35,11 @@ export function ChatInterface() {
   });
 
   return (
-    <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1 p-4">
-        {/* Messages go here */}
+    <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/30">
+      <ScrollArea className="flex-1 p-4 space-y-4">
+        {/* Messages will be added here with bubble styling */}
       </ScrollArea>
-      <div className="p-4 border-t flex gap-2">
+      <div className="p-4 border-t border-primary/10 backdrop-blur-sm flex gap-2">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}

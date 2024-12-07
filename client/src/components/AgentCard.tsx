@@ -39,13 +39,13 @@ export function AgentCard({ agent }: AgentCardProps) {
   };
 
   return (
-    <Card className="p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+    <Card className="p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-gradient-to-br from-background to-muted/30 backdrop-blur-sm border-primary/10">
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold">{agent.name}</h3>
           <p className="text-sm text-muted-foreground">{agent.type}</p>
         </div>
-        <Badge className={getStatusColor(agent.status)}>{agent.status}</Badge>
+        <Badge className={`${getStatusColor(agent.status)} transition-all duration-300 ${agent.status === 'active' ? 'animate-pulse' : ''}`}>{agent.status}</Badge>
       </div>
       <p className="mt-2 text-sm">{agent.description}</p>
       

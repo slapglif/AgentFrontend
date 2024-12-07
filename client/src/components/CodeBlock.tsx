@@ -28,7 +28,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
 
   return (
     <div className="relative group">
-      <pre className="rounded-lg bg-muted p-4">
+      <pre className="rounded-lg bg-gradient-to-br from-muted to-muted/90 p-4 shadow-inner transition-all duration-300 group-hover:shadow-md">
         <Button
           variant="ghost"
           size="icon"

@@ -30,7 +30,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50">
       <div className="flex items-start justify-between">
         <Badge className={getTypeColor(memory.type)}>{memory.type}</Badge>
         <span className="text-sm text-muted-foreground">

@@ -23,7 +23,8 @@ export function AgentTimeline() {
               key={memory.id} 
               className="relative animate-fadeIn transition-all duration-300 hover:translate-x-1"
             >
-              <div className="absolute left-0 w-px h-full bg-border" />
+              <div className="absolute left-0 w-0.5 h-full bg-gradient-to-b from-primary/50 via-primary/30 to-transparent" />
+              <div className="absolute left-0 w-2 h-2 -translate-x-[3px] rounded-full bg-primary shadow-lg shadow-primary/50" />
               <div className="ml-6">
                 <MemoryCard memory={memory} />
               </div>
