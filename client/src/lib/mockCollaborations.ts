@@ -1,6 +1,10 @@
-import type { Collaboration, CollaborationParticipant, CollaborationMessage } from "@db/schema";
+import type { 
+  collaborations, 
+  collaborationParticipants, 
+  messages 
+} from "@db/schema";
 
-export const mockCollaborations: Partial<Collaboration>[] = [
+export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] = [
   {
     id: 1,
     title: "Research Analysis Project",

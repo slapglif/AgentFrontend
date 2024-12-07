@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Users, MessageSquare, Plus, Loader2 } from "lucide-react";
+import type { collaborations, collaborationParticipants, messages } from "@db/schema";
 import {
   Dialog,
   DialogContent,
@@ -53,9 +55,8 @@ export function CollaborationPanel() {
   const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [collaborations, setCollaborations] = useState(mockCollaborations);
-  const [participants, setParticipants] = useState(mockParticipants);
-  const [messages, setMessages] = useState(mockMessages);
+  const [participants, setParticipants] = useState<Partial<typeof collaborationParticipants.$inferSelect>[]>(mockParticipants);
+  const [messages, setMessages] = useState<Partial<typeof messages.$inferSelect>[]>(mockMessages);
   const [inviteAgentId, setInviteAgentId] = useState("");
 
   useEffect(() => {
@@ -87,12 +88,14 @@ export function CollaborationPanel() {
           break;
           
         case 'status_update':
-          setCollaborations(prev => 
-            prev.map(collab => 
-              collab.id === data.data.collaborationId 
-                ? { ...collab, status: data.data.status }
-                : collab
-            )
+          queryClient.setQueryData<typeof collaborations.$inferSelect[]>(
+            ["collaborations"],
+            (prev) =>
+              prev?.map((collab) =>
+                collab.id === data.data.collaborationId
+                  ? { ...collab, status: data.data.status }
+                  : collab
+              ) ?? []
           );
           toast({
             title: "Status Update",

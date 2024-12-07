@@ -63,3 +63,6 @@ export const selectMessageSchema = createSelectSchema(messages);
 export type Agent = z.infer<typeof selectAgentSchema>;
 export type Memory = z.infer<typeof selectMemorySchema>;
 export type Message = z.infer<typeof selectMessageSchema>;
+export type Collaboration = typeof collaborations.$inferSelect;
+export type CollaborationParticipant = typeof collaborationParticipants.$inferSelect;
+export type CollaborationMessage = typeof messages.$inferSelect;
