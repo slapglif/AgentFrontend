@@ -1,7 +1,7 @@
 import type { 
-  collaborations, 
-  collaborationParticipants, 
-  messages 
+  Collaboration,
+  CollaborationParticipant,
+  CollaborationMessage 
 } from "@db/schema";
 
 export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] = [
@@ -10,8 +10,8 @@ export const mockCollaborations: Partial<typeof collaborations.$inferSelect>[] =
     title: "Research Analysis Project",
     description: "Analyzing patterns in multi-agent systems",
     status: "active",
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000).toISOString(),
+    createdAt: new Date(Date.now() - 7200000),
+    updatedAt: new Date(Date.now() - 3600000),
     metadata: {
       priority: "high",
       tags: ["research", "analysis", "patterns"]

@@ -56,11 +56,12 @@ export function CollaborationPanel() {
   const [loading, setLoading] = useState(true);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [participants, setParticipants] = useState<Partial<typeof collaborationParticipants.$inferSelect>[]>(mockParticipants);
-  const [messages, setMessages] = useState<Partial<typeof messages.$inferSelect>[]>(mockMessages);
+  const [messages, setMessages] = useState<typeof mockMessages>([]);
   const [inviteAgentId, setInviteAgentId] = useState("");
 
   useEffect(() => {
-    const websocket = new WebSocket(`ws://${window.location.host}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const websocket = new WebSocket(`${protocol}//${window.location.host}`);
     
     websocket.onopen = () => {
       setWs(websocket);
@@ -139,7 +140,7 @@ export function CollaborationPanel() {
     }
   }, [ws, selectedCollaboration]);
 
-  const { data: collaborations } = useQuery<Collaboration[]>({
+  const { data: collaborations = [] } = useQuery<Collaboration[]>({
     queryKey: ["collaborations"],
     queryFn: async () => {
       const res = await fetch("/api/collaborations");
