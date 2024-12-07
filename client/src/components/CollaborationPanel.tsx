@@ -25,7 +25,7 @@ interface CollaborationParticipant {
   joinedAt: Date;
   metadata: {
     expertise: string[];
-  } | null;
+  } | Record<string, never>;
 }
 
 interface MessageReply {
@@ -254,7 +254,7 @@ export function CollaborationPanel() {
                             onClick={() => {
                               toast({
                                 title: `Agent ${participant.agentId}`,
-                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") || "None"}`,
+                                description: `Role: ${participant.role}\nExpertise: ${('expertise' in participant.metadata ? participant.metadata.expertise.join(", ") : "None")}`,
                               });
                             }}
                             className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"

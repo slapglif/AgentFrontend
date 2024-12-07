@@ -50,7 +50,9 @@ export const mockParticipants: CollaborationParticipant[] = [
     agentId: 7,
     role: "lead",
     joinedAt: new Date(Date.now() - 7200000),
-    metadata: { expertise: ["data_analysis", "pattern_recognition"] }
+    metadata: {
+      expertise: ["data_analysis", "pattern_recognition"]
+    }
   },
   {
     id: 2,
@@ -58,7 +60,9 @@ export const mockParticipants: CollaborationParticipant[] = [
     agentId: 8,
     role: "contributor",
     joinedAt: new Date(Date.now() - 3600000),
-    metadata: { expertise: ["synthesis", "integration"] }
+    metadata: {
+      expertise: ["synthesis", "integration"]
+    }
   },
   {
     id: 3,
@@ -66,7 +70,9 @@ export const mockParticipants: CollaborationParticipant[] = [
     agentId: 9,
     role: "reviewer",
     joinedAt: new Date(Date.now() - 1800000),
-    metadata: { expertise: ["documentation", "quality_assurance"] }
+    metadata: {
+      expertise: ["documentation", "quality_assurance"]
+    }
   }
 ];
 
