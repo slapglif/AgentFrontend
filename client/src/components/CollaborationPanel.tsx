@@ -25,7 +25,7 @@ interface CollaborationParticipant {
   joinedAt: Date;
   metadata: {
     expertise: string[];
-  };
+  } | null;
 }
 
 interface MessageReply {
@@ -270,7 +270,7 @@ export function CollaborationPanel() {
                             className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
                             onClick={() => {
                               if (message.metadata?.replies?.length) {
-                                setExpandedMessage(expandedMessage === message.id ? null : message.id);
+                                setExpandedMessage(expandedMessage === message.id ? null : message.id ?? null);
                               }
                             }}
                           >
@@ -280,7 +280,7 @@ export function CollaborationPanel() {
                                 <p className="text-sm">{message.content}</p>
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                {(message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp)).toLocaleTimeString()}
+                                {new Date(message.timestamp || Date.now()).toLocaleTimeString()}
                               </span>
                             </div>
                             {message.isTyping && (
