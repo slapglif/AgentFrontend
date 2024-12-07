@@ -17,15 +17,17 @@ import {
 } from "@/components/ui/dialog";
 import { mockCollaborations, mockParticipants, mockMessages, simulateRealTimeEvents } from "@/lib/mockCollaborations";
 
+interface ParticipantMetadata {
+  expertise: string[];
+}
+
 interface CollaborationParticipant {
   id: number;
   collaborationId: number;
   agentId: number;
   role: string;
   joinedAt: Date;
-  metadata: {
-    expertise: string[];
-  };
+  metadata: ParticipantMetadata | null;
 }
 
 interface MessageReply {

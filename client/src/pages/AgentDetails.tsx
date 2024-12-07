@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Agent } from "@/lib/agents";
 
 export default function AgentDetails() {
+  const [setLocation] = useLocation();
   const { toast } = useToast();
   const { id } = useParams();
   const { data: agent, isLoading, isError, error } = useQuery<Agent>({
