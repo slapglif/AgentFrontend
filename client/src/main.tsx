@@ -11,7 +11,7 @@ import Agents from "./pages/Agents";
 import AgentDetails from "./pages/AgentDetails";
 import Collaborations from "./pages/Collaborations";
 import Analytics from "./pages/Analytics";
-import Tasks from "./pages/Tasks";
+import Goals from "./pages/Goals";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
 
@@ -24,7 +24,7 @@ function Router() {
         <Route path="/agents/:id" component={AgentDetails} />
         <Route path="/collaborations" component={Collaborations} />
         <Route path="/analytics" component={Analytics} />
-        <Route path="/tasks" component={Tasks} />
+        <Route path="/goals" component={Goals} />
         <Route path="/history" component={History} />
         <Route path="/settings" component={Settings} />
         <Route>404 Page Not Found</Route>

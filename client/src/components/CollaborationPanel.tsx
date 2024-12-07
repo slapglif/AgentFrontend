@@ -18,7 +18,8 @@ import {
 import { mockCollaborations, mockParticipants, mockMessages, simulateRealTimeEvents } from "@/lib/mockCollaborations";
 
 interface ParticipantMetadata {
-  expertise: string[];
+  expertise?: string[];
+  [key: string]: any;
 }
 
 interface CollaborationParticipant {
