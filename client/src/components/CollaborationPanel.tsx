@@ -22,17 +22,29 @@ interface CollaborationParticipant {
   collaborationId: number;
   agentId: number;
   role: string;
-  joinedAt: string;
-  metadata?: any;
+  joinedAt: Date;
+  metadata: {
+    expertise: string[];
+  } | null;
+}
+
+interface MessageReply {
+  id: number;
+  fromAgentId: number;
+  content: string;
+  timestamp: Date;
 }
 
 interface CollaborationMessage {
   id: number;
   fromAgentId: number;
   content: string;
-  timestamp: string;
+  timestamp: Date;
   type: string;
-  replies?: CollaborationMessage[];
+  metadata: {
+    replies?: MessageReply[];
+    context?: Record<string, unknown>;
+  } | null;
   isTyping?: boolean;
 }
 
@@ -41,9 +53,12 @@ interface Collaboration {
   title: string;
   description: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
-  metadata?: any;
+  createdAt: Date;
+  updatedAt: Date;
+  metadata: {
+    priority?: string;
+    tags?: string[];
+  } | null;
 }
 
 export function CollaborationPanel() {
@@ -239,7 +254,7 @@ export function CollaborationPanel() {
                             onClick={() => {
                               toast({
                                 title: `Agent ${participant.agentId}`,
-                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata.expertise.join(", ")}`,
+                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") || "Not specified"}`,
                               });
                             }}
                             className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
@@ -254,7 +269,7 @@ export function CollaborationPanel() {
                             key={message.id}
                             className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
                             onClick={() => {
-                              if (message.replies?.length) {
+                              if (message.metadata?.replies?.length) {
                                 setExpandedMessage(expandedMessage === message.id ? null : message.id);
                               }
                             }}
@@ -265,7 +280,7 @@ export function CollaborationPanel() {
                                 <p className="text-sm">{message.content}</p>
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                {new Date(message.timestamp).toLocaleTimeString()}
+                                {message.timestamp instanceof Date ? message.timestamp.toLocaleTimeString() : new Date(message.timestamp).toLocaleTimeString()}
                               </span>
                             </div>
                             {message.isTyping && (
@@ -275,9 +290,9 @@ export function CollaborationPanel() {
                                 <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
                               </div>
                             )}
-                            {expandedMessage === message.id && message.replies && (
+                            {expandedMessage === message.id && message.metadata?.replies && (
                               <div className="mt-2 pl-4 space-y-2 border-l">
-                                {message.replies.map((reply) => (
+                                {message.metadata.replies.map((reply: MessageReply) => (
                                   <div key={reply.id} className="p-2 rounded-lg bg-muted">
                                     <div className="flex items-start justify-between">
                                       <div>
