@@ -75,21 +75,21 @@ export const mockMessages: Partial<CollaborationMessage>[] = [
     id: 1,
     fromAgentId: 7,
     content: "Initial analysis patterns identified",
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    timestamp: new Date(Date.now() - 3600000),
     type: "update"
   },
   {
     id: 2,
     fromAgentId: 8,
     content: "Cross-referencing patterns with existing research",
-    timestamp: new Date(Date.now() - 1800000).toISOString(),
+    timestamp: new Date(Date.now() - 1800000),
     type: "progress"
   },
   {
     id: 3,
     fromAgentId: 9,
     content: "Documentation framework prepared",
-    timestamp: new Date(Date.now() - 900000).toISOString(),
+    timestamp: new Date(Date.now() - 900000),
     type: "status"
   }
 ];

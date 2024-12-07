@@ -54,10 +54,9 @@ export function CollaborationPanel() {
 
   const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [participants, setParticipants] = useState<Partial<typeof collaborationParticipants.$inferSelect>[]>(mockParticipants);
-  const [messages, setMessages] = useState<typeof mockMessages>([]);
-  const [inviteAgentId, setInviteAgentId] = useState("");
+  const [participants, setParticipants] = useState(mockParticipants);
+  const [messages, setMessages] = useState(mockMessages);
+  const [collaborations, setCollaborations] = useState(mockCollaborations);
 
   useEffect(() => {
     setLoading(false);
@@ -99,23 +98,16 @@ export function CollaborationPanel() {
   }, []);
 
   useEffect(() => {
-    if (ws && selectedCollaboration) {
-      ws.send(JSON.stringify({
-        type: 'collaboration.join',
-        collaborationId: selectedCollaboration,
-        role: 'participant'
-      }));
+    if (selectedCollaboration) {
+      const selectedParticipants = mockParticipants.filter(p => p.collaborationId === selectedCollaboration);
+      setParticipants(selectedParticipants);
     }
-  }, [ws, selectedCollaboration]);
+  }, [selectedCollaboration]);
 
-  const { data: collaborations = [] } = useQuery<Collaboration[]>({
-    queryKey: ["collaborations"],
-    queryFn: async () => {
-      const res = await fetch("/api/collaborations");
-      if (!res.ok) throw new Error("Failed to load collaborations");
-      return res.json();
-    },
-  });
+  // Using mock data directly instead of fetching from API
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   const createCollaboration = useMutation({
     mutationFn: async (data: typeof newCollaboration) => {
