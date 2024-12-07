@@ -6,30 +6,75 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Filter, Plus, AlertCircle, Loader2 } from "lucide-react";
 import { DEFAULT_AGENTS } from "@/lib/agents";
+import { mockAnalytics } from "@/lib/mockAnalytics";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { OrchestratorState, AgentWithStatus } from "@/types/agent";
 
 export default function Agents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [, setLocation] = useLocation();
-  const [orchestratorStatus, setOrchestratorStatus] = useState<"connected" | "disconnected" | "connecting">("connecting");
-  const agents = DEFAULT_AGENTS;
+  const [orchestratorState, setOrchestratorState] = useState<OrchestratorState>({
+    status: "connecting",
+    retryCount: 0
+  });
+  const [agents, setAgents] = useState<AgentWithStatus[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Connect to orchestrator
+  // Initialize agents with mock data and connect to orchestrator
   useEffect(() => {
+    const initializeAgents = () => {
+      const agentsWithMetrics = DEFAULT_AGENTS.map(agent => {
+        const metrics = mockAnalytics.agentPerformance.find(
+          perf => perf.agent === agent.name
+        );
+        return {
+          ...agent,
+          performanceMetrics: metrics || undefined,
+          realTimeStatus: {
+            isOnline: agent.status === "active",
+            lastSeen: new Date(),
+            currentLoad: Math.random() * 100,
+            errorCount: 0
+          }
+        };
+      });
+      setAgents(agentsWithMetrics);
+      setIsLoading(false);
+    };
+
     const connectToOrchestrator = async () => {
       try {
-        setOrchestratorStatus("connecting");
+        setOrchestratorState(prev => ({
+          ...prev,
+          status: "connecting",
+          error: undefined
+        }));
+
         const res = await fetch("/api/orchestrator/connect");
         if (res.ok) {
-          setOrchestratorStatus("connected");
+          setOrchestratorState({
+            status: "connected",
+            lastConnected: new Date(),
+            retryCount: 0
+          });
+          // In a real implementation, we would fetch real agent data here
+          initializeAgents();
         } else {
-          setOrchestratorStatus("disconnected");
+          throw new Error("Failed to connect to orchestrator");
         }
       } catch (error) {
         console.error("Failed to connect to orchestrator:", error);
-        setOrchestratorStatus("disconnected");
+        setOrchestratorState(prev => ({
+          status: "error",
+          error: error instanceof Error ? error.message : "Unknown error",
+          retryCount: prev.retryCount + 1,
+          lastConnected: prev.lastConnected
+        }));
+        // Fall back to mock data when orchestrator is unavailable
+        initializeAgents();
       }
     };
     
@@ -53,21 +98,22 @@ export default function Agents() {
             <div 
               className={cn(
                 "w-2 h-2 rounded-full",
-                orchestratorStatus === "connected" ? "bg-green-500" : 
-                orchestratorStatus === "connecting" ? "bg-yellow-500" :
+                orchestratorState.status === "connected" ? "bg-green-500" : 
+                orchestratorState.status === "connecting" ? "bg-yellow-500" :
                 "bg-red-500"
               )} 
             />
             <span className="text-sm text-muted-foreground">
-              Orchestrator: {orchestratorStatus}
+              Orchestrator: {orchestratorState.status}
+              {orchestratorState.lastConnected && ` (Last connected: ${orchestratorState.lastConnected.toLocaleTimeString()})`}
             </span>
           </div>
         </div>
         <Button 
           className="gap-2"
-          disabled={orchestratorStatus !== "connected"}
+          disabled={orchestratorState.status !== "connected"}
           onClick={() => {
-            if (orchestratorStatus === "connected") {
+            if (orchestratorState.status === "connected") {
               fetch("/api/orchestrator/agents", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -80,6 +126,16 @@ export default function Agents() {
           New Agent
         </Button>
       </div>
+
+      {orchestratorState.status === "error" && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to connect to orchestrator: {orchestratorState.error}
+            {orchestratorState.retryCount > 0 && ` (Retry attempt: ${orchestratorState.retryCount})`}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="flex gap-2">
         <div className="relative flex-1">
@@ -98,8 +154,13 @@ export default function Agents() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAgents.map((agent) => (
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredAgents.map((agent) => (
             <Card
               key={agent.id}
               className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
@@ -135,20 +196,36 @@ export default function Agents() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="text-muted-foreground">Tasks:</div>
-                    <div>{agent.performance_metrics.tasks_completed}</div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="text-muted-foreground">Tasks:</div>
+                      <div>{agent.performance_metrics.tasks_completed}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-muted-foreground">Success Rate:</div>
+                      <div>{(agent.performance_metrics.success_rate * 100).toFixed(1)}%</div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-muted-foreground">Success Rate:</div>
-                    <div>{(agent.performance_metrics.success_rate * 100).toFixed(1)}%</div>
-                  </div>
+                  
+                  {agent.realTimeStatus && (
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="text-muted-foreground">Load:</div>
+                        <div>{agent.realTimeStatus.currentLoad.toFixed(1)}%</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-muted-foreground">Errors:</div>
+                        <div>{agent.realTimeStatus.errorCount}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
           ))}
         </div>
+        )}
       </ScrollArea>
     </div>
   );
