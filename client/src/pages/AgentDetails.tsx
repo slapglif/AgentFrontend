@@ -15,8 +15,11 @@ import {
   ChevronLeft,
   Users,
   BarChart2,
-  ListTodo
+  ListTodo,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
+import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Agent } from "@/lib/agents";

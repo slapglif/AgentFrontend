@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Search, Filter, Plus, AlertCircle, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { mockAnalytics } from "@/lib/mockAnalytics";
 import { cn } from "@/lib/utils";
@@ -22,27 +23,35 @@ export default function Agents() {
   });
   const [agents, setAgents] = useState<AgentWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Initialize agents with mock data and connect to orchestrator
   useEffect(() => {
     const initializeAgents = () => {
-      const agentsWithMetrics = DEFAULT_AGENTS.map(agent => {
-        const metrics = mockAnalytics.agentPerformance.find(
-          perf => perf.agent === agent.name
-        );
-        return {
-          ...agent,
-          performanceMetrics: metrics || undefined,
-          realTimeStatus: {
-            isOnline: agent.status === "active",
-            lastSeen: new Date(),
-            currentLoad: Math.random() * 100,
-            errorCount: 0
-          }
-        };
-      });
-      setAgents(agentsWithMetrics);
-      setIsLoading(false);
+      try {
+        const agentsWithMetrics = DEFAULT_AGENTS.map(agent => {
+          const metrics = mockAnalytics.agentPerformance.find(
+            perf => perf.agent === agent.name
+          );
+          return {
+            ...agent,
+            performanceMetrics: metrics || undefined,
+            realTimeStatus: {
+              isOnline: agent.status === "active",
+              lastSeen: new Date(),
+              currentLoad: Math.random() * 100,
+              errorCount: 0
+            }
+          };
+        });
+        setAgents(agentsWithMetrics);
+        setError(null);
+        setIsLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to initialize agents");
+        setIsLoading(false);
+      }
     };
 
     const connectToOrchestrator = async () => {
@@ -81,7 +90,25 @@ export default function Agents() {
     connectToOrchestrator();
     const interval = setInterval(connectToOrchestrator, 30000); // Reconnect every 30 seconds
     
-    return () => clearInterval(interval);
+    // Update agent status periodically
+    const statusInterval = setInterval(() => {
+      setAgents(prevAgents => 
+        prevAgents.map(agent => ({
+          ...agent,
+          realTimeStatus: {
+            ...agent.realTimeStatus!,
+            currentLoad: Math.random() * 100,
+            lastSeen: new Date(),
+            isOnline: Math.random() > 0.1 // 90% chance of being online
+          }
+        }))
+      );
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(statusInterval);
+    };
   }, []);
 
   const filteredAgents = agents.filter((agent) =>
