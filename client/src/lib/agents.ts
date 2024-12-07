@@ -19,6 +19,102 @@ export interface Agent {
 }
 
 export const DEFAULT_AGENTS: Agent[] = [
+  // Data Analysis Agent
+  {
+    id: 7,
+    name: "Data Analysis Agent",
+    type: "analytics",
+    description: "Specializes in analyzing research data and extracting meaningful patterns",
+    capabilities: [
+      "statistical_analysis",
+      "pattern_recognition",
+      "data_visualization",
+      "hypothesis_testing",
+      "anomaly_detection"
+    ],
+    status: "active",
+    level: 5,
+    experience: 85,
+    confidence: 93,
+    achievements: [
+      {
+        id: 13,
+        name: "Pattern Master",
+        description: "Discovered 50 significant patterns in research data",
+        icon: "bar-chart"
+      },
+      {
+        id: 14,
+        name: "Insight Oracle",
+        description: "Generated 100 actionable insights from complex datasets",
+        icon: "brain"
+      }
+    ]
+  },
+  // Research Synthesis Agent
+  {
+    id: 8,
+    name: "Research Synthesis Agent",
+    type: "synthesis",
+    description: "Combines and synthesizes research findings from multiple sources",
+    capabilities: [
+      "cross_reference_analysis",
+      "knowledge_integration",
+      "contradiction_resolution",
+      "gap_analysis",
+      "recommendation_generation"
+    ],
+    status: "active",
+    level: 4,
+    experience: 72,
+    confidence: 88,
+    achievements: [
+      {
+        id: 15,
+        name: "Synthesis Sage",
+        description: "Successfully integrated findings from 200 research sources",
+        icon: "git-merge"
+      },
+      {
+        id: 16,
+        name: "Knowledge Weaver",
+        description: "Created 30 comprehensive research summaries",
+        icon: "book"
+      }
+    ]
+  },
+  // Documentation Agent
+  {
+    id: 9,
+    name: "Documentation Agent",
+    type: "documentation",
+    description: "Maintains comprehensive documentation of research processes and findings",
+    capabilities: [
+      "technical_writing",
+      "process_documentation",
+      "version_control",
+      "metadata_management",
+      "documentation_automation"
+    ],
+    status: "active",
+    level: 4,
+    experience: 78,
+    confidence: 91,
+    achievements: [
+      {
+        id: 17,
+        name: "Documentation Maestro",
+        description: "Created 1000 pages of detailed technical documentation",
+        icon: "file-text"
+      },
+      {
+        id: 18,
+        name: "Process Chronicler",
+        description: "Documented 50 complex research workflows",
+        icon: "clipboard"
+      }
+    ]
+  },
   {
     id: 1,
     name: "Research Lead",

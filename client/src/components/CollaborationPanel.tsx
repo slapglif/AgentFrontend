@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+interface CollaborationParticipant {
+  id: number;
+  collaborationId: number;
+  agentId: number;
+  role: string;
+  joinedAt: string;
+  metadata?: any;
+}
+
+interface CollaborationMessage {
+  id: number;
+  fromAgentId: number;
+  content: string;
+  timestamp: string;
+  type: string;
+}
 
 interface Collaboration {
   id: number;
@@ -32,6 +49,35 @@ export function CollaborationPanel() {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    const websocket = new WebSocket(`ws://${window.location.host}`);
+    
+    websocket.onopen = () => {
+      console.log('Connected to WebSocket');
+    };
+
+    websocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case 'collaboration.message':
+          queryClient.invalidateQueries({ queryKey: ['collaboration-messages'] });
+          break;
+        case 'collaboration.joined':
+          queryClient.invalidateQueries({ queryKey: ['collaboration-participants'] });
+          break;
+      }
+    };
+
+    setWs(websocket);
+
+    return () => {
+      websocket.close();
+    };
+  }, []);
 
   const { data: collaborations } = useQuery<Collaboration[]>({
     queryKey: ["collaborations"],
@@ -137,15 +183,50 @@ export function CollaborationPanel() {
                 </div>
                 <Badge>{collab.status}</Badge>
               </div>
-              <div className="mt-4 flex items-center gap-4">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  Participants
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Messages
-                </Button>
+              <div className="mt-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <Button 
+                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setSelectedCollaboration(collab.id)}
+                  >
+                    <Users className="h-4 w-4" />
+                    Participants
+                  </Button>
+                  <Button 
+                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setSelectedCollaboration(collab.id)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Messages
+                  </Button>
+                </div>
+                {selectedCollaboration === collab.id && (
+                  <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Collaboration Timeline</h4>
+                      <Badge variant="outline">{new Date(collab.updatedAt).toLocaleDateString()}</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Active participants will appear here in real-time
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3].map((id) => (
+                          <div 
+                            key={id} 
+                            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"
+                          >
+                            👤
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
           ))}
