@@ -116,10 +116,115 @@ export default function AgentDetails() {
           </TabsContent>
 
           <TabsContent value="configuration" className="flex-1 mt-4">
-            <Card className="p-4">
-              <h3 className="font-medium mb-4">Agent Configuration</h3>
-              {/* Configuration form will be added here */}
-            </Card>
+            <div className="space-y-4">
+              <Card className="p-4">
+                <h3 className="font-medium mb-4">Agent Configuration</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm mb-2 block">Decision Threshold</label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={agent.configuration.decision_threshold}
+                        className="flex-1"
+                        onChange={(e) => {
+                          // Update agent configuration
+                          toast({
+                            title: "Configuration Updated",
+                            description: `Decision threshold set to ${e.target.value}`,
+                          });
+                        }}
+                      />
+                      <span className="text-sm font-mono w-16">
+                        {agent.configuration.decision_threshold}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm mb-2 block">Response Time Limit (ms)</label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="1000"
+                        max="10000"
+                        step="100"
+                        value={agent.configuration.response_time_limit}
+                        className="flex-1"
+                        onChange={(e) => {
+                          // Update agent configuration
+                          toast({
+                            title: "Configuration Updated",
+                            description: `Response time limit set to ${e.target.value}ms`,
+                          });
+                        }}
+                      />
+                      <span className="text-sm font-mono w-16">
+                        {agent.configuration.response_time_limit}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-4">
+                <h3 className="font-medium mb-4">Capabilities</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {agent.capabilities.map((capability) => (
+                    <div
+                      key={capability}
+                      className="flex items-center justify-between p-2 bg-muted rounded-lg"
+                    >
+                      <span className="text-sm">{capability}</span>
+                      <Switch
+                        checked={true}
+                        onCheckedChange={(checked) => {
+                          toast({
+                            title: checked ? "Capability Enabled" : "Capability Disabled",
+                            description: `${capability} has been ${checked ? "enabled" : "disabled"}`,
+                          });
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="p-4">
+                <h3 className="font-medium mb-4">Memory Allocation</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all"
+                          style={{
+                            width: `${(agent.memory_allocation.used / agent.memory_allocation.total) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-sm font-mono">
+                      {agent.memory_allocation.used}/{agent.memory_allocation.total} MB
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">Reserved</p>
+                      <p className="text-lg font-semibold">{agent.memory_allocation.reserved} MB</p>
+                    </div>
+                    <div className="p-2 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">Available</p>
+                      <p className="text-lg font-semibold">
+                        {agent.memory_allocation.total - agent.memory_allocation.used} MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="history" className="flex-1 mt-4">
