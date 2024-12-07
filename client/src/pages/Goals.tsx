@@ -63,59 +63,62 @@ export default function Goals() {
 
   return (
     <div className="p-6 space-y-6">
-      <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "timeline")}>
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Goal Management</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Goal Management</h1>
+      </div>
+
+      <Tabs defaultValue="kanban" value={view} onValueChange={(v) => setView(v as "kanban" | "timeline")}>
+        <div className="flex items-center justify-end mb-4">
           <TabsList>
             <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="kanban" className="mt-0">
-        <div className="grid grid-cols-4 gap-4">
-          {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
-            <Card key={status} className="p-4">
-              <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
-              <ScrollArea className="h-[calc(100vh-250px)]">
-                <div className="space-y-2">
-                  {statusGoals.map((goal) => (
-                    <Card key={goal.id} className="p-3">
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h4 className="font-medium">{goal.title}</h4>
-                            <p className="text-sm text-muted-foreground">{goal.description}</p>
+        <TabsContent value="kanban">
+          <div className="grid grid-cols-4 gap-4">
+            {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
+              <Card key={status} className="p-4">
+                <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
+                <ScrollArea className="h-[calc(100vh-250px)]">
+                  <div className="space-y-2">
+                    {statusGoals.map((goal) => (
+                      <Card key={goal.id} className="p-3">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium">{goal.title}</h4>
+                              <p className="text-sm text-muted-foreground">{goal.description}</p>
+                            </div>
+                            <Badge variant={
+                              goal.priority === 'high' ? 'destructive' : 
+                              goal.priority === 'medium' ? 'default' : 
+                              'secondary'
+                            }>
+                              {goal.priority}
+                            </Badge>
                           </div>
-                          <Badge variant={
-                            goal.priority === 'high' ? 'destructive' : 
-                            goal.priority === 'medium' ? 'default' : 
-                            'secondary'
-                          }>
-                            {goal.priority}
-                          </Badge>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
+                          </div>
+                          <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary transition-all duration-500"
+                              style={{ width: `${goal.progress}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all duration-500"
-                            style={{ width: `${goal.progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            </Card>
-          ))}
-        </div>
-      </TabsContent>
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-        <TabsContent value="timeline" className="mt-0">
+        <TabsContent value="timeline">
           <Card className="p-4">
             <div className="flex items-center justify-center h-[400px]">
               <div className="text-center text-muted-foreground">

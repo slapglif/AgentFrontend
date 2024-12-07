@@ -16,7 +16,7 @@ import {
   Users,
   BarChart2,
   ListTodo,
-  Loader2,
+  Loader,
   AlertCircle
 } from "lucide-react";
 import { DEFAULT_AGENTS } from "@/lib/agents";
@@ -64,7 +64,7 @@ export default function AgentDetails() {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="flex items-center gap-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
+          <Loader className="h-6 w-6 animate-spin" />
           <span>Loading agent details...</span>
         </div>
       </div>
