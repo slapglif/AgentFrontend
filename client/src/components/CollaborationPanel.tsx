@@ -25,7 +25,7 @@ interface CollaborationParticipant {
   joinedAt: Date;
   metadata: {
     expertise: string[];
-  } | null;
+  };
 }
 
 interface MessageReply {
@@ -44,7 +44,7 @@ interface CollaborationMessage {
   metadata: {
     replies?: MessageReply[];
     context?: Record<string, unknown>;
-  } | null;
+  };
   isTyping?: boolean;
 }
 
@@ -280,7 +280,7 @@ export function CollaborationPanel() {
                                 <p className="text-sm">{message.content}</p>
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                {message.timestamp instanceof Date ? message.timestamp.toLocaleTimeString() : new Date(message.timestamp).toLocaleTimeString()}
+                                {(message.timestamp instanceof Date ? message.timestamp : new Date(message.timestamp)).toLocaleTimeString()}
                               </span>
                             </div>
                             {message.isTyping && (
@@ -300,7 +300,7 @@ export function CollaborationPanel() {
                                         <p className="text-sm">{reply.content}</p>
                                       </div>
                                       <span className="text-xs text-muted-foreground">
-                                        {new Date(reply.timestamp).toLocaleTimeString()}
+                                        {(reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp)).toLocaleTimeString()}
                                       </span>
                                     </div>
                                   </div>
