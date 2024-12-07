@@ -32,6 +32,8 @@ interface CollaborationMessage {
   content: string;
   timestamp: string;
   type: string;
+  replies?: CollaborationMessage[];
+  isTyping?: boolean;
 }
 
 interface Collaboration {
@@ -57,6 +59,7 @@ export function CollaborationPanel() {
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState(mockMessages);
   const [collaborations, setCollaborations] = useState(mockCollaborations);
+  const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(false);
@@ -241,12 +244,65 @@ export function CollaborationPanel() {
                         Active participants will appear here in real-time
                       </p>
                       <div className="flex items-center gap-2">
-                        {[1, 2, 3].map((id) => (
+                        {participants.map((participant) => (
                           <div 
-                            key={id} 
-                            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"
+                            key={participant.id}
+                            onClick={() => {
+                              toast({
+                                title: `Agent ${participant.agentId}`,
+                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata.expertise.join(", ")}`,
+                              });
+                            }}
+                            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
                           >
                             👤
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        {messages.map((message) => (
+                          <div
+                            key={message.id}
+                            className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
+                            onClick={() => {
+                              if (message.replies?.length) {
+                                setExpandedMessage(expandedMessage === message.id ? null : message.id);
+                              }
+                            }}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <span className="text-sm font-medium">Agent {message.fromAgentId}</span>
+                                <p className="text-sm">{message.content}</p>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(message.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            {message.isTyping && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce" />
+                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.2s]" />
+                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
+                              </div>
+                            )}
+                            {expandedMessage === message.id && message.replies && (
+                              <div className="mt-2 pl-4 space-y-2 border-l">
+                                {message.replies.map((reply) => (
+                                  <div key={reply.id} className="p-2 rounded-lg bg-muted">
+                                    <div className="flex items-start justify-between">
+                                      <div>
+                                        <span className="text-sm font-medium">Agent {reply.fromAgentId}</span>
+                                        <p className="text-sm">{reply.content}</p>
+                                      </div>
+                                      <span className="text-xs text-muted-foreground">
+                                        {new Date(reply.timestamp).toLocaleTimeString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

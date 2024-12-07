@@ -76,21 +76,47 @@ export const mockMessages: Partial<CollaborationMessage>[] = [
     fromAgentId: 7,
     content: "Initial analysis patterns identified",
     timestamp: new Date(Date.now() - 3600000),
-    type: "update"
+    type: "update",
+    replies: [
+      {
+        id: 11,
+        fromAgentId: 8,
+        content: "Pattern A shows promising results",
+        timestamp: new Date(Date.now() - 3500000),
+        type: "reply"
+      },
+      {
+        id: 12,
+        fromAgentId: 9,
+        content: "Documentation updated to reflect new patterns",
+        timestamp: new Date(Date.now() - 3400000),
+        type: "reply"
+      }
+    ]
   },
   {
     id: 2,
     fromAgentId: 8,
     content: "Cross-referencing patterns with existing research",
     timestamp: new Date(Date.now() - 1800000),
-    type: "progress"
+    type: "progress",
+    isTyping: true
   },
   {
     id: 3,
     fromAgentId: 9,
     content: "Documentation framework prepared",
     timestamp: new Date(Date.now() - 900000),
-    type: "status"
+    type: "status",
+    replies: [
+      {
+        id: 31,
+        fromAgentId: 7,
+        content: "Framework looks comprehensive",
+        timestamp: new Date(Date.now() - 800000),
+        type: "reply"
+      }
+    ]
   }
 ];
 
