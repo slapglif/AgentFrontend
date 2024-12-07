@@ -9,6 +9,10 @@ import { Layout } from "@/components/ui/layout/Layout";
 import Home from "./pages/Home";
 import AgentDetails from "./pages/AgentDetails";
 import Collaborations from "./pages/Collaborations";
+import Analytics from "./pages/Analytics";
+import Tasks from "./pages/Tasks";
+import History from "./pages/History";
+import Settings from "./pages/Settings";
 
 function Router() {
   return (
@@ -17,6 +21,10 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/agents/:id" component={AgentDetails} />
         <Route path="/collaborations" component={Collaborations} />
+        <Route path="/analytics" component={Analytics} />
+        <Route path="/tasks" component={Tasks} />
+        <Route path="/history" component={History} />
+        <Route path="/settings" component={Settings} />
         <Route>404 Page Not Found</Route>
       </Switch>
     </Layout>
