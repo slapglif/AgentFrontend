@@ -162,6 +162,25 @@ export const DEFAULT_AGENTS: Agent[] = [
         description: "Optimized resource allocation by 40%",
         icon: "zap"
       }
+    ],
+    configuration: {
+      decision_threshold: 0.85,
+      response_time_limit: 3000,
+      coordination_strategy: "hierarchical"
+    },
+    performance_metrics: {
+      tasks_completed: 245,
+      success_rate: 0.95,
+      avg_response_time: 1500
+    },
+    memory_allocation: {
+      total: 2048,
+      used: 1536,
+      reserved: 256
+    },
+    specializations: ["workflow_optimization", "team_coordination", "resource_management"],
+    current_tasks: [
+      { id: 1, type: "coordination", status: "active", priority: "high" }
     ]
   },
   {
@@ -212,6 +231,25 @@ export const DEFAULT_AGENTS: Agent[] = [
         description: "Identified and fixed 50 critical vulnerabilities",
         icon: "lock"
       }
+    ],
+    configuration: {
+      decision_threshold: 0.95,
+      response_time_limit: 2000,
+      analysis_depth: "deep"
+    },
+    performance_metrics: {
+      tasks_completed: 320,
+      success_rate: 0.98,
+      avg_response_time: 800
+    },
+    memory_allocation: {
+      total: 4096,
+      used: 2048,
+      reserved: 512
+    },
+    specializations: ["security_audit", "threat_prevention", "vulnerability_assessment"],
+    current_tasks: [
+      { id: 3, type: "security_scan", status: "active", priority: "high" }
     ]
   },
   {
@@ -237,6 +275,25 @@ export const DEFAULT_AGENTS: Agent[] = [
         description: "Identified and resolved 200 critical bugs",
         icon: "bug"
       }
+    ],
+    configuration: {
+      decision_threshold: 0.90,
+      response_time_limit: 5000,
+      analysis_depth: "comprehensive"
+    },
+    performance_metrics: {
+      tasks_completed: 450,
+      success_rate: 0.92,
+      avg_response_time: 2000
+    },
+    memory_allocation: {
+      total: 3072,
+      used: 2048,
+      reserved: 512
+    },
+    specializations: ["automated_testing", "regression_testing", "load_testing"],
+    current_tasks: [
+      { id: 4, type: "integration_test", status: "active", priority: "medium" }
     ]
   },
   {
@@ -262,6 +319,25 @@ export const DEFAULT_AGENTS: Agent[] = [
         description: "Reduced resource usage by 40%",
         icon: "gauge"
       }
+    ],
+    configuration: {
+      decision_threshold: 0.88,
+      response_time_limit: 1000,
+      analysis_depth: "realtime"
+    },
+    performance_metrics: {
+      tasks_completed: 280,
+      success_rate: 0.94,
+      avg_response_time: 500
+    },
+    memory_allocation: {
+      total: 4096,
+      used: 3072,
+      reserved: 512
+    },
+    specializations: ["performance_optimization", "resource_management", "bottleneck_detection"],
+    current_tasks: [
+      { id: 5, type: "performance_monitoring", status: "active", priority: "high" }
     ]
   },
   {
@@ -287,6 +363,25 @@ export const DEFAULT_AGENTS: Agent[] = [
         description: "Optimized 20 API endpoints for better performance",
         icon: "activity"
       }
+    ],
+    configuration: {
+      decision_threshold: 0.85,
+      response_time_limit: 3000,
+      integration_mode: "async"
+    },
+    performance_metrics: {
+      tasks_completed: 180,
+      success_rate: 0.89,
+      avg_response_time: 1500
+    },
+    memory_allocation: {
+      total: 2048,
+      used: 1536,
+      reserved: 256
+    },
+    specializations: ["api_integration", "protocol_design", "data_transformation"],
+    current_tasks: [
+      { id: 6, type: "api_optimization", status: "pending", priority: "medium" }
     ]
   }
 ];

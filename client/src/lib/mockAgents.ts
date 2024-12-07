@@ -144,15 +144,4 @@ export interface MemoryAllocation {
   reserved: number;
 }
 
-export interface Agent {
-  id: number;
-  name: string;
-  type: string;
-  status: string;
-  capabilities: string[];
-  configuration: AgentConfiguration;
-  performance_metrics: PerformanceMetrics;
-  specializations: string[];
-  current_tasks: AgentTask[];
-  memory_allocation: MemoryAllocation;
-}
+// Using Agent interface from agents.ts
