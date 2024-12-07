@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,6 +89,46 @@ export default function Agents() {
     };
     
     connectToOrchestrator();
+  // Poll for agent status updates
+  useEffect(() => {
+    let statusInterval: NodeJS.Timeout;
+    
+    const pollAgentStatus = async () => {
+      try {
+        // In a real implementation, this would be an API call
+        // For now, we'll simulate status updates
+        setAgents(prevAgents => 
+          prevAgents.map(agent => ({
+            ...agent,
+            realTimeStatus: {
+              ...agent.realTimeStatus!,
+              currentLoad: Math.random() * 100,
+              lastSeen: new Date(),
+              isOnline: Math.random() > 0.1, // 90% chance of being online
+              errorCount: agent.realTimeStatus?.errorCount || 0 + (Math.random() > 0.95 ? 1 : 0) // 5% chance of error
+            }
+          }))
+        );
+      } catch (error) {
+        console.error('Failed to update agent status:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update agent status. Retrying...",
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (orchestratorState.status === "connected") {
+      statusInterval = setInterval(pollAgentStatus, 5000);
+      pollAgentStatus(); // Initial poll
+    }
+
+    return () => {
+      if (statusInterval) clearInterval(statusInterval);
+    };
+  }, [orchestratorState.status]);
+
     const interval = setInterval(connectToOrchestrator, 30000); // Reconnect every 30 seconds
     
     // Update agent status periodically
@@ -116,8 +157,36 @@ export default function Agents() {
     agent.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const retryConnection = useCallback(async () => {
+    try {
+      const res = await fetch("/api/orchestrator/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      
+      if (!res.ok) throw new Error("Failed to connect to orchestrator");
+      
+      setOrchestratorState({
+        status: "connected",
+        lastConnected: new Date(),
+        retryCount: 0
+      });
+      
+      return true;
+    } catch (error) {
+      setOrchestratorState(prev => ({
+        status: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+        retryCount: prev.retryCount + 1,
+        lastConnected: prev.lastConnected
+      }));
+      return false;
+    }
+  }, []);
+
   return (
-    <div className="h-full flex flex-col gap-4 p-4">
+    <ErrorBoundary>
+      <div className="h-full flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-semibold">Agent Management</h2>
@@ -289,5 +358,6 @@ export default function Agents() {
         )}
       </ScrollArea>
     </div>
+    </ErrorBoundary>
   );
 }
