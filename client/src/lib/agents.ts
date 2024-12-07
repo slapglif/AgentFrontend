@@ -16,6 +16,30 @@ export interface Agent {
   experience: number;
   achievements: Achievement[];
   confidence: number;
+  configuration: {
+    decision_threshold: number;
+    response_time_limit: number;
+    coordination_strategy?: string;
+    analysis_depth?: string;
+    integration_mode?: string;
+  };
+  performance_metrics: {
+    tasks_completed: number;
+    success_rate: number;
+    avg_response_time: number;
+  };
+  memory_allocation: {
+    total: number;
+    used: number;
+    reserved: number;
+  };
+  specializations?: string[];
+  current_tasks?: {
+    id: number;
+    type: string;
+    status: string;
+    priority: string;
+  }[];
 }
 
 export const DEFAULT_AGENTS: Agent[] = [

@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -9,6 +9,15 @@ export const agents = pgTable("agents", {
   description: text("description").notNull(),
   capabilities: jsonb("capabilities").notNull(),
   status: text("status").notNull().default("idle"),
+  level: integer("level").notNull().default(1),
+  experience: integer("experience").notNull().default(0),
+  confidence: integer("confidence").notNull().default(0),
+  achievements: jsonb("achievements").notNull().default([]),
+  configuration: jsonb("configuration").notNull(),
+  performance_metrics: jsonb("performance_metrics").notNull(),
+  memory_allocation: jsonb("memory_allocation").notNull(),
+  specializations: jsonb("specializations"),
+  current_tasks: jsonb("current_tasks"),
 });
 
 export const memories = pgTable("memories", {
@@ -32,6 +41,8 @@ export const messages = pgTable("messages", {
   collaborationId: integer("collaboration_id").references(() => collaborations.id),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   metadata: jsonb("metadata"),
+  parentId: integer("parent_id").references(() => messages.id),
+  isTyping: boolean("is_typing").notNull().default(false),
 });
 
 export const collaborations = pgTable("collaborations", {

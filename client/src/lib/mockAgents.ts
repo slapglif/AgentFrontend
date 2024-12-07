@@ -5,7 +5,11 @@ export const mockAgents: Agent[] = [
     id: 1,
     name: "Research Orchestrator",
     type: "orchestrator",
+    description: "Coordinates and manages research activities across agent teams",
     status: "active",
+    level: 5,
+    experience: 85,
+    confidence: 95,
     capabilities: ["task_delegation", "coordination", "performance_monitoring"],
     configuration: {
       decision_threshold: 0.85,
@@ -25,7 +29,15 @@ export const mockAgents: Agent[] = [
       total: 1024,
       used: 768,
       reserved: 128
-    }
+    },
+    achievements: [
+      {
+        id: 1,
+        name: "Master Coordinator",
+        description: "Successfully coordinated 100 research tasks",
+        icon: "award"
+      }
+    ]
   },
   {
     id: 2,
