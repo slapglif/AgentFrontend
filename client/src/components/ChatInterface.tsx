@@ -48,14 +48,18 @@ export function ChatInterface() {
     <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/30">
       <ScrollArea className="flex-1 p-4 space-y-4">
         <div className="flex flex-col space-y-4">
-          {messages?.map((message) => (
+          {messages?.map((message, index) => (
             <div
               key={message.id}
-              className={`flex items-start gap-3 ${
+              className={`flex items-start gap-3 animate-message ${
                 message.fromAgentId === 1 ? 'flex-row-reverse' : ''
               }`}
+              style={{
+                '--slide-x': message.fromAgentId === 1 ? '20px' : '-20px',
+                animationDelay: `${index * 0.1}s`
+              } as React.CSSProperties}
             >
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center animate-float">
                 {message.fromAgentId === 1 ? '👤' : '🤖'}
               </div>
               <div
@@ -63,9 +67,10 @@ export function ChatInterface() {
                   message.fromAgentId === 1
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted'
-                } rounded-lg p-3 transition-all duration-300 hover:shadow-lg`}
+                } rounded-lg p-3 hover-3d interactive-hover relative overflow-hidden`}
               >
-                <p className="text-sm">{message.content}</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-progress" />
+                <p className="text-sm relative">{message.content}</p>
                 <span className="text-xs opacity-50 mt-1 block">
                   {formatDistance(new Date(message.timestamp), new Date(), {
                     addSuffix: true,
@@ -75,10 +80,15 @@ export function ChatInterface() {
             </div>
           ))}
           {sendMessage.isPending && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <div className="w-2 h-2 rounded-full bg-current animate-bounce" />
-              <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:0.2s]" />
-              <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:0.4s]" />
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center animate-float">
+                🤖
+              </div>
+              <div className="bg-muted rounded-lg p-3 flex items-center gap-2 animate-message" style={{ '--slide-x': '-20px' } as React.CSSProperties}>
+                <div className="w-2 h-2 rounded-full bg-current type-indicator" />
+                <div className="w-2 h-2 rounded-full bg-current type-indicator" style={{ animationDelay: '0.2s' }} />
+                <div className="w-2 h-2 rounded-full bg-current type-indicator" style={{ animationDelay: '0.4s' }} />
+              </div>
             </div>
           )}
         </div>
