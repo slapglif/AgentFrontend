@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Layout } from "@/components/ui/layout/Layout";
 import Home from "./pages/Home";
 import AgentDetails from "./pages/AgentDetails";
+import Collaborations from "./pages/Collaborations";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/agents/:id" component={AgentDetails} />
+        <Route path="/collaborations" component={Collaborations} />
         <Route>404 Page Not Found</Route>
       </Switch>
     </Layout>

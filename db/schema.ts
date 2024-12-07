@@ -27,7 +27,29 @@ export const messages = pgTable("messages", {
   toAgentId: integer("to_agent_id").notNull().references(() => agents.id),
   content: text("content").notNull(),
   type: text("type").notNull(),
+  priority: text("priority").notNull().default("normal"),
+  status: text("status").notNull().default("pending"),
+  collaborationId: integer("collaboration_id").references(() => collaborations.id),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
+  metadata: jsonb("metadata"),
+});
+
+export const collaborations = pgTable("collaborations", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  metadata: jsonb("metadata"),
+});
+
+export const collaborationParticipants = pgTable("collaboration_participants", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  collaborationId: integer("collaboration_id").notNull().references(() => collaborations.id),
+  agentId: integer("agent_id").notNull().references(() => agents.id),
+  role: text("role").notNull(),
+  joinedAt: timestamp("joined_at").notNull().defaultNow(),
   metadata: jsonb("metadata"),
 });
 

@@ -7,7 +7,8 @@ import {
   Clock, 
   Settings,
   KanbanSquare,
-  BarChart
+  BarChart,
+  MessageSquare
 } from "lucide-react";
 
 interface LayoutProps {
@@ -20,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
   const navigationItems = [
     { href: "/", label: "Overview", icon: LayoutIcon },
     { href: "/agents", label: "Agents", icon: Users },
+    { href: "/collaborations", label: "Collaborations", icon: MessageSquare },
     { href: "/tasks", label: "Tasks", icon: KanbanSquare },
     { href: "/analytics", label: "Analytics", icon: BarChart },
     { href: "/history", label: "History", icon: Clock },
