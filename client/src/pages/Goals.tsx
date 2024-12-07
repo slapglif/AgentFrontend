@@ -67,13 +67,11 @@ export default function Goals() {
         <h1 className="text-2xl font-semibold">Goal Management</h1>
       </div>
 
-      <Tabs defaultValue="kanban" value={view} onValueChange={(v) => setView(v as "kanban" | "timeline")}>
-        <div className="flex items-center justify-end mb-4">
-          <TabsList>
-            <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs defaultValue="kanban" className="w-full">
+        <TabsList className="justify-end mb-4">
+          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+        </TabsList>
 
         <TabsContent value="kanban">
           <div className="grid grid-cols-4 gap-4">

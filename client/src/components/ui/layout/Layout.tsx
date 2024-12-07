@@ -23,6 +23,7 @@ export function Layout({ children }: LayoutProps) {
   const navigationItems = [
     { href: "/", label: "Overview", icon: LayoutIcon },
     { href: "/agents", label: "Agents", icon: Users },
+    { href: "/collaborations", label: "Collaborations", icon: MessageSquare },
     { href: "/goals", label: "Goals", icon: KanbanSquare },
     { href: "/analytics", label: "Analytics", icon: BarChart },
     { href: "/history", label: "History", icon: Clock },

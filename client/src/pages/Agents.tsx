@@ -59,7 +59,7 @@ export default function Agents() {
       title: "Connected to Orchestrator",
       description: "Successfully connected to mock orchestrator v1.0.0",
     });
-  }, [toast]);
+  }, [toast, setAgents, setOrchestratorState, setIsLoading]);
 
   // Initialize mock orchestrator connection immediately
   useEffect(() => {

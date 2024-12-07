@@ -24,20 +24,17 @@ export default function AgentDetails() {
     queryKey: ["agent", id],
     queryFn: async () => {
       try {
+        // First try to get from mock data
+        const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
+        if (mockAgent) return mockAgent;
+
+        // If no mock data, then try API
         const res = await fetch(`/api/agents/${id}`);
-        if (res.status === 404) {
-          // If agent not found, try to get from mock data
-          const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
-          if (mockAgent) return mockAgent;
-          throw new Error("Agent not found");
-        }
         if (!res.ok) throw new Error("Failed to load agent");
         return res.json();
       } catch (err) {
-        // If API fails, try to get from mock data
-        const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
-        if (mockAgent) return mockAgent;
-        throw err;
+        console.error('Error loading agent:', err);
+        throw new Error("Failed to load agent details");
       }
     },
   });
