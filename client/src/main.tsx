@@ -7,6 +7,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { Layout } from "@/components/ui/layout/Layout";
 import Home from "./pages/Home";
+import Agents from "./pages/Agents";
 import AgentDetails from "./pages/AgentDetails";
 import Collaborations from "./pages/Collaborations";
 import Analytics from "./pages/Analytics";
@@ -19,6 +20,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/agents" component={Agents} />
         <Route path="/agents/:id" component={AgentDetails} />
         <Route path="/collaborations" component={Collaborations} />
         <Route path="/analytics" component={Analytics} />

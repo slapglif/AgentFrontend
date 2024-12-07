@@ -6,28 +6,91 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistance } from "date-fns";
 import type { Message } from "@db/schema";
+import { useEffect } from "react";
+
+interface OrchestratorMessage extends Message {
+  metadata: {
+    replies?: Array<{
+      id: number;
+      content: string;
+      fromAgentId: number;
+      timestamp: Date;
+    }>;
+    context?: Record<string, unknown>;
+  };
+}
 
 export function ChatInterface() {
   const [input, setInput] = useState("");
-  const { data: messages } = useQuery<Message[]>({
+  const [isConnected, setIsConnected] = useState(false);
+  
+  const { data: messages, refetch } = useQuery<OrchestratorMessage[]>({
     queryKey: ["messages"],
     queryFn: async () => {
       const res = await fetch("/api/messages");
       if (!res.ok) throw new Error("Failed to load messages");
       return res.json();
     },
+    refetchInterval: 2000, // Poll every 2 seconds for new messages
   });
+
+  // Connect to orchestrator
+  useEffect(() => {
+    const connectToOrchestrator = async () => {
+      try {
+        const res = await fetch("/api/orchestrator/connect");
+        if (res.ok) {
+          setIsConnected(true);
+        }
+      } catch (error) {
+        console.error("Failed to connect to orchestrator:", error);
+        setIsConnected(false);
+      }
+    };
+    
+    connectToOrchestrator();
+    return () => setIsConnected(false);
+  }, []);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const sendMessage = useMutation({
     mutationFn: async (message: string) => {
+      // First, notify orchestrator about incoming message
+      await fetch("/api/orchestrator/typing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isTyping: true }),
+      });
+
+      // Send the actual message
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: message }),
+        body: JSON.stringify({
+          content: message,
+          type: "user_message",
+          priority: "normal",
+          metadata: {
+            context: {
+              timestamp: new Date().toISOString(),
+              clientInfo: {
+                type: "web",
+                isConnected
+              }
+            }
+          }
+        }),
       });
+
+      // Clear typing indicator
+      await fetch("/api/orchestrator/typing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isTyping: false }),
+      });
+
       if (!res.ok) throw new Error("Failed to send message");
       return res.json();
     },

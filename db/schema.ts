@@ -30,7 +30,8 @@ export const memories = pgTable("memories", {
   metadata: jsonb("metadata"),
 });
 
-export const messages = pgTable("messages", {
+// Message type definition
+const messageSchema = {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   fromAgentId: integer("from_agent_id").notNull().references(() => agents.id),
   toAgentId: integer("to_agent_id").notNull().references(() => agents.id),
@@ -40,10 +41,20 @@ export const messages = pgTable("messages", {
   status: text("status").notNull().default("pending"),
   collaborationId: integer("collaboration_id").references(() => collaborations.id),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
-  metadata: jsonb("metadata"),
-  parentId: integer("parent_id").references(() => messages.id),
+  metadata: jsonb("metadata").$type<{
+    replies?: Array<{
+      id: number;
+      content: string;
+      fromAgentId: number;
+      timestamp: Date;
+    }>;
+    context?: Record<string, unknown>;
+  }>(),
+  parentId: integer("parent_id"),
   isTyping: boolean("is_typing").notNull().default(false),
-});
+};
+
+export const messages = pgTable("messages", messageSchema);
 
 export const collaborations = pgTable("collaborations", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
