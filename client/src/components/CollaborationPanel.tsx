@@ -62,55 +62,31 @@ export function CollaborationPanel() {
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.host}`);
-    
-    ws.onopen = () => {
-      setLoading(false);
-      // Register the agent
-      ws.send(JSON.stringify({ type: "register", agentId: 1 })); // Using a default agent ID for now
-    };
-    
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      switch (data.type) {
-        case 'collaboration.joined':
-          setParticipants(prev => [...prev, data.data]);
+    setLoading(false);
+    // Simulate real-time events
+    return simulateRealTimeEvents((event) => {
+      switch (event.type) {
+        case 'participant_joined':
+          setParticipants(prev => [...prev, event.data.participant]);
           toast({
             title: "New Participant",
-            description: `Agent ${data.data.agentId} joined as ${data.data.role}`
+            description: `Agent ${event.data.participant.agentId} joined as ${event.data.participant.role}`
           });
           break;
-          
-        case 'collaboration.message':
-          setMessages(prev => [...prev, data.data]);
-          toast({
-            title: "New Message",
-            description: `From Agent ${data.data.fromAgentId}`
-          });
+        case 'new_message':
+          setMessages(prev => [...prev, event.data.message]);
           break;
-          
-        case 'collaboration.typing':
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.fromAgentId === data.data.agentId
-                ? { ...msg, isTyping: data.data.isTyping }
-                : msg
-            )
-          );
-          break;
-          
-        case 'collaboration.presence':
-          setParticipants(prev =>
-            prev.map(participant =>
-              participant.agentId === data.data.agentId
-                ? { ...participant, status: data.data.status }
-                : participant
+        case 'status_update':
+          setCollaborations(prev => 
+            prev.map(collab => 
+              collab.id === event.data.collaborationId
+                ? { ...collab, status: event.data.status }
+                : collab
             )
           );
           break;
       }
-    };
+    });
   }, []);
 
   useEffect(() => {
