@@ -19,7 +19,10 @@ export function AgentTimeline() {
       <ScrollArea className="h-[calc(100%-2rem)]">
         <div className="space-y-4 p-4">
           {memories?.map((memory: any) => (
-            <div key={memory.id} className="relative">
+            <div 
+              key={memory.id} 
+              className="relative animate-fadeIn transition-all duration-300 hover:translate-x-1"
+            >
               <div className="absolute left-0 w-px h-full bg-border" />
               <div className="ml-6">
                 <MemoryCard memory={memory} />

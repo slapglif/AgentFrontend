@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { formatDistance } from "date-fns";
+import { CodeBlock } from "./CodeBlock";
 
 interface MemoryCardProps {
   memory: {

@@ -7,6 +7,11 @@ export function registerRoutes(app: Express) {
   app.get("/api/agents", async (req, res) => {
     try {
       const result = await db.select().from(agents);
+      // If no agents in database, return mock data
+      if (result.length === 0) {
+        const { DEFAULT_AGENTS } = await import("../client/src/lib/agents");
+        return res.json(DEFAULT_AGENTS);
+      }
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch agents" });
@@ -16,6 +21,11 @@ export function registerRoutes(app: Express) {
   app.get("/api/memories", async (req, res) => {
     try {
       const result = await db.select().from(memories).orderBy(memories.timestamp);
+      // If no memories in database, return mock data
+      if (result.length === 0) {
+        const { DEFAULT_MEMORIES } = await import("../client/src/lib/mockMemories");
+        return res.json(DEFAULT_MEMORIES);
+      }
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch memories" });
