@@ -11,24 +11,28 @@ interface WebSocketClient extends WebSocket {
 export function setupWebSocket(server: Server) {
   const wss = new WebSocket.Server({ server });
 
-  const broadcastToCollaboration = (collaborationId: number, message: any) => {
+  const broadcastToCollaboration = async (collaborationId: number, message: any, excludeAgent?: number) => {
+    const participants = await db.select()
+      .from(collaborationParticipants)
+      .where(eq(collaborationParticipants.collaborationId, collaborationId));
+
+    const participantIds = participants.map(p => p.agentId);
+    
     wss.clients.forEach((client: WebSocketClient) => {
-      if (client.readyState === WebSocket.OPEN && client.agentId) {
-        db.select()
-          .from(collaborationParticipants)
-          .where(
-            and(
-              eq(collaborationParticipants.collaborationId, collaborationId),
-              eq(collaborationParticipants.agentId, client.agentId)
-            )
-          )
-          .then((participants) => {
-            if (participants.length > 0) {
-              client.send(JSON.stringify(message));
-            }
-          });
+      if (
+        client.readyState === WebSocket.OPEN && 
+        client.agentId && 
+        participantIds.includes(client.agentId) &&
+        (!excludeAgent || client.agentId !== excludeAgent)
+      ) {
+        client.send(JSON.stringify(message));
       }
     });
+    
+    // Update last activity timestamp
+    await db.update(collaborations)
+      .set({ updatedAt: new Date() })
+      .where(eq(collaborations.id, collaborationId));
   };
 
   wss.on("connection", (ws: WebSocketClient) => {
@@ -62,10 +66,26 @@ export function setupWebSocket(server: Server) {
               status: "sent",
               collaborationId: data.collaborationId,
               metadata: data.metadata,
+              parentId: data.parentId || null,
             });
+            
             broadcastToCollaboration(data.collaborationId, {
               type: "collaboration.message",
               data: messageResult,
+            });
+            break;
+            
+          case "collaboration.typing":
+            broadcastToCollaboration(data.collaborationId, {
+              type: "collaboration.typing",
+              data: { agentId: ws.agentId, isTyping: data.isTyping }
+            }, ws.agentId);
+            break;
+            
+          case "collaboration.presence":
+            broadcastToCollaboration(data.collaborationId, {
+              type: "collaboration.presence",
+              data: { agentId: ws.agentId, status: data.status }
             });
             break;
 

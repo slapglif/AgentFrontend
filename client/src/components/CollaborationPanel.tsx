@@ -62,42 +62,55 @@ export function CollaborationPanel() {
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
 
   useEffect(() => {
-    setLoading(false);
-    return simulateRealTimeEvents((event) => {
-      switch (event.type) {
-        case 'participant_joined':
-          setParticipants(prev => [...prev, event.data.participant]);
+    const ws = new WebSocket(`ws://${window.location.host}`);
+    
+    ws.onopen = () => {
+      setLoading(false);
+      // Register the agent
+      ws.send(JSON.stringify({ type: "register", agentId: 1 })); // Using a default agent ID for now
+    };
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      switch (data.type) {
+        case 'collaboration.joined':
+          setParticipants(prev => [...prev, data.data]);
           toast({
             title: "New Participant",
-            description: `Agent ${event.data.participant.agentId} joined as ${event.data.participant.role}`,
+            description: `Agent ${data.data.agentId} joined as ${data.data.role}`
           });
           break;
           
-        case 'new_message':
-          setMessages(prev => [...prev, event.data.message]);
+        case 'collaboration.message':
+          setMessages(prev => [...prev, data.data]);
           toast({
             title: "New Message",
-            description: `From Agent ${event.data.message.fromAgentId}`,
+            description: `From Agent ${data.data.fromAgentId}`
           });
           break;
           
-        case 'status_update':
-          queryClient.setQueryData<Collaboration[]>(
-            ["collaborations"],
-            (prev) =>
-              prev?.map((collab) =>
-                collab.id === event.data.collaborationId
-                  ? { ...collab, status: event.data.status }
-                  : collab
-              ) ?? []
+        case 'collaboration.typing':
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.fromAgentId === data.data.agentId
+                ? { ...msg, isTyping: data.data.isTyping }
+                : msg
+            )
           );
-          toast({
-            title: "Status Update",
-            description: `Collaboration ${event.data.collaborationId} status: ${event.data.status}`,
-          });
+          break;
+          
+        case 'collaboration.presence':
+          setParticipants(prev =>
+            prev.map(participant =>
+              participant.agentId === data.data.agentId
+                ? { ...participant, status: data.data.status }
+                : participant
+            )
+          );
           break;
       }
-    });
+    };
   }, []);
 
   useEffect(() => {

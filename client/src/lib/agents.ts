@@ -14,8 +14,8 @@ export interface Agent {
   status: "idle" | "active" | "error";
   level: number;
   experience: number;
-  achievements: Achievement[];
   confidence: number;
+  achievements: Achievement[];
   configuration: {
     decision_threshold: number;
     response_time_limit: number;
@@ -33,8 +33,8 @@ export interface Agent {
     used: number;
     reserved: number;
   };
-  specializations?: string[];
-  current_tasks?: {
+  specializations: string[];
+  current_tasks: {
     id: number;
     type: string;
     status: string;

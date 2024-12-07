@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Agent } from "@/lib/agents";
 
 export default function AgentDetails() {
+  const { toast } = useToast();
   const { id } = useParams();
   const { data: agent } = useQuery<Agent>({
     queryKey: ["agent", id],

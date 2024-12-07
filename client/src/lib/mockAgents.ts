@@ -43,7 +43,11 @@ export const mockAgents: Agent[] = [
     id: 2,
     name: "Data Analysis Agent",
     type: "analyzer",
+    description: "Specializes in complex data analysis and pattern recognition",
     status: "active",
+    level: 4,
+    experience: 72,
+    confidence: 92,
     capabilities: ["pattern_recognition", "data_processing", "statistical_analysis"],
     configuration: {
       decision_threshold: 0.92,
@@ -63,13 +67,25 @@ export const mockAgents: Agent[] = [
       total: 2048,
       used: 1536,
       reserved: 256
-    }
+    },
+    achievements: [
+      {
+        id: 3,
+        name: "Data Wizard",
+        description: "Processed over 1 million data points",
+        icon: "database"
+      }
+    ]
   },
   {
     id: 3,
     name: "Integration Specialist",
     type: "integrator",
+    description: "Expert in system integration and compatibility analysis",
     status: "active",
+    level: 4,
+    experience: 68,
+    confidence: 88,
     capabilities: ["system_integration", "protocol_management", "compatibility_analysis"],
     configuration: {
       decision_threshold: 0.88,
@@ -89,7 +105,15 @@ export const mockAgents: Agent[] = [
       total: 1536,
       used: 1024,
       reserved: 192
-    }
+    },
+    achievements: [
+      {
+        id: 4,
+        name: "Integration Master",
+        description: "Successfully integrated 50 different systems",
+        icon: "git-merge"
+      }
+    ]
   }
 ];
 
