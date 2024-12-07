@@ -24,7 +24,7 @@ export const DEFAULT_AGENTS: Agent[] = [
     name: "Research Lead",
     type: "coordinator",
     description: "Coordinates research activities and delegates tasks",
-    capabilities: ["task_delegation", "synthesis", "evaluation"],
+    capabilities: ["task_delegation", "synthesis", "evaluation", "resource_optimization"],
     status: "active",
     level: 5,
     experience: 75,
@@ -35,63 +35,137 @@ export const DEFAULT_AGENTS: Agent[] = [
         name: "Master Coordinator",
         description: "Successfully coordinated 100 research tasks",
         icon: "trophy"
+      },
+      {
+        id: 2,
+        name: "Efficiency Expert",
+        description: "Optimized resource allocation by 40%",
+        icon: "zap"
       }
     ]
   },
   {
     id: 2,
-    name: "Bioinformatics Agent",
-    type: "specialist",
-    description: "Analyzes biological data and literature",
-    capabilities: ["data_analysis", "literature_review"],
+    name: "DevOps Agent",
+    type: "infrastructure",
+    description: "Manages deployment pipelines and infrastructure",
+    capabilities: ["ci_cd", "infrastructure_as_code", "monitoring", "kubernetes_orchestration"],
     status: "active",
     level: 4,
-    experience: 60,
-    confidence: 85,
+    experience: 80,
+    confidence: 92,
     achievements: [
       {
-        id: 2,
-        name: "Data Maestro",
-        description: "Analyzed over 1000 datasets",
-        icon: "database"
+        id: 3,
+        name: "Pipeline Pioneer",
+        description: "Automated 50 deployment pipelines",
+        icon: "git-branch"
+      },
+      {
+        id: 4,
+        name: "Cloud Champion",
+        description: "Achieved 99.9% uptime across services",
+        icon: "cloud"
       }
     ]
   },
   {
     id: 3,
-    name: "Chemoinformatics Agent",
-    type: "specialist",
-    description: "Handles chemical information and analysis",
-    capabilities: ["structure_analysis", "property_prediction"],
-    status: "idle",
-    level: 3,
-    experience: 45,
-    confidence: 80,
+    name: "Security Agent",
+    type: "security",
+    description: "Ensures system security and performs vulnerability assessments",
+    capabilities: ["threat_detection", "vulnerability_scanning", "penetration_testing", "audit_logging"],
+    status: "active",
+    level: 5,
+    experience: 85,
+    confidence: 94,
     achievements: [
       {
-        id: 3,
-        name: "Structure Savant",
-        description: "Predicted properties of 500 compounds",
-        icon: "atom"
+        id: 5,
+        name: "Breach Blocker",
+        description: "Prevented 100 security threats",
+        icon: "shield"
+      },
+      {
+        id: 6,
+        name: "Code Guardian",
+        description: "Identified and fixed 50 critical vulnerabilities",
+        icon: "lock"
       }
     ]
   },
   {
     id: 4,
-    name: "Neuroprotection Agent",
-    type: "specialist",
-    description: "Specializes in neuroprotective strategies",
-    capabilities: ["pathway_analysis", "drug_targeting"],
+    name: "Testing Agent",
+    type: "quality",
+    description: "Performs automated testing and quality assurance",
+    capabilities: ["unit_testing", "integration_testing", "performance_testing", "test_automation"],
     status: "active",
     level: 4,
-    experience: 65,
+    experience: 70,
+    confidence: 88,
+    achievements: [
+      {
+        id: 7,
+        name: "Test Master",
+        description: "Created 1000+ automated test cases",
+        icon: "check-circle"
+      },
+      {
+        id: 8,
+        name: "Bug Hunter",
+        description: "Identified and resolved 200 critical bugs",
+        icon: "bug"
+      }
+    ]
+  },
+  {
+    id: 5,
+    name: "Performance Agent",
+    type: "optimization",
+    description: "Monitors and optimizes system performance",
+    capabilities: ["performance_profiling", "resource_monitoring", "optimization", "bottleneck_analysis"],
+    status: "active",
+    level: 4,
+    experience: 75,
     confidence: 90,
     achievements: [
       {
-        id: 4,
-        name: "Neural Guardian",
-        description: "Identified 50 neuroprotective compounds",
-        icon: "brain"
+        id: 9,
+        name: "Speed Demon",
+        description: "Improved system performance by 60%",
+        icon: "zap-fast"
+      },
+      {
+        id: 10,
+        name: "Resource Ranger",
+        description: "Reduced resource usage by 40%",
+        icon: "gauge"
+      }
+    ]
+  },
+  {
+    id: 6,
+    name: "API Integration Agent",
+    type: "integration",
+    description: "Manages API integrations and data flow",
+    capabilities: ["api_development", "data_transformation", "service_integration", "protocol_optimization"],
+    status: "idle",
+    level: 3,
+    experience: 65,
+    confidence: 85,
+    achievements: [
+      {
+        id: 11,
+        name: "Integration Master",
+        description: "Successfully integrated 30 external services",
+        icon: "plug"
+      },
+      {
+        id: 12,
+        name: "Protocol Pioneer",
+        description: "Optimized 20 API endpoints for better performance",
+        icon: "activity"
       }
     ]
   }
