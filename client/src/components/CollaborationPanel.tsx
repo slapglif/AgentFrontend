@@ -25,7 +25,7 @@ interface CollaborationParticipant {
   joinedAt: Date;
   metadata: {
     expertise: string[];
-  } | Record<string, never>;
+  };
 }
 
 interface MessageReply {
@@ -71,13 +71,36 @@ export function CollaborationPanel() {
 
   const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState(mockMessages);
   const [collaborations, setCollaborations] = useState(mockCollaborations);
+  const [agentStatus, setAgentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>({})
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
 
   useEffect(() => {
-    setLoading(false);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        // Initialize agent status
+        const initialAgentStatus: Record<number, { isOnline: boolean; lastSeen: Date }> = {};
+        mockParticipants.forEach(participant => {
+          initialAgentStatus[participant.agentId] = {
+            isOnline: true,
+            lastSeen: new Date()
+          };
+        });
+        setAgentStatus(initialAgentStatus);
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setLoading(false);
+      }
+    };
+
+    loadData();
+    
     // Simulate real-time events
     return simulateRealTimeEvents((event) => {
       switch (event.type) {
@@ -196,9 +219,16 @@ export function CollaborationPanel() {
       </div>
 
       <ScrollArea className="flex-1">
-        {loading ? (
+        {error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
+              {error}
+            </div>
+          </div>
+        ) : loading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">Loading collaborations...</span>
           </div>
         ) : (
         <div className="space-y-4">
@@ -254,7 +284,7 @@ export function CollaborationPanel() {
                             onClick={() => {
                               toast({
                                 title: `Agent ${participant.agentId}`,
-                                description: `Role: ${participant.role}\nExpertise: ${('expertise' in participant.metadata ? participant.metadata.expertise.join(", ") : "None")}`,
+                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") ?? "None"}`,
                               });
                             }}
                             className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
