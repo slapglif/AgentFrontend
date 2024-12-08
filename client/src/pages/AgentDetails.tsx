@@ -21,7 +21,8 @@ import {
   BarChart2,
   ListTodo,
   Monitor,
-  HardDrive
+  HardDrive,
+  Cpu
 } from "lucide-react";
 import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";

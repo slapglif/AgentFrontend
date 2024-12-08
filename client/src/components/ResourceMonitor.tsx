@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Activity, Cpu, Database, HardDrive, AlertCircle } from "lucide-react";
+import { Activity, Cpu, Database, HardDrive, AlertCircle, Clock, List } from "lucide-react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { Agent } from "@/lib/agents";
 
@@ -23,6 +23,9 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
       : 0,
     storage: Math.random() * 100,
     tasks: agent.current_tasks.length,
+    taskQueue: agent.current_tasks.filter(task => task.status === 'active').length,
+    memoryTrend: Array(10).fill(0).map(() => Math.random() * 100),
+    cpuTrend: Array(10).fill(0).map(() => Math.random() * 100)
   });
 
   useEffect(() => {
@@ -40,14 +43,22 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
 
       // Set up interval for real-time updates
       intervalRef.current = setInterval(() => {
-        setResourceMetrics(prev => ({
-          cpu: Math.min(100, Math.max(0, prev.cpu + (Math.random() - 0.5) * 20)),
-          memory: Math.min(100, Math.max(0, agent.memory_allocation.total > 0 
+        setResourceMetrics(prev => {
+          const newCpuValue = Math.min(100, Math.max(0, prev.cpu + (Math.random() - 0.5) * 20));
+          const newMemoryValue = Math.min(100, Math.max(0, agent.memory_allocation.total > 0 
             ? (agent.memory_allocation.used / agent.memory_allocation.total) * 100 + (Math.random() - 0.5) * 5
-            : 0)),
-          storage: Math.min(100, Math.max(0, prev.storage + (Math.random() - 0.5) * 10)),
-          tasks: agent.current_tasks.length,
-        }));
+            : 0));
+          
+          return {
+            cpu: newCpuValue,
+            memory: newMemoryValue,
+            storage: Math.min(100, Math.max(0, prev.storage + (Math.random() - 0.5) * 10)),
+            tasks: agent.current_tasks.length,
+            taskQueue: agent.current_tasks.filter(task => task.status === 'active').length,
+            memoryTrend: [...prev.memoryTrend.slice(1), newMemoryValue],
+            cpuTrend: [...prev.cpuTrend.slice(1), newCpuValue]
+          };
+        });
       }, 2000);
 
       setIsLoading(false);
@@ -154,12 +165,51 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
             {/* Resource Details */}
             <div className="grid grid-cols-2 gap-2">
               <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Active Tasks</div>
-                <div className="text-lg font-semibold">{resourceMetrics.tasks}</div>
+                <div className="flex items-center gap-2">
+                  <List className="h-4 w-4" />
+                  <div className="text-sm text-muted-foreground">Task Queue</div>
+                </div>
+                <div className="text-lg font-semibold">{resourceMetrics.taskQueue}</div>
+                <div className="text-xs text-muted-foreground">Total Tasks: {resourceMetrics.tasks}</div>
               </div>
               <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Reserved Memory</div>
-                <div className="text-lg font-semibold">{agent.memory_allocation.reserved}MB</div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <div className="text-sm text-muted-foreground">Processing Time</div>
+                </div>
+                <div className="text-lg font-semibold">{agent.performance_metrics.avg_response_time}ms</div>
+                <div className="text-xs text-muted-foreground">Reserved: {agent.memory_allocation.reserved}MB</div>
+              </div>
+            </div>
+
+            {/* Performance Trends */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Resource Trends</div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-2">Memory Trend</div>
+                  <div className="flex items-end gap-1 h-12">
+                    {resourceMetrics.memoryTrend.map((value, index) => (
+                      <div
+                        key={index}
+                        className="flex-1 bg-primary transition-all duration-300"
+                        style={{ height: `${value}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="p-3 bg-muted rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-2">CPU Trend</div>
+                  <div className="flex items-end gap-1 h-12">
+                    {resourceMetrics.cpuTrend.map((value, index) => (
+                      <div
+                        key={index}
+                        className="flex-1 bg-primary transition-all duration-300"
+                        style={{ height: `${value}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

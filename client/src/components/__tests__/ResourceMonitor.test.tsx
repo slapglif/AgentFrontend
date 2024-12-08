@@ -1,6 +1,7 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { ResourceMonitor } from '../ResourceMonitor';
 import { mockAgents } from '@/lib/mockAgents';
+import { mockAnalytics } from '@/lib/mockAnalytics';
 
 describe('ResourceMonitor', () => {
   const mockAgent = mockAgents[0];
@@ -34,24 +35,59 @@ describe('ResourceMonitor', () => {
       }
     };
     render(<ResourceMonitor agent={invalidAgent} />);
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Failed to initialize/)).toBeInTheDocument();
+  });
+
+  it('tracks real-time memory allocation changes', async () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    await waitFor(() => {
+      const memoryUsage = screen.getByText(/Memory Usage/);
+      expect(memoryUsage).toBeInTheDocument();
+      const memoryValue = screen.getByText(/\d+\.\d+%/);
+      expect(memoryValue).toBeInTheDocument();
+    });
+  });
+
+  it('simulates CPU usage correctly', async () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    await waitFor(() => {
+      const cpuUsage = screen.getByText(/CPU Usage/);
+      expect(cpuUsage).toBeInTheDocument();
+      const cpuValue = screen.getByText(/\d+\.\d+%/);
+      expect(cpuValue).toBeInTheDocument();
+    });
+  });
+
+  it('monitors task queue status', async () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    await waitFor(() => {
+      const activeTasks = screen.getByText('Active Tasks');
+      expect(activeTasks).toBeInTheDocument();
+      expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
+    });
   });
 
   it('displays resource metrics correctly', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
-    // Wait for initial loading state to clear
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
-    // Check for resource metric headings
+    // Core resource metrics
     expect(screen.getByText('CPU Usage')).toBeInTheDocument();
     expect(screen.getByText('Memory Usage')).toBeInTheDocument();
     expect(screen.getByText('Storage Usage')).toBeInTheDocument();
+    
+    // Resource details
+    expect(screen.getByText('Active Tasks')).toBeInTheDocument();
+    expect(screen.getByText('Reserved Memory')).toBeInTheDocument();
   });
 
-  it('displays memory allocation correctly', () => {
+  it('displays memory allocation details correctly', () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
     const memoryText = `${mockAgent.memory_allocation.used}MB / ${mockAgent.memory_allocation.total}MB`;
@@ -64,18 +100,53 @@ describe('ResourceMonitor', () => {
   it('updates metrics periodically', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
-    // Initial render
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
-    // Advance timers to trigger update
     act(() => {
       jest.advanceTimersByTime(2000);
     });
 
-    // Verify metrics are displayed (specific values will be random)
+    // Verify metrics are updated
     expect(screen.getByText(/\d+\.\d+%/)).toBeInTheDocument();
+  });
+
+  it('displays agent performance metrics', () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    expect(screen.getByText('Active Tasks')).toBeInTheDocument();
+    expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
+  });
+
+  it('handles agent research metrics display', () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    const tasksCompleted = mockAgent.performance_metrics.tasks_completed;
+    const successRate = (mockAgent.performance_metrics.success_rate * 100).toFixed(1);
+    
+    expect(screen.getByText(tasksCompleted.toString())).toBeInTheDocument();
+    expect(screen.getByText(`${successRate}%`)).toBeInTheDocument();
+  });
+
+  it('displays correct utilization colors based on thresholds', async () => {
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    const metrics = screen.getAllByText(/\d+\.\d+%/);
+    metrics.forEach(metric => {
+      const value = parseFloat(metric.textContent!);
+      if (value > 80) {
+        expect(metric.closest('div')?.className).toContain('text-red-500');
+      } else if (value > 60) {
+        expect(metric.closest('div')?.className).toContain('text-yellow-500');
+      } else {
+        expect(metric.closest('div')?.className).toContain('text-green-500');
+      }
+    });
   });
 
   it('cleans up interval on unmount', () => {
@@ -86,5 +157,15 @@ describe('ResourceMonitor', () => {
     
     expect(clearIntervalSpy).toHaveBeenCalled();
     clearIntervalSpy.mockRestore();
+  });
+
+  it('handles error state gracefully', () => {
+    const errorAgent = {
+      ...mockAgent,
+      memory_allocation: null as any
+    };
+    
+    render(<ResourceMonitor agent={errorAgent} />);
+    expect(screen.getByText(/Failed to initialize resource monitoring/)).toBeInTheDocument();
   });
 });
