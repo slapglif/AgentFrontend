@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -13,15 +13,57 @@ interface AgentCommunicationLogProps {
 
 export function AgentCommunicationLog({ agentId, className }: AgentCommunicationLogProps) {
   const [logs, setLogs] = useState<CommunicationLog[]>(mockCommunicationLogs);
+  const [isConnected, setIsConnected] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const mountedRef = useRef(true);
+  const maxRetries = 3;
 
   useEffect(() => {
-    // Set up realtime communication simulation
-    const cleanup = simulateRealtimeCommunication((newLog) => {
-      setLogs(prev => [...prev, newLog].slice(-50)); // Keep last 50 messages
-    });
+    let cleanupFunction: (() => void) | undefined;
+    let retryTimeout: NodeJS.Timeout;
 
-    return () => cleanup();
-  }, []);
+    const setupCommunication = () => {
+      try {
+        setIsConnected(true);
+        cleanupFunction = simulateRealtimeCommunication((newLog) => {
+          if (mountedRef.current) {
+            setLogs(prev => {
+              const updatedLogs = [...prev, newLog];
+              // Keep last 50 messages for performance and memory management
+              return updatedLogs.slice(-50);
+            });
+          }
+        });
+        // Reset retry count on successful connection
+        setRetryCount(0);
+      } catch (error) {
+        console.error('Failed to setup communication:', error);
+        setIsConnected(false);
+        
+        // Implement retry logic
+        if (retryCount < maxRetries) {
+          retryTimeout = setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+            setupCommunication();
+          }, Math.min(1000 * Math.pow(2, retryCount), 10000)); // Exponential backoff
+        }
+      }
+    };
+
+    setupCommunication();
+
+    // Enhanced cleanup function
+    return () => {
+      mountedRef.current = false;
+      if (cleanupFunction) {
+        cleanupFunction();
+      }
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+      }
+      setIsConnected(false);
+    };
+  }, [retryCount]);
 
   const filteredLogs = agentId
     ? logs.filter(log => log.fromAgentId === agentId || log.toAgentId === agentId)
@@ -63,10 +105,25 @@ export function AgentCommunicationLog({ agentId, className }: AgentCommunication
 
   return (
     <Card className={cn("p-4", className)}>
-      <h3 className="font-medium mb-4">Communication Log</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-medium">Communication Log</h3>
+        <div className="flex items-center gap-2">
+          <div className={cn(
+            "w-2 h-2 rounded-full",
+            isConnected ? "bg-green-500" : "bg-red-500"
+          )} />
+          <span className="text-xs text-muted-foreground">
+            {isConnected ? "Connected" : retryCount < maxRetries ? `Reconnecting (${retryCount}/${maxRetries})` : "Disconnected"}
+          </span>
+        </div>
+      </div>
       <ScrollArea className="h-[400px] pr-4">
         <div className="space-y-2">
-          {filteredLogs.map((log) => (
+          {filteredLogs.length === 0 ? (
+            <div className="flex items-center justify-center h-32 text-muted-foreground">
+              No communication logs available
+            </div>
+          ) : filteredLogs.map((log) => (
             <div
               key={log.id}
               className={cn(
@@ -110,6 +167,11 @@ export function AgentCommunicationLog({ agentId, className }: AgentCommunication
           ))}
         </div>
       </ScrollArea>
+      {retryCount >= maxRetries && !isConnected && (
+        <div className="mt-4 p-2 bg-destructive/10 text-destructive rounded-lg text-sm">
+          Failed to establish connection. Please try refreshing the page.
+        </div>
+      )}
     </Card>
   );
 }

@@ -5,8 +5,23 @@ import { Progress } from "@/components/ui/progress";
 import { mockAnalytics } from "@/lib/mockAnalytics";
 import { PerformanceMetrics } from "@/components/PerformanceMetrics";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRef, useEffect } from "react";
 
 export default function Analytics() {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  if (!chartRef.current && mounted.current) {
+    return null;
+  }
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
@@ -97,11 +112,15 @@ export default function Analytics() {
                   <div key={stat.date} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                     <div>
                       <p className="text-sm text-muted-foreground">{stat.date}</p>
-                      <p className="text-sm">Synthesis: {stat.knowledgeSynthesis}%</p>
+                      <div className="space-y-1">
+                        <p className="text-sm">Active Tasks: {stat.activeResearchTasks}</p>
+                        <p className="text-sm">Interactions: {stat.agentInteractions}</p>
+                      </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">{stat.researchProgress}%</p>
-                      <p className="text-xs text-muted-foreground">progress</p>
+                      <p className="text-sm">Knowledge Gen: {stat.knowledgeGenerationRate}%</p>
+                      <p className="text-sm font-medium">Synthesis: {stat.knowledgeSynthesis}%</p>
+                      <p className="text-xs text-muted-foreground">Research: {stat.researchProgress}%</p>
                     </div>
                   </div>
                 ))}

@@ -45,21 +45,27 @@ export const mockAnalytics = {
   collaborationStats: [
     { 
       date: "2024-12-06", 
-      activeAgents: 7, 
+      activeResearchTasks: 6,
+      agentInteractions: 124,
       knowledgeSynthesis: 82,
-      researchProgress: 72 
+      researchProgress: 72,
+      knowledgeGenerationRate: 76
     },
     { 
       date: "2024-12-07", 
-      activeAgents: 8, 
+      activeResearchTasks: 7,
+      agentInteractions: 142,
       knowledgeSynthesis: 85,
-      researchProgress: 75 
+      researchProgress: 75,
+      knowledgeGenerationRate: 82
     },
     { 
       date: "2024-12-08", 
-      activeAgents: 8, 
+      activeResearchTasks: 8,
+      agentInteractions: 156,
       knowledgeSynthesis: 88,
-      researchProgress: 78 
+      researchProgress: 78,
+      knowledgeGenerationRate: 85
     }
   ],
   realtimeMetrics: {
