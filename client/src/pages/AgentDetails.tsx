@@ -10,7 +10,19 @@ import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
-import { AlertCircle, Settings, Activity, Clock, Database, ChevronLeft, Users, BarChart2, ListTodo, Monitor } from "lucide-react";
+import { 
+  AlertCircle,
+  Settings,
+  Activity,
+  Clock,
+  Database,
+  ChevronLeft,
+  Users,
+  BarChart2,
+  ListTodo,
+  Monitor,
+  HardDrive
+} from "lucide-react";
 import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
