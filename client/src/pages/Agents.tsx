@@ -27,6 +27,7 @@ export default function Agents() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
 
   // Mock orchestrator connection
   const connectToOrchestrator = useCallback(() => {
@@ -100,11 +101,19 @@ export default function Agents() {
     return () => clearInterval(statusInterval);
   }, [orchestratorState.status, pollAgentStatus]);
 
-  // Filter agents based on search query
-  const filteredAgents = agents.filter((agent) =>
-    agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    agent.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter agents based on search query and status
+  const filteredAgents = agents.filter((agent) => {
+    const matchesSearch = 
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.type.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFilter = 
+      filterStatus === "all" ? true :
+      filterStatus === "active" ? agent.status === "active" :
+      agent.status === "inactive";
+    
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <ErrorBoundary>
@@ -149,10 +158,29 @@ export default function Agents() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant={filterStatus === "all" ? "secondary" : "outline"} 
+              size="sm"
+              onClick={() => setFilterStatus("all")}
+            >
+              All
+            </Button>
+            <Button 
+              variant={filterStatus === "active" ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setFilterStatus("active")}
+            >
+              Active
+            </Button>
+            <Button 
+              variant={filterStatus === "inactive" ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setFilterStatus("inactive")}
+            >
+              Inactive
+            </Button>
+          </div>
         </div>
 
         <ScrollArea className="flex-1">

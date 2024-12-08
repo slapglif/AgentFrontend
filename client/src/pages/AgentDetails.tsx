@@ -22,11 +22,28 @@ export default function AgentDetails() {
 
   const { data: agent, isLoading, isError, error } = useQuery<Agent>({
     queryKey: ["agent", id],
-    queryFn: () => {
-      const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
-      if (!mockAgent) throw new Error("Agent not found");
-      return Promise.resolve(mockAgent); // Ensure we return a Promise
+    queryFn: async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
+        const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
+        if (!mockAgent) {
+          throw new Error(`Agent with ID ${id} not found`);
+        }
+        return {
+          ...mockAgent,
+          lastUpdated: new Date().toISOString(),
+        };
+      } catch (err) {
+        console.error('Error loading agent:', err);
+        throw new Error(
+          err instanceof Error 
+            ? err.message 
+            : "An unexpected error occurred while loading agent details"
+        );
+      }
     },
+    retry: 1,
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
   const { data: memories, isLoading: isLoadingMemories } = useQuery({
@@ -43,10 +60,13 @@ export default function AgentDetails() {
 
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Loading agent details...</span>
+      <div className="h-full flex items-center justify-center bg-background/50 backdrop-blur-sm transition-all duration-300">
+        <div className="flex flex-col items-center gap-4 p-6 rounded-lg bg-card animate-in fade-in zoom-in duration-300">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="space-y-2 text-center">
+            <h3 className="font-semibold">Loading Agent Details</h3>
+            <p className="text-sm text-muted-foreground">Please wait while we fetch the agent information...</p>
+          </div>
         </div>
       </div>
     );
@@ -54,16 +74,27 @@ export default function AgentDetails() {
 
   if (isError) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="max-w-md p-4 text-center">
-          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-          <h2 className="text-lg font-semibold mb-2">Error Loading Agent</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            {error instanceof Error ? error.message : "Failed to load agent details"}
-          </p>
-          <Button variant="outline" onClick={() => window.history.back()}>
-            Go Back
-          </Button>
+      <div className="h-full flex items-center justify-center bg-background/50 backdrop-blur-sm">
+        <div className="max-w-md p-6 rounded-lg bg-card animate-in fade-in zoom-in duration-300">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+            </div>
+            <div className="space-y-2 text-center">
+              <h2 className="text-lg font-semibold">Error Loading Agent</h2>
+              <p className="text-sm text-muted-foreground">
+                {error instanceof Error ? error.message : "Failed to load agent details"}
+              </p>
+            </div>
+            <div className="flex gap-3 mt-2">
+              <Button variant="outline" onClick={() => window.history.back()}>
+                Go Back
+              </Button>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
