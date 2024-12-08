@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
+import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
 import { AlertCircle, Settings, Activity, Clock, Database, ChevronLeft, Users, BarChart2, ListTodo } from "lucide-react";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
@@ -370,6 +371,12 @@ export default function AgentDetails() {
                     ))}
                   </div>
                 </Card>
+
+                <ErrorBoundary>
+                  <div className="col-span-2">
+                    <AgentCommunicationLog agentId={agent.id} />
+                  </div>
+                </ErrorBoundary>
               </div>
             </TabsContent>
           </div>

@@ -11,14 +11,14 @@ export default function Analytics() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
       
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="real-time">Real-time</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">Research Metrics</h3>
