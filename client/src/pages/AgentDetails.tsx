@@ -22,29 +22,21 @@ export default function AgentDetails() {
 
   const { data: agent, isLoading, isError, error } = useQuery<Agent>({
     queryKey: ["agent", id],
-    queryFn: async () => {
-      try {
-        // First try to get from mock data
-        const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
-        if (mockAgent) return mockAgent;
-
-        // If no mock data, then try API
-        const res = await fetch(`/api/agents/${id}`);
-        if (!res.ok) throw new Error("Failed to load agent");
-        return res.json();
-      } catch (err) {
-        console.error('Error loading agent:', err);
-        throw new Error("Failed to load agent details");
-      }
+    queryFn: () => {
+      const mockAgent = DEFAULT_AGENTS.find(a => a.id === Number(id));
+      if (!mockAgent) throw new Error("Agent not found");
+      return Promise.resolve(mockAgent); // Ensure we return a Promise
     },
   });
 
   const { data: memories, isLoading: isLoadingMemories } = useQuery({
     queryKey: ["memories", id],
-    queryFn: async () => {
-      const res = await fetch(`/api/memories?agentId=${id}`);
-      if (!res.ok) return []; // Return empty array if API fails
-      return res.json();
+    queryFn: () => {
+      // Use mock memories data instead of API call
+      return Promise.resolve([
+        { id: 1, type: "event", content: "Task completed successfully", timestamp: new Date() },
+        { id: 2, type: "interaction", content: "Collaborated with Research Lead", timestamp: new Date() }
+      ]);
     },
     enabled: !!agent, // Only fetch memories if we have an agent
   });
@@ -178,6 +170,41 @@ export default function AgentDetails() {
                     ))}
                   </div>
                 </Card>
+
+                {/* System Stats Card */}
+                <Card className="p-4">
+                  <h3 className="font-medium mb-4">System Stats</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Memory Usage</span>
+                      <span className="text-sm font-medium">
+                        {agent.memory_allocation.used} / {agent.memory_allocation.total} MB
+                      </span>
+                    </div>
+                    <Progress 
+                      value={(agent.memory_allocation.used / agent.memory_allocation.total) * 100}
+                      className="animate-progress"
+                    />
+                  </div>
+                </Card>
+
+                {/* Tasks Overview Card */}
+                <Card className="p-4">
+                  <h3 className="font-medium mb-4">Current Tasks</h3>
+                  <div className="space-y-2">
+                    {agent.current_tasks.map((task) => (
+                      <div 
+                        key={task.id}
+                        className="flex items-center justify-between p-2 bg-muted rounded-lg"
+                      >
+                        <span className="text-sm">{task.type}</span>
+                        <Badge variant={task.priority === "high" ? "destructive" : "secondary"}>
+                          {task.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
               </div>
             </TabsContent>
 
@@ -270,6 +297,46 @@ export default function AgentDetails() {
                         className="animate-progress" 
                       />
                     </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Tasks Completed</span>
+                        <span className="text-sm font-medium">
+                          {agent.performance_metrics.tasks_completed}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={(agent.performance_metrics.tasks_completed / 500) * 100}
+                        className="animate-progress" 
+                      />
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-4">
+                  <h3 className="font-medium mb-4">Specializations</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {agent.specializations.map((spec, index) => (
+                      <Badge key={index} variant="outline">
+                        {spec}
+                      </Badge>
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="p-4 col-span-2">
+                  <h3 className="font-medium mb-4">Achievements</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {agent.achievements.map((achievement) => (
+                      <div key={achievement.id} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                        <div className="mt-1">
+                          <span className="text-lg">🏆</span>
+                        </div>
+                        <div>
+                          <h4 className="font-medium">{achievement.name}</h4>
+                          <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </Card>
               </div>
