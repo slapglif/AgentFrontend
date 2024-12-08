@@ -10,6 +10,7 @@ import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
+import { LearningProgress } from "@/components/LearningProgress";
 import { 
   AlertCircle,
   Settings,
@@ -22,7 +23,8 @@ import {
   ListTodo,
   Monitor,
   HardDrive,
-  Cpu
+  Cpu,
+  GraduationCap
 } from "lucide-react";
 import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";
@@ -172,6 +174,10 @@ export default function AgentDetails() {
             <TabsTrigger value="resources" className="gap-2">
               <Monitor className="h-4 w-4" />
               Resources
+            </TabsTrigger>
+            <TabsTrigger value="learning" className="gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Learning
             </TabsTrigger>
           </TabsList>
 
@@ -401,6 +407,14 @@ export default function AgentDetails() {
             <TabsContent value="resources">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ResourceMonitor agent={agent} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="learning">
+              <div className="grid grid-cols-1 gap-4">
+                <ErrorBoundary>
+                  <LearningProgress metrics={agent.learningMetrics} />
+                </ErrorBoundary>
               </div>
             </TabsContent>
           </div>

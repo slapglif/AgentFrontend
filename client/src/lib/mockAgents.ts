@@ -1,5 +1,21 @@
 import { Agent } from "@/lib/agents";
 
+export interface LearningMetrics {
+  skillsProficiency: {
+    [key: string]: number;  // 0-100 proficiency level
+  };
+  knowledgeAreas: {
+    name: string;
+    progress: number;  // 0-100 progress level
+    lastUpdated: string;
+  }[];
+  learningRate: number;  // 0-100 learning efficiency
+  completedLessons: number;
+  totalLessons: number;
+  adaptabilityScore: number;  // 0-100 score
+  retentionRate: number;  // 0-100 percentage
+}
+
 export const mockAgents: Agent[] = [
   {
     id: 1,
@@ -11,6 +27,36 @@ export const mockAgents: Agent[] = [
     experience: 85,
     confidence: 95,
     capabilities: ["task_delegation", "coordination", "performance_monitoring"],
+    learningMetrics: {
+      skillsProficiency: {
+        "research": 92,
+        "coordination": 88,
+        "analysis": 85,
+        "communication": 90
+      },
+      knowledgeAreas: [
+        {
+          name: "Research Methodology",
+          progress: 95,
+          lastUpdated: "2024-12-08T10:30:00Z"
+        },
+        {
+          name: "Team Coordination",
+          progress: 88,
+          lastUpdated: "2024-12-08T09:15:00Z"
+        },
+        {
+          name: "Data Analysis",
+          progress: 82,
+          lastUpdated: "2024-12-08T11:00:00Z"
+        }
+      ],
+      learningRate: 92,
+      completedLessons: 48,
+      totalLessons: 60,
+      adaptabilityScore: 94,
+      retentionRate: 89
+    },
     configuration: {
       decision_threshold: 0.85,
       response_time_limit: 5000,

@@ -24,8 +24,8 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
     storage: Math.random() * 100,
     tasks: agent.current_tasks.length,
     taskQueue: agent.current_tasks.filter(task => task.status === 'active').length,
-    memoryTrend: Array(10).fill(0).map(() => Math.random() * 100),
-    cpuTrend: Array(10).fill(0).map(() => Math.random() * 100)
+    memoryTrend: Array.from({ length: 10 }, () => Math.random() * 100),
+    cpuTrend: Array.from({ length: 10 }, () => Math.random() * 100)
   });
 
   useEffect(() => {
