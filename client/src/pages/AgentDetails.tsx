@@ -10,7 +10,8 @@ import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
-import { AlertCircle, Settings, Activity, Clock, Database, ChevronLeft, Users, BarChart2, ListTodo } from "lucide-react";
+import { AlertCircle, Settings, Activity, Clock, Database, ChevronLeft, Users, BarChart2, ListTodo, Monitor } from "lucide-react";
+import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -154,6 +155,10 @@ export default function AgentDetails() {
             <TabsTrigger value="collaboration" className="gap-2">
               <Users className="h-4 w-4" />
               Collaboration
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="gap-2">
+              <Monitor className="h-4 w-4" />
+              Resources
             </TabsTrigger>
           </TabsList>
 
@@ -377,6 +382,12 @@ export default function AgentDetails() {
                     <AgentCommunicationLog agentId={agent.id} />
                   </div>
                 </ErrorBoundary>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="resources">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ResourceMonitor agent={agent} />
               </div>
             </TabsContent>
           </div>
