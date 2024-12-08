@@ -16,47 +16,63 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout>();
   
+  // Initialize trend data with default values
+  const defaultTrendData = Array.from({ length: 10 }, () => 0);
+  
   const [resourceMetrics, setResourceMetrics] = useState({
-    cpu: Math.random() * 100,
-    memory: agent?.memory_allocation?.total > 0 
-      ? (agent.memory_allocation.used / agent.memory_allocation.total) * 100 
-      : 0,
-    storage: Math.random() * 100,
-    tasks: agent?.current_tasks?.length || 0,
-    taskQueue: agent?.current_tasks?.filter(task => task.status === 'active')?.length || 0,
-    memoryTrend: Array.from({ length: 10 }, () => Math.random() * 100),
-    cpuTrend: Array.from({ length: 10 }, () => Math.random() * 100)
+    cpu: 0,
+    memory: 0,
+    storage: 0,
+    tasks: 0,
+    taskQueue: 0,
+    memoryTrend: defaultTrendData,
+    cpuTrend: defaultTrendData
   });
 
   useEffect(() => {
+    // Validate required agent data
+    if (!agent?.memory_allocation || !agent?.current_tasks) {
+      setError('Invalid agent data');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
-      // Initial metrics update
+      
+      // Initial metrics update with safe property access
       setResourceMetrics(prev => ({
-        cpu: Math.random() * 100,
-        memory: agent.memory_allocation.total > 0 
+        ...prev,
+        memory: agent.memory_allocation?.total > 0 
           ? (agent.memory_allocation.used / agent.memory_allocation.total) * 100 
           : 0,
-        storage: Math.random() * 100,
-        tasks: agent.current_tasks.length,
+        tasks: agent.current_tasks?.length || 0,
+        taskQueue: agent.current_tasks?.filter(task => task.status === 'active')?.length || 0
       }));
 
       // Set up interval for real-time updates
       intervalRef.current = setInterval(() => {
         setResourceMetrics(prev => {
-          const newCpuValue = Math.min(100, Math.max(0, prev.cpu + (Math.random() - 0.5) * 20));
-          const newMemoryValue = Math.min(100, Math.max(0, agent.memory_allocation.total > 0 
-            ? (agent.memory_allocation.used / agent.memory_allocation.total) * 100 + (Math.random() - 0.5) * 5
-            : 0));
+          // Ensure smooth transitions with bounds checking
+          const newCpuValue = Math.min(100, Math.max(0, prev.cpu + (Math.random() - 0.5) * 10));
+          const newMemoryValue = Math.min(100, Math.max(0, prev.memory + (Math.random() - 0.5) * 5));
+          
+          // Ensure arrays exist before updating
+          const newMemoryTrend = Array.isArray(prev.memoryTrend) 
+            ? [...prev.memoryTrend.slice(1), newMemoryValue]
+            : [...defaultTrendData.slice(1), newMemoryValue];
+          
+          const newCpuTrend = Array.isArray(prev.cpuTrend)
+            ? [...prev.cpuTrend.slice(1), newCpuValue]
+            : [...defaultTrendData.slice(1), newCpuValue];
           
           return {
+            ...prev,
             cpu: newCpuValue,
             memory: newMemoryValue,
-            storage: Math.min(100, Math.max(0, prev.storage + (Math.random() - 0.5) * 10)),
-            tasks: agent.current_tasks.length,
-            taskQueue: agent.current_tasks.filter(task => task.status === 'active').length,
-            memoryTrend: [...prev.memoryTrend.slice(1), newMemoryValue],
-            cpuTrend: [...prev.cpuTrend.slice(1), newCpuValue]
+            storage: Math.min(100, Math.max(0, prev.storage + (Math.random() - 0.5) * 5)),
+            memoryTrend: newMemoryTrend,
+            cpuTrend: newCpuTrend
           };
         });
       }, 2000);
@@ -138,7 +154,7 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
                     {resourceMetrics.memory.toFixed(1)}%
                   </Badge>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {agent.memory_allocation.used}MB / {agent.memory_allocation.total}MB
+                    {agent?.memory_allocation?.used || 0}MB / {agent?.memory_allocation?.total || 0}MB
                   </div>
                 </div>
               </div>
@@ -177,41 +193,47 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
                   <Clock className="h-4 w-4" />
                   <div className="text-sm text-muted-foreground">Processing Time</div>
                 </div>
-                <div className="text-lg font-semibold">{agent.performance_metrics.avg_response_time}ms</div>
-                <div className="text-xs text-muted-foreground">Reserved: {agent.memory_allocation.reserved}MB</div>
+                <div className="text-lg font-semibold">
+                  {agent?.performance_metrics?.avg_response_time || 0}ms
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Reserved: {agent?.memory_allocation?.reserved || 0}MB
+                </div>
               </div>
             </div>
 
             {/* Performance Trends */}
-            <div className="space-y-2">
-              <div className="text-sm font-medium">Resource Trends</div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="p-3 bg-muted rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">Memory Trend</div>
-                  <div className="flex items-end gap-1 h-12">
-                    {resourceMetrics.memoryTrend.map((value, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 bg-primary transition-all duration-300"
-                        style={{ height: `${value}%` }}
-                      />
-                    ))}
+            {resourceMetrics.memoryTrend && resourceMetrics.cpuTrend && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Resource Trends</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 bg-muted rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-2">Memory Trend</div>
+                    <div className="flex items-end gap-1 h-12">
+                      {resourceMetrics.memoryTrend.map((value, index) => (
+                        <div
+                          key={index}
+                          className="flex-1 bg-primary transition-all duration-300"
+                          style={{ height: `${Math.max(0, Math.min(100, value))}%` }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 bg-muted rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">CPU Trend</div>
-                  <div className="flex items-end gap-1 h-12">
-                    {resourceMetrics.cpuTrend.map((value, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 bg-primary transition-all duration-300"
-                        style={{ height: `${value}%` }}
-                      />
-                    ))}
+                  <div className="p-3 bg-muted rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-2">CPU Trend</div>
+                    <div className="flex items-end gap-1 h-12">
+                      {resourceMetrics.cpuTrend.map((value, index) => (
+                        <div
+                          key={index}
+                          className="flex-1 bg-primary transition-all duration-300"
+                          style={{ height: `${Math.max(0, Math.min(100, value))}%` }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </ScrollArea>
       </Card>
