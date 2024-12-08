@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { mockAnalytics } from "@/lib/mockAnalytics";
 import { PerformanceMetrics } from "@/components/PerformanceMetrics";
+import { AgentBehaviorPatterns } from "@/components/AgentBehaviorPatterns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRef, useEffect } from "react";
 
@@ -29,6 +30,7 @@ export default function Analytics() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="behavior">Behavior Patterns</TabsTrigger>
           <TabsTrigger value="real-time">Real-time</TabsTrigger>
         </TabsList>
 
@@ -132,6 +134,12 @@ export default function Analytics() {
         <TabsContent value="real-time">
           <ErrorBoundary>
             <PerformanceMetrics />
+          </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="behavior">
+          <ErrorBoundary>
+            <AgentBehaviorPatterns />
           </ErrorBoundary>
         </TabsContent>
       </Tabs>
