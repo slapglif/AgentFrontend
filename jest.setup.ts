@@ -18,7 +18,7 @@ window.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock requestAnimationFrame
-window.requestAnimationFrame = vi.fn((callback) => {
+window.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
   callback(Date.now());
   return 0;
 });
@@ -29,7 +29,7 @@ vi.useFakeTimers();
 // Add required test environment setup
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,

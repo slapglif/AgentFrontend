@@ -18,12 +18,12 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
   
   const [resourceMetrics, setResourceMetrics] = useState({
     cpu: Math.random() * 100,
-    memory: agent.memory_allocation.total > 0 
+    memory: agent?.memory_allocation?.total > 0 
       ? (agent.memory_allocation.used / agent.memory_allocation.total) * 100 
       : 0,
     storage: Math.random() * 100,
-    tasks: agent.current_tasks.length,
-    taskQueue: agent.current_tasks.filter(task => task.status === 'active').length,
+    tasks: agent?.current_tasks?.length || 0,
+    taskQueue: agent?.current_tasks?.filter(task => task.status === 'active')?.length || 0,
     memoryTrend: Array.from({ length: 10 }, () => Math.random() * 100),
     cpuTrend: Array.from({ length: 10 }, () => Math.random() * 100)
   });
