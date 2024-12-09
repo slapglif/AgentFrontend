@@ -62,15 +62,31 @@ def analyze_collaboration_patterns(interaction_data):
     timestamp: new Date(Date.now() - 7200000),
     confidence: 94,
     metadata: {
-      analysis_type: "collaboration_patterns",
+      analysis_type: "ayurvedic_analysis",
       data_points: 1250,
       key_findings: [
-        "Three distinct collaboration patterns identified",
-        "High correlation between response time and success rate",
-        "Optimal team size: 4-6 agents"
+        { id: "finding-1", text: "Vata-Pitta dominant research patterns identified" },
+        { id: "finding-2", text: "Correlation between dosha balance and healing efficacy" },
+        { id: "finding-3", text: "Optimal herb combinations for tridosha balance" }
       ],
-      methodology: "clustering_analysis",
-      validation_score: 0.92
+      methodology: "traditional_assessment",
+      validation_score: 0.92,
+      interactionHistory: [
+        { 
+          id: "int-1",
+          action: "dosha_analysis",
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          context: "Analyzed constitutional patterns",
+          doshaType: "Vata-Pitta"
+        },
+        {
+          id: "int-2",
+          action: "herb_research",
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          context: "Documented traditional formulations",
+          doshaType: "Tridosha"
+        }
+      ]
     }
   },
   // Decision Making Memory

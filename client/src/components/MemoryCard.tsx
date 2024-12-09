@@ -21,15 +21,21 @@ export function MemoryCard({ memory }: MemoryCardProps) {
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const getTypeColor = (type: string) => {
-    switch (type) {
-      case "research":
-        return "bg-blue-500";
-      case "analysis":
+    switch (type.toLowerCase()) {
+      case "research_analysis":
+        return "bg-emerald-500";
+      case "ayurvedic_analysis":
+        return "bg-sage-500";
+      case "dosha_assessment":
+        return "bg-amber-500";
+      case "herbal_research":
         return "bg-green-500";
-      case "conclusion":
-        return "bg-purple-500";
+      case "traditional_practice":
+        return "bg-indigo-500";
+      case "holistic_healing":
+        return "bg-violet-500";
       default:
-        return "bg-gray-500";
+        return "bg-slate-500";
     }
   };
 
@@ -175,24 +181,32 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'history' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.interactionHistory?.map((interaction: any, index: number) => (
-                  <div 
-                    key={`interaction-${memory.id}-${index}-${interaction.timestamp}`} 
-                    className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xs font-medium capitalize flex items-center gap-1">
-                        <Badge variant="outline" className="h-4">
-                          {interaction.action}
-                        </Badge>
+                {memory.metadata.interactionHistory?.map((interaction: any, index: number) => {
+                  const uniqueKey = `interaction-${memory.id}-${index}-${typeof interaction.timestamp === 'string' ? interaction.timestamp : Date.now()}`;
+                  return (
+                    <div 
+                      key={uniqueKey}
+                      className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium capitalize flex items-center gap-1">
+                          <Badge variant="outline" className="h-4">
+                            {interaction.action}
+                          </Badge>
+                          {interaction.doshaType && (
+                            <Badge variant="secondary" className="h-4">
+                              {interaction.doshaType}
+                            </Badge>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground mt-1">{interaction.context}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistance(new Date(interaction.timestamp), new Date(), { addSuffix: true })}
                       </span>
-                      <span className="text-xs text-muted-foreground mt-1">{interaction.context}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistance(new Date(interaction.timestamp), new Date(), { addSuffix: true })}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
