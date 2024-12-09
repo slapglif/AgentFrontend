@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistance } from "date-fns";
 import type { Message } from "@db/schema";
@@ -38,10 +37,9 @@ export function ChatInterface() {
       if (!res.ok) throw new Error("Failed to load messages");
       return res.json();
     },
-    refetchInterval: 2000, // Poll every 2 seconds for new messages
+    refetchInterval: 2000,
   });
 
-  // Connect to orchestrator
   useEffect(() => {
     const connectToOrchestrator = async () => {
       try {
@@ -64,14 +62,12 @@ export function ChatInterface() {
 
   const sendMessage = useMutation({
     mutationFn: async (message: string) => {
-      // First, notify orchestrator about incoming message
       await fetch("/api/orchestrator/typing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isTyping: true }),
       });
 
-      // Send the actual message
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,7 +87,6 @@ export function ChatInterface() {
         }),
       });
 
-      // Clear typing indicator
       await fetch("/api/orchestrator/typing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -116,7 +111,7 @@ export function ChatInterface() {
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/30">
-      <ScrollArea className="flex-1 p-4 space-y-4">
+      <div className="flex-1 p-4">
         <div className="flex flex-col space-y-4">
           {messages?.map((message, index) => (
             <div
@@ -162,7 +157,7 @@ export function ChatInterface() {
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
       <div className="p-4 border-t border-primary/10 backdrop-blur-sm flex gap-2">
         <Input
           value={input}

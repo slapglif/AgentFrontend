@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Users, MessageSquare, Plus, Loader2 } from "lucide-react";
-import type { collaborations, collaborationParticipants, messages } from "@db/schema";
 import {
   Dialog,
   DialogContent,
@@ -78,7 +76,7 @@ export function CollaborationPanel() {
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState(mockMessages);
   const [collaborations, setCollaborations] = useState(mockCollaborations);
-  const [agentStatus, setAgentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>({})
+  const [agentStatus, setAgentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>({});
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
 
   useEffect(() => {
@@ -170,7 +168,7 @@ export function CollaborationPanel() {
   });
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Collaborations</h2>
         <Dialog>
@@ -221,7 +219,7 @@ export function CollaborationPanel() {
         </Dialog>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         {error ? (
           <div className="flex items-center justify-center h-full">
             <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
@@ -234,124 +232,135 @@ export function CollaborationPanel() {
             <span className="ml-2 text-sm text-muted-foreground">Loading collaborations...</span>
           </div>
         ) : (
-        <div className="space-y-4">
-          {collaborations.map((collab) => (
-            <Card
-              key={collab.id}
-              className="p-4 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold">{collab.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {collab.description}
-                  </p>
-                </div>
-                <Badge>{collab.status}</Badge>
-              </div>
-              <div className="mt-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <Button 
-                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => setSelectedCollaboration(collab.id)}
-                  >
-                    <Users className="h-4 w-4" />
-                    Participants
-                  </Button>
-                  <Button 
-                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => setSelectedCollaboration(collab.id)}
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Messages
-                  </Button>
-                </div>
-                {selectedCollaboration === collab.id && (
-                  <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Collaboration Timeline</h4>
-                      <Badge variant="outline">{new Date(collab.updatedAt).toLocaleDateString()}</Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        Active participants will appear here in real-time
-                      </p>
-                      <div className="flex items-center gap-2">
-                        {participants.map((participant) => (
-                          <div 
-                            key={participant.id}
-                            onClick={() => {
-                              toast({
-                                title: `Agent ${participant.agentId}`,
-                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") ?? "None"}`,
-                              });
-                            }}
-                            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
-                          >
-                            👤
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 space-y-2">
-                        {messages.map((message) => (
-                          <div
-                            key={message.id}
-                            className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
-                            onClick={() => {
-                              if (message.metadata?.replies?.length) {
-                                setExpandedMessage(expandedMessage === message.id ? null : message.id ?? null);
-                              }
-                            }}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <span className="text-sm font-medium">Agent {message.fromAgentId}</span>
-                                <p className="text-sm">{message.content}</p>
-                              </div>
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(message.timestamp || Date.now()).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            {message.isTyping && (
-                              <div className="flex items-center gap-1 mt-1">
-                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce" />
-                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.2s]" />
-                                <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
-                              </div>
-                            )}
-                            {expandedMessage === message.id && message.metadata?.replies && (
-                              <div className="mt-2 pl-4 space-y-2 border-l">
-                                {message.metadata.replies.map((reply: MessageReply) => (
-                                  <div key={reply.id} className="p-2 rounded-lg bg-muted">
-                                    <div className="flex items-start justify-between">
-                                      <div>
-                                        <span className="text-sm font-medium">Agent {reply.fromAgentId}</span>
-                                        <p className="text-sm">{reply.content}</p>
-                                      </div>
-                                      <span className="text-xs text-muted-foreground">
-                                        {(reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp)).toLocaleTimeString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+          <div className="space-y-4">
+            {collaborations.map((collab) => (
+              <Card
+                key={collab.id}
+                className="p-4 hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold">{collab.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {collab.description}
+                    </p>
                   </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
+                  <Badge>{collab.status}</Badge>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Button 
+                      variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => setSelectedCollaboration(collab.id)}
+                    >
+                      <Users className="h-4 w-4" />
+                      Participants
+                    </Button>
+                    <Button 
+                      variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => setSelectedCollaboration(collab.id)}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      Messages
+                    </Button>
+                  </div>
+                  {selectedCollaboration === collab.id && (
+                    <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Collaboration Timeline</h4>
+                        <Badge variant="outline">
+                          {new Date(collab.updatedAt).toLocaleDateString()}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">
+                          Active participants will appear here in real-time
+                        </p>
+                        <div className="flex items-center gap-2">
+                          {participants.map((participant) => (
+                            <div 
+                              key={participant.id}
+                              onClick={() => {
+                                toast({
+                                  title: `Agent ${participant.agentId}`,
+                                  description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") ?? "None"}`,
+                                });
+                              }}
+                              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
+                            >
+                              👤
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          {messages.map((message) => (
+                            <div
+                              key={message.id}
+                              className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
+                              onClick={() => {
+                                if (message.metadata?.replies?.length) {
+                                  setExpandedMessage(
+                                    expandedMessage === message.id ? null : message.id
+                                  );
+                                }
+                              }}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <span className="text-sm font-medium">
+                                    Agent {message.fromAgentId}
+                                  </span>
+                                  <p className="text-sm">{message.content}</p>
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(message.timestamp).toLocaleTimeString()}
+                                </span>
+                              </div>
+                              {message.isTyping && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce" />
+                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.2s]" />
+                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
+                                </div>
+                              )}
+                              {expandedMessage === message.id && message.metadata?.replies && (
+                                <div className="mt-2 pl-4 space-y-2 border-l">
+                                  {message.metadata.replies.map((reply) => (
+                                    <div
+                                      key={reply.id}
+                                      className="p-2 rounded-lg bg-muted"
+                                    >
+                                      <div className="flex items-start justify-between">
+                                        <div>
+                                          <span className="text-sm font-medium">
+                                            Agent {reply.fromAgentId}
+                                          </span>
+                                          <p className="text-sm">{reply.content}</p>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground">
+                                          {new Date(reply.timestamp).toLocaleTimeString()}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 }

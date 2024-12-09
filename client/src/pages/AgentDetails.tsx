@@ -151,7 +151,7 @@ export default function AgentDetails() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b p-4 bg-muted/30 backdrop-blur-sm flex-none">
+      <header className="border-b p-4 bg-muted/30 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
             <ChevronLeft className="h-4 w-4" />
@@ -163,7 +163,7 @@ export default function AgentDetails() {
         </div>
       </header>
 
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6">
         <Tabs defaultValue="overview" className="w-full">
           <TabsList>
             <TabsTrigger value="overview" className="gap-2">
