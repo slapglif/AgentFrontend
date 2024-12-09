@@ -9,8 +9,29 @@ interface ChatDrawerProps {
   className?: string;
 }
 
-export function ChatDrawer({ className }: ChatDrawerProps) {
+interface Message {
+  id: number;
+  role: string;
+  content: string;
+  timestamp: Date;
+}
+
+interface ChatDrawerProps {
+  className?: string;
+  messages?: Message[];
+  onSendMessage?: (message: string) => void;
+}
+
+export function ChatDrawer({ className, messages = [], onSendMessage }: ChatDrawerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleSendMessage = () => {
+    if (inputValue.trim() && onSendMessage) {
+      onSendMessage(inputValue.trim());
+      setInputValue("");
+    }
+  };
 
   return (
     <div
@@ -46,8 +67,32 @@ export function ChatDrawer({ className }: ChatDrawerProps) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Agent Orchestration</h2>
           </div>
-          <Card className="h-[calc(100vh-8rem)]">
-            <ChatInterface />
+          <Card className="h-[calc(100vh-8rem)] flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === 'assistant' ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-[80%] p-3 rounded-lg ${message.role === 'assistant' ? 'bg-primary/10' : 'bg-muted'}`}>
+                    <p className="text-sm">{message.content}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDistance(new Date(message.timestamp), new Date(), { addSuffix: true })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 bg-muted p-2 rounded-md"
+                  placeholder="Type a message..."
+                />
+                <Button onClick={handleSendMessage}>Send</Button>
+              </div>
+            </div>
           </Card>
         </div>
       )}

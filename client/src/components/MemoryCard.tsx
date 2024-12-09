@@ -41,7 +41,7 @@ interface MemoryCardProps {
 }
 
 export function MemoryCard({ memory }: MemoryCardProps) {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  // Remove unused state
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const getTypeColor = (type: string) => {
