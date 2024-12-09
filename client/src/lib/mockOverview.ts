@@ -44,12 +44,22 @@ interface PerformanceMetrics {
 interface AgentStats {
   id: number;
   name: string;
+  type: string;
   status: 'active' | 'idle' | 'learning';
+  current_task: {
+    id: string;
+    summary: string;
+    progress: number;
+    status: 'pending' | 'in_progress' | 'completed';
+    priority: 'low' | 'medium' | 'high';
+    started_at: string;
+    estimated_completion: string;
+  };
   currentTasks: number;
   successRate: number;
   skillLevel: number;
   recentAchievements: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     unlockedAt: string;
@@ -145,10 +155,26 @@ export const mockOverview: SystemOverview = {
   agents: DEFAULT_AGENTS.map((agent, agentIndex) => ({
     id: agent.id,
     name: agent.name,
+    type: agent.type,
     status: (() => {
       const r = Math.random();
       return r > 0.6 ? 'active' : r > 0.3 ? 'learning' : 'idle';
     })() as 'active' | 'idle' | 'learning',
+    current_task: {
+      id: `task-${agent.id}-${Date.now()}`,
+      summary: [
+        'Analyzing large dataset for pattern recognition',
+        'Optimizing neural network architecture',
+        'Training on new problem domain',
+        'Collaborating on multi-agent task',
+        'Performing system maintenance',
+      ][Math.floor(Math.random() * 5)],
+      progress: Math.floor(Math.random() * 100),
+      status: ['pending', 'in_progress', 'completed'][Math.floor(Math.random() * 3)] as 'pending' | 'in_progress' | 'completed',
+      priority: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
+      started_at: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+      estimated_completion: new Date(Date.now() + Math.random() * 86400000).toISOString(),
+    },
     currentTasks: Math.floor(Math.random() * 3) + 2, // 2-5 tasks
     successRate: 0.75 + (Math.random() * 0.23), // 75-98%
     skillLevel: Math.floor(Math.random() * 10) + 1,
