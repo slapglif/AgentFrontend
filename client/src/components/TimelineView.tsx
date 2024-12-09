@@ -35,8 +35,8 @@ export function TimelineView({ goals }: TimelineViewProps) {
   };
 
   const getWidthForDuration = (startTime: Date, endTime: Date) => {
-    const durationMinutes = differenceInMinutes(endTime, startTime);
-    return (durationMinutes / 60) * hourWidth;
+    const durationMinutes = Math.max(differenceInMinutes(endTime, startTime), 30); // Minimum 30 minutes width
+    return Math.max((durationMinutes / 60) * hourWidth, 50); // Minimum 50px width
   };
 
   return (

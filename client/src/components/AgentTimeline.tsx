@@ -15,12 +15,12 @@ export function AgentTimeline() {
       <h2 className="text-xl font-semibold mb-4 flex-shrink-0">Memory Timeline</h2>
       <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-4 p-4">
-          {memories?.map((memory: any, index: number) => (
+          {memories?.map((memory: any, idx: number) => (
             <div 
-              key={memory.id} 
+              key={`memory-${memory.id}`} 
               className="relative animate-staggered-fade-in transition-all duration-500 hover:translate-x-2"
               style={{
-                animationDelay: `${index * 150}ms`,
+                animationDelay: `${idx * 150}ms`,
                 transformStyle: 'preserve-3d',
                 perspective: '1000px'
               }}

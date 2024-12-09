@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatDistance } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, ChevronRight, ChevronLeft } from "lucide-react";

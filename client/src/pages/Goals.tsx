@@ -33,15 +33,12 @@ interface Task {
   dependencies?: string[];
 }
 
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  status: "todo" | "in_progress" | "completed";
+import { type Goal as KanbanGoal } from "@/components/GoalKanbanBoard";
+
+interface Goal extends KanbanGoal {
   startTime: Date;
   endTime: Date;
   progress: number;
-  tasks: Task[];
 }
 
 // Mock initial goals data
@@ -156,7 +153,10 @@ export default function Goals() {
   });
 
   const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
+    if (!result.destination || result.destination.droppableId === result.source.droppableId && 
+        result.destination.index === result.source.index) {
+      return;
+    }
 
     if (result.type === "GOAL") {
       const updatedGoals = [...goals];
@@ -317,7 +317,7 @@ export default function Goals() {
           <TabsContent value="kanban">
             <GoalKanbanBoard 
               goals={goals} 
-              onGoalsUpdate={setGoals}
+              onGoalsUpdate={(updatedGoals: Goal[]) => setGoals([...updatedGoals])}
               onDragEnd={handleDragEnd}
             />
           </TabsContent>

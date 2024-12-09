@@ -1,16 +1,16 @@
 import React from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   completed: boolean;
 }
 
-interface Goal {
+export interface Goal {
   id: string;
   title: string;
   description: string;
@@ -21,6 +21,7 @@ interface Goal {
 interface GoalKanbanBoardProps {
   goals: Goal[];
   onGoalsUpdate: (goals: Goal[]) => void;
+  onDragEnd?: (result: DropResult) => void;
 }
 
 export function GoalKanbanBoard({ goals, onGoalsUpdate }: GoalKanbanBoardProps) {
@@ -30,8 +31,12 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate }: GoalKanbanBoardProps) 
     { id: "completed", title: "Completed" }
   ];
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination || 
+        (result.destination.droppableId === result.source.droppableId && 
+         result.destination.index === result.source.index)) {
+      return;
+    }
 
     const updatedGoals = Array.from(goals);
     const [reorderedGoal] = updatedGoals.splice(result.source.index, 1);
@@ -39,6 +44,7 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate }: GoalKanbanBoardProps) 
     updatedGoals.splice(result.destination.index, 0, reorderedGoal);
     
     onGoalsUpdate(updatedGoals);
+    onDragEnd?.(result);
   };
 
   return (
