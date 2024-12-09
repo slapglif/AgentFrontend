@@ -5,14 +5,19 @@ import { MessageSquare, ChevronRight, ChevronLeft } from "lucide-react";
 import { ChatInterface } from "@/components/ChatInterface";
 import { cn } from "@/lib/utils";
 
-export function ChatDrawer() {
+interface ChatDrawerProps {
+  className?: string;
+}
+
+export function ChatDrawer({ className }: ChatDrawerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div
       className={cn(
-        "fixed right-0 top-0 h-screen bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-l transition-all duration-300 ease-in-out",
-        isExpanded ? "w-96" : "w-12"
+        "relative h-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out",
+        isExpanded ? "w-96" : "w-12",
+        className
       )}
     >
       <Button

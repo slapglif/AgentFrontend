@@ -65,74 +65,76 @@ export default function Goals() {
   };
 
   return (
-    <div className="relative p-6 space-y-6">
-      <React.Suspense fallback={null}>
-        <ChatDrawer />
-      </React.Suspense>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Goal Management</h1>
-      </div>
+    <div className="flex h-screen overflow-hidden">
+      <div className="flex-1 p-6 space-y-6 overflow-hidden">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Goal Management</h1>
+        </div>
 
-      <Tabs defaultValue="kanban" className="w-full">
-        <TabsList className="justify-end mb-4">
-          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="kanban" className="w-full">
+          <TabsList className="justify-end mb-4">
+            <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="kanban">
-          <div className="grid grid-cols-4 gap-4">
-            {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
-              <Card key={status} className="p-4">
-                <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
-                <ScrollArea className="h-[calc(100vh-250px)]">
-                  <div className="space-y-2">
-                    {statusGoals.map((goal) => (
-                      <Card key={goal.id} className="p-3">
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h4 className="font-medium">{goal.title}</h4>
-                              <p className="text-sm text-muted-foreground">{goal.description}</p>
+          <TabsContent value="kanban">
+            <div className="grid grid-cols-4 gap-4">
+              {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
+                <Card key={status} className="p-4">
+                  <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
+                  <ScrollArea className="h-[calc(100vh-250px)]">
+                    <div className="space-y-2">
+                      {statusGoals.map((goal) => (
+                        <Card key={goal.id} className="p-3">
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h4 className="font-medium">{goal.title}</h4>
+                                <p className="text-sm text-muted-foreground">{goal.description}</p>
+                              </div>
+                              <Badge variant={
+                                goal.priority === 'high' ? 'destructive' : 
+                                goal.priority === 'medium' ? 'default' : 
+                                'secondary'
+                              }>
+                                {goal.priority}
+                              </Badge>
                             </div>
-                            <Badge variant={
-                              goal.priority === 'high' ? 'destructive' : 
-                              goal.priority === 'medium' ? 'default' : 
-                              'secondary'
-                            }>
-                              {goal.priority}
-                            </Badge>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
+                            </div>
+                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary transition-all duration-500"
+                                style={{ width: `${goal.progress}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-4 w-4" />
-                            <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
-                          </div>
-                          <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-primary transition-all duration-500"
-                              style={{ width: `${goal.progress}%` }}
-                            />
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="timeline">
-          <Card className="p-4">
-            <div className="flex items-center justify-center h-[400px]">
-              <div className="text-center text-muted-foreground">
-                <BarChart2 className="h-12 w-12 mx-auto mb-4" />
-                <p>Timeline view will be implemented here</p>
-              </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </Card>
+              ))}
             </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+
+          <TabsContent value="timeline">
+            <Card className="p-4">
+              <div className="flex items-center justify-center h-[400px]">
+                <div className="text-center text-muted-foreground">
+                  <BarChart2 className="h-12 w-12 mx-auto mb-4" />
+                  <p>Timeline view will be implemented here</p>
+                </div>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+      <Suspense fallback={<div className="p-4 border-l">Loading chat...</div>}>
+        <ChatDrawer className="border-l w-[400px] h-screen" />
+      </Suspense>
     </div>
   );
 }
