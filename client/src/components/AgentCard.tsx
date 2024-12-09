@@ -6,7 +6,22 @@ import { Trophy, Database, Atom, Brain } from "lucide-react";
 import type { Agent } from "@/lib/agents";
 
 interface AgentCardProps {
-  agent: Agent;
+  agent: {
+    id: number;
+    name: string;
+    type: string;
+    status: 'active' | 'idle' | 'learning';
+    current_task: {
+      id: string;
+      summary: string;
+      progress: number;
+      status: 'pending' | 'in_progress' | 'completed';
+      priority: 'low' | 'medium' | 'high';
+    };
+    currentTasks: number;
+    successRate: number;
+    skillLevel: number;
+  };
 }
 
 export function AgentCard({ agent }: AgentCardProps) {
@@ -60,15 +75,33 @@ export function AgentCard({ agent }: AgentCardProps) {
             <span className="absolute inset-0 animate-ripple bg-current opacity-25" />
           </Badge>
         </div>
-        <p className="mt-2 text-sm">{agent.description}</p>
         
+        {agent.current_task && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Current Task</span>
+              <Badge variant={agent.current_task.priority === 'high' ? 'destructive' : 'secondary'}>
+                {agent.current_task.priority}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{agent.current_task.summary}</p>
+            <div className="mt-2">
+              <div className="flex justify-between text-xs mb-1">
+                <span>Progress</span>
+                <span>{agent.current_task.progress}%</span>
+              </div>
+              <Progress value={agent.current_task.progress} className="h-1" />
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Level {agent.level}</span>
-            <span className="text-sm text-muted-foreground">{agent.experience}%</span>
+            <span className="text-sm font-medium">Level {agent.skillLevel}</span>
+            <span className="text-sm text-muted-foreground">{(agent.successRate * 100).toFixed(1)}% Success Rate</span>
           </div>
           <Progress 
-            value={agent.experience} 
+            value={agent.successRate * 100} 
             className="animate-progress relative overflow-hidden"
             style={{
               background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
@@ -78,55 +111,10 @@ export function AgentCard({ agent }: AgentCardProps) {
         </div>
 
         <div className="mt-4">
-          <div className="text-sm font-medium mb-2">Achievements</div>
-          <div className="flex gap-2">
-            {agent.achievements.map((achievement) => (
-              <Badge
-                key={achievement.id}
-                variant="outline"
-                className="flex items-center gap-1 animate-float animate-glow interactive-hover"
-                title={achievement.description}
-              >
-                <span className="relative">
-                  {getAchievementIcon(achievement.icon)}
-                  {/* Particle effects container */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="animate-particle absolute"
-                        style={{
-                          '--x': `${Math.random() * 100 - 50}px`,
-                          '--y': `${Math.random() * -100 - 50}px`,
-                          animationDelay: `${i * 0.1}s`,
-                          backgroundColor: 'var(--primary)',
-                          width: '4px',
-                          height: '4px',
-                          borderRadius: '50%',
-                        } as React.CSSProperties}
-                      />
-                    ))}
-                  </div>
-                </span>
-                {achievement.name}
-              </Badge>
-            ))}
+          <div className="flex items-center justify-between text-sm">
+            <span>Active Tasks</span>
+            <span className="font-medium">{agent.currentTasks}</span>
           </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Confidence</span>
-            <span className="text-sm">{agent.confidence}%</span>
-          </div>
-          <Progress 
-            value={agent.confidence} 
-            className="mt-2 animate-progress relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
-              backgroundSize: '200% 100%',
-            }}
-          />
         </div>
       </Card>
     </Link>
