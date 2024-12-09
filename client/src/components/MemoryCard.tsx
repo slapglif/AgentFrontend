@@ -177,7 +177,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               }`}>
                 {memory.metadata.interactionHistory?.map((interaction: any, index: number) => (
                   <div 
-                    key={`interaction-${memory.id}-${interaction.agentId}-${interaction.timestamp}-${index}`} 
+                    key={`interaction-${memory.id}-${index}-${interaction.timestamp}`} 
                     className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                   >
                     <div className="flex flex-col">
