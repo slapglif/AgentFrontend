@@ -1,7 +1,6 @@
 import React, { useState, Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertCircle, Calendar, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -62,8 +61,8 @@ export default function Goals() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <main className="flex-1 p-6 overflow-hidden">
+    <div className="flex">
+      <main className="flex-1 p-6 min-h-screen">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Goal Management</h1>
         </div>
@@ -74,44 +73,42 @@ export default function Goals() {
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="kanban" className="h-[calc(100vh-200px)]">
-            <div className="grid grid-cols-4 gap-4 h-full">
+          <TabsContent value="kanban">
+            <div className="grid grid-cols-4 gap-4">
               {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
-                <Card key={status} className="p-4 flex flex-col h-full">
+                <Card key={status} className="p-4">
                   <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
-                  <ScrollArea className="flex-1 pr-4">
-                    <div className="space-y-4 pb-4">
-                      {statusGoals.map((goal) => (
-                        <Card key={goal.id} className="p-3">
-                          <div className="space-y-2">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h4 className="font-medium">{goal.title}</h4>
-                                <p className="text-sm text-muted-foreground">{goal.description}</p>
-                              </div>
-                              <Badge variant={
-                                goal.priority === 'high' ? 'destructive' : 
-                                goal.priority === 'medium' ? 'default' : 
-                                'secondary'
-                              }>
-                                {goal.priority}
-                              </Badge>
+                  <div className="space-y-4">
+                    {statusGoals.map((goal) => (
+                      <Card key={goal.id} className="p-3">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium">{goal.title}</h4>
+                              <p className="text-sm text-muted-foreground">{goal.description}</p>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Calendar className="h-4 w-4" />
-                              <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
-                            </div>
-                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary transition-all duration-500"
-                                style={{ width: `${goal.progress}%` }}
-                              />
-                            </div>
+                            <Badge variant={
+                              goal.priority === 'high' ? 'destructive' : 
+                              goal.priority === 'medium' ? 'default' : 
+                              'secondary'
+                            }>
+                              {goal.priority}
+                            </Badge>
                           </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>Due {new Date(goal.deadline).toLocaleDateString()}</span>
+                          </div>
+                          <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary transition-all duration-500"
+                              style={{ width: `${goal.progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
                 </Card>
               ))}
             </div>
@@ -131,11 +128,11 @@ export default function Goals() {
       </main>
 
       <Suspense fallback={
-        <div className="w-[400px] border-l bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="w-[400px] border-l bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
           <div className="p-4">Loading chat...</div>
         </div>
       }>
-        <ChatDrawer className="border-l" />
+        <ChatDrawer className="border-l sticky top-0" />
       </Suspense>
     </div>
   );

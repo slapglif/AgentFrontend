@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Badge } from "@/components/ui/badge";
 import { Brain, BookOpen, Target, Zap, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -161,8 +161,7 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
         </div>
       </div>
 
-      <ScrollArea className="flex-1 pr-4">
-        <div className="space-y-6">
+      <div className="space-y-6">
           {/* Overall Progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -247,7 +246,6 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
             </div>
           </div>
         </div>
-      </ScrollArea>
     </Card>
   );
 }

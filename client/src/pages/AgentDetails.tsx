@@ -4,7 +4,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -151,7 +150,7 @@ export default function AgentDetails() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col min-h-screen">
       <header className="border-b p-4 bg-muted/30 backdrop-blur-sm flex-none">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
@@ -164,8 +163,8 @@ export default function AgentDetails() {
         </div>
       </header>
 
-      <div className="flex-1 p-6 overflow-hidden">
-        <Tabs defaultValue="overview" className="h-full flex flex-col">
+      <div className="flex-1 p-6 overflow-auto">
+        <Tabs defaultValue="overview" className="w-full">
           <TabsList>
             <TabsTrigger value="overview" className="gap-2">
               <Activity className="h-4 w-4" />
@@ -185,132 +184,124 @@ export default function AgentDetails() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 mt-4 overflow-hidden">
-            <TabsContent value="overview" className="h-full">
-              <ScrollArea className="h-[calc(100vh-240px)]">
-                <div className="grid grid-cols-2 gap-4 pb-6">
-                  <Card className="p-4">
-                    <h3 className="font-medium mb-4">Performance Metrics</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm">Success Rate</span>
-                          <span className="text-sm font-medium">
-                            {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <Progress 
-                          value={agent.performance_metrics.success_rate * 100} 
-                          className="animate-progress" 
-                        />
+          <div className="mt-4">
+            <TabsContent value="overview">
+              <div className="grid grid-cols-2 gap-4 pb-6">
+                <Card className="p-4">
+                  <h3 className="font-medium mb-4">Performance Metrics</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Success Rate</span>
+                        <span className="text-sm font-medium">
+                          {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm">Tasks Completed</span>
-                          <span className="text-sm font-medium">
-                            {agent.performance_metrics.tasks_completed}
-                          </span>
-                        </div>
-                        <Progress 
-                          value={(agent.performance_metrics.tasks_completed / 100) * 100}
-                          className="animate-progress" 
-                        />
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <h3 className="font-medium mb-4">Resource Usage</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm">CPU Usage</span>
-                          <span className="text-sm font-medium">
-                            {mockPerformanceData.resource_usage.cpu}%
-                          </span>
-                        </div>
-                        <Progress 
-                          value={mockPerformanceData.resource_usage.cpu}
-                          className="animate-progress" 
-                        />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-sm">Memory Usage</span>
-                          <span className="text-sm font-medium">
-                            {mockPerformanceData.resource_usage.memory}%
-                          </span>
-                        </div>
-                        <Progress 
-                          value={mockPerformanceData.resource_usage.memory}
-                          className="animate-progress" 
-                        />
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-4 col-span-2">
-                    <h3 className="font-medium mb-4">Current Tasks</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {mockPerformanceData.current_tasks.map((task) => (
-                        <div 
-                          key={task.id}
-                          className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                        >
-                          <div className="flex items-center gap-2">
-                            <ListTodo className="h-4 w-4" />
-                            <span className="text-sm font-medium">{task.type}</span>
-                          </div>
-                          <Badge variant={task.priority === "high" ? "destructive" : "secondary"}>
-                            {task.status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                </div>
-              </ScrollArea>
-            </TabsContent>
-
-            <TabsContent value="memory" className="h-full">
-              <ScrollArea className="h-[calc(100vh-240px)]">
-                <div className="space-y-4 pr-4">
-                  {isLoadingMemories ? (
-                    <div className="flex items-center justify-center h-32">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    </div>
-                  ) : memories?.length > 0 ? (
-                    memories.map((memory) => (
-                      <MemoryCard 
-                        key={memory.id}
-                        memory={memory} 
+                      <Progress 
+                        value={agent.performance_metrics.success_rate * 100} 
+                        className="animate-progress" 
                       />
-                    ))
-                  ) : (
-                    <div className="text-center text-muted-foreground">
-                      No memories found
                     </div>
-                  )}
-                </div>
-              </ScrollArea>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Tasks Completed</span>
+                        <span className="text-sm font-medium">
+                          {agent.performance_metrics.tasks_completed}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={(agent.performance_metrics.tasks_completed / 100) * 100}
+                        className="animate-progress" 
+                      />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4">
+                  <h3 className="font-medium mb-4">Resource Usage</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">CPU Usage</span>
+                        <span className="text-sm font-medium">
+                          {mockPerformanceData.resource_usage.cpu}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={mockPerformanceData.resource_usage.cpu}
+                        className="animate-progress" 
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Memory Usage</span>
+                        <span className="text-sm font-medium">
+                          {mockPerformanceData.resource_usage.memory}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={mockPerformanceData.resource_usage.memory}
+                        className="animate-progress" 
+                      />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-4 col-span-2">
+                  <h3 className="font-medium mb-4">Current Tasks</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {mockPerformanceData.current_tasks.map((task) => (
+                      <div 
+                        key={task.id}
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                      >
+                        <div className="flex items-center gap-2">
+                          <ListTodo className="h-4 w-4" />
+                          <span className="text-sm font-medium">{task.type}</span>
+                        </div>
+                        <Badge variant={task.priority === "high" ? "destructive" : "secondary"}>
+                          {task.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
             </TabsContent>
 
-            <TabsContent value="resources" className="h-full">
-              <ScrollArea className="h-[calc(100vh-240px)]">
-                <div className="grid grid-cols-2 gap-4 pr-4">
-                  <ResourceMonitor agent={agent} />
-                </div>
-              </ScrollArea>
+            <TabsContent value="memory">
+              <div className="space-y-4 pb-6">
+                {isLoadingMemories ? (
+                  <div className="flex items-center justify-center h-32">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : memories?.length > 0 ? (
+                  memories.map((memory) => (
+                    <MemoryCard 
+                      key={memory.id}
+                      memory={memory} 
+                    />
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    No memories found
+                  </div>
+                )}
+              </div>
             </TabsContent>
 
-            <TabsContent value="learning" className="h-full">
-              <ScrollArea className="h-[calc(100vh-240px)]">
-                <div className="grid grid-cols-1 gap-4 pr-4">
-                  <ErrorBoundary>
-                    <LearningProgress metrics={mockLearningMetrics} />
-                  </ErrorBoundary>
-                </div>
-              </ScrollArea>
+            <TabsContent value="resources">
+              <div className="grid grid-cols-2 gap-4 pb-6">
+                <ResourceMonitor agent={agent} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="learning">
+              <div className="grid grid-cols-1 gap-4 pb-6">
+                <ErrorBoundary>
+                  <LearningProgress metrics={mockLearningMetrics} />
+                </ErrorBoundary>
+              </div>
             </TabsContent>
           </div>
         </Tabs>

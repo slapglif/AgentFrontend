@@ -42,11 +42,11 @@ export function ChatDrawer({ className }: ChatDrawerProps) {
       )}
 
       {isExpanded && (
-        <div className="h-full p-4">
+        <div className="p-4 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Agent Orchestration</h2>
           </div>
-          <Card className="h-[calc(100vh-10rem)] overflow-hidden">
+          <Card className="flex-1">
             <ChatInterface />
           </Card>
         </div>

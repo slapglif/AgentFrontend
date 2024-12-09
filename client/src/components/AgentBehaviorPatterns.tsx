@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { mockAnalytics } from "@/lib/mockAnalytics";
 import { DEFAULT_AGENTS } from "@/lib/agents";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Brain, GitMerge, Target, Zap } from "lucide-react";
 
 export function AgentBehaviorPatterns() {
@@ -24,8 +24,7 @@ export function AgentBehaviorPatterns() {
         {/* Individual Agent Behavior Analysis */}
         <Card className="p-4">
           <h3 className="font-medium mb-4">Agent Behavior Analysis</h3>
-          <ScrollArea className="h-[calc(100vh-300px)]">
-            <div className="space-y-6">
+          <div className="space-y-6">
               {mockAnalytics.agentPerformance.map((agent) => {
                 const scores = getBehaviorScore(agent);
                 return (
@@ -71,7 +70,6 @@ export function AgentBehaviorPatterns() {
                 );
               })}
             </div>
-          </ScrollArea>
         </Card>
 
         {/* Research Pattern Analysis */}
