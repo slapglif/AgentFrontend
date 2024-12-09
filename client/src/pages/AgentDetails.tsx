@@ -15,6 +15,7 @@ import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
 import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { mockPerformanceData, mockLearningMetrics, mockMemoryData } from "@/lib/mockData";
+import { mockOverview } from "@/lib/mockOverview";
 import type { Agent } from "@/lib/agents";
 import {
   Activity,
@@ -47,12 +48,30 @@ export default function AgentDetails() {
         if (!mockAgent) {
           throw new Error(`Agent with ID ${id} not found`);
         }
+
+        // Get the latest metrics from mockOverview
+        const latestMetrics = {
+          success_rate: mockOverview.performanceMetrics.successRate,
+          tasks_completed: mockOverview.performanceMetrics.taskCompletion.successful,
+          avg_response_time: mockOverview.performanceMetrics.avgResponseTime,
+          memory_usage: mockOverview.performanceMetrics.resourceUtilization.memory
+        };
+
         return {
           ...mockAgent,
           lastUpdated: new Date().toISOString(),
-          performance_metrics: mockPerformanceData.daily_metrics[6], // Get latest metrics
-          current_tasks: mockPerformanceData.current_tasks,
-          learningMetrics: mockLearningMetrics
+          performance_metrics: latestMetrics,
+          current_tasks: mockPerformanceData.current_tasks.map(task => ({
+            ...task,
+            priority: Math.random() > 0.7 ? "high" : "medium",
+            status: ["pending", "in_progress", "completed"][Math.floor(Math.random() * 3)]
+          })),
+          learningMetrics: mockLearningMetrics,
+          resource_usage: {
+            cpu: mockOverview.performanceMetrics.resourceUtilization.cpu,
+            memory: mockOverview.performanceMetrics.resourceUtilization.memory,
+            network: mockOverview.performanceMetrics.resourceUtilization.network
+          }
         };
       } catch (err) {
         console.error('Error loading agent:', err);
