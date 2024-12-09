@@ -5,14 +5,38 @@ import { Progress } from "@/components/ui/progress";
 import { formatDistance } from "date-fns";
 import { CodeBlock } from "./CodeBlock";
 
+interface MemoryMetadata {
+  detailedAnalysis?: Record<string, number>;
+  relatedMemories?: Array<{
+    id: string;
+    type: string;
+    relevanceScore: number;
+  }>;
+  interactionHistory?: Array<{
+    id?: string;
+    action: string;
+    timestamp: string;
+    context: string;
+    doshaType?: string;
+  }>;
+  xpGained?: number;
+  duration?: number;
+}
+
+interface MemoryContent {
+  text: string;
+  code?: string;
+  language?: string;
+}
+
 interface MemoryCardProps {
   memory: {
     id: number;
     type: string;
-    content: any;
+    content: MemoryContent;
     timestamp: string;
     confidence: number;
-    metadata: any;
+    metadata: MemoryMetadata;
   };
 }
 
@@ -182,7 +206,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
                 activeSection === 'history' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
                 {memory.metadata.interactionHistory?.map((interaction: any, index: number) => {
-                  const uniqueKey = `interaction-${memory.id}-${index}-${typeof interaction.timestamp === 'string' ? interaction.timestamp : Date.now()}`;
+                  const uniqueKey = `interaction-${memory.id}-${interaction.id || index}-${Date.now()}`;
                   return (
                     <div 
                       key={uniqueKey}

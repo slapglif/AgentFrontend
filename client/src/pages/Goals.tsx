@@ -53,6 +53,9 @@ const mockGoals: Goal[] = [
 export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>(mockGoals);
   const [view, setView] = useState<"kanban" | "timeline">("kanban");
+  
+  // Add ChatDrawer to handle agent orchestration
+  const ChatDrawer = React.lazy(() => import("@/components/ChatDrawer"));
 
   const goalsByStatus = {
     planning: goals.filter(goal => goal.status === "planning"),
@@ -62,7 +65,10 @@ export default function Goals() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="relative p-6 space-y-6">
+      <React.Suspense fallback={null}>
+        <ChatDrawer />
+      </React.Suspense>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Goal Management</h1>
       </div>

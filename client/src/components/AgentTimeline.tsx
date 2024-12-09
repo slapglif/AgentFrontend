@@ -11,9 +11,9 @@ export function AgentTimeline() {
   });
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       <h2 className="text-xl font-semibold mb-4 flex-shrink-0">Memory Timeline</h2>
-      <ScrollArea className="flex-1 h-[calc(100vh-12rem)]">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-4 p-4">
           {memories?.map((memory: any, index: number) => (
             <div 

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgentTimeline } from "@/components/AgentTimeline";
-import { ChatInterface } from "@/components/ChatInterface";
 import { AgentCard } from "@/components/AgentCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -38,8 +37,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      <aside className="w-64 border-r">
+    <div className="flex h-screen bg-background overflow-hidden">
+      <aside className="w-64 border-r flex-shrink-0">
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <h2 className="text-lg font-semibold">Agents</h2>
@@ -63,12 +62,9 @@ export default function Home() {
         </ScrollArea>
       </aside>
       
-      <main className="flex-1 flex flex-col">
-        <div className="flex-1 p-6">
+      <main className="flex-1 overflow-hidden">
+        <div className="h-full p-6">
           <AgentTimeline />
-        </div>
-        <div className="h-1/3 border-t">
-          <ChatInterface />
         </div>
       </main>
     </div>
