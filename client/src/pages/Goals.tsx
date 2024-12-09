@@ -5,7 +5,6 @@ import { ChatDrawer } from "@/components/ChatDrawer";
 import { GoalKanbanBoard } from "@/components/GoalKanbanBoard";
 import { TimelineView } from "@/components/TimelineView";
 import { Plus } from "lucide-react";
-import { addDays, differenceInDays } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -29,8 +28,9 @@ interface Task {
   description?: string;
   completed: boolean;
   assignedTo?: string;
-  startDate: Date;
-  endDate: Date;
+  startTime: Date;
+  endTime: Date;
+  dependencies?: string[];
 }
 
 interface Goal {
@@ -38,26 +38,28 @@ interface Goal {
   title: string;
   description: string;
   status: "todo" | "in_progress" | "completed";
-  startDate: Date;
-  endDate: Date;
+  startTime: Date;
+  endTime: Date;
   progress: number;
   tasks: Task[];
 }
 
 // Mock initial goals data
 const today = new Date();
-const twoWeeksFromNow = new Date();
-twoWeeksFromNow.setDate(today.getDate() + 14);
+const makeTime = (hours: number, minutes: number = 0) => {
+  const date = new Date(today);
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+};
 
-// Ensure dates are properly instantiated
 const initialGoals: Goal[] = [
   {
     id: "1",
     title: "Research Data Analysis",
     description: "Analyze research data for patterns and insights",
     status: "in_progress",
-    startDate: new Date(today.getTime()),
-    endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    startTime: makeTime(9), // 9 AM
+    endTime: makeTime(16), // 4 PM
     progress: 60,
     tasks: [
       {
@@ -65,24 +67,26 @@ const initialGoals: Goal[] = [
         title: "Data preprocessing",
         description: "Clean and prepare data for analysis",
         completed: true,
-        startDate: today,
-        endDate: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        startTime: makeTime(9), // 9 AM
+        endTime: makeTime(11), // 11 AM
       },
       {
         id: "1-2",
         title: "Feature selection",
         description: "Select relevant features for analysis",
         completed: true,
-        startDate: new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000),
-        endDate: new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000),
+        dependencies: ["1-1"],
+        startTime: makeTime(11), // 11 AM
+        endTime: makeTime(13), // 1 PM
       },
       {
         id: "1-3",
         title: "Model selection",
         description: "Choose appropriate models for analysis",
         completed: false,
-        startDate: new Date(today.getTime() + 6 * 24 * 60 * 60 * 1000),
-        endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+        dependencies: ["1-2"],
+        startTime: makeTime(14), // 2 PM
+        endTime: makeTime(16), // 4 PM
       }
     ]
   },
@@ -91,8 +95,8 @@ const initialGoals: Goal[] = [
     title: "Implement Machine Learning Pipeline",
     description: "Create end-to-end ML pipeline",
     status: "todo",
-    startDate: new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000),
-    endDate: twoWeeksFromNow,
+    startTime: makeTime(10), // 10 AM
+    endTime: makeTime(17), // 5 PM
     progress: 0,
     tasks: [
       {
@@ -100,16 +104,17 @@ const initialGoals: Goal[] = [
         title: "Data ingestion",
         description: "Set up data ingestion pipeline",
         completed: false,
-        startDate: new Date(today.getTime() + 8 * 24 * 60 * 60 * 1000),
-        endDate: new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000),
+        startTime: makeTime(10), // 10 AM
+        endTime: makeTime(13), // 1 PM
       },
       {
         id: "2-2",
         title: "Model training",
         description: "Implement model training pipeline",
         completed: false,
-        startDate: new Date(today.getTime() + 11 * 24 * 60 * 60 * 1000),
-        endDate: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000),
+        dependencies: ["2-1"],
+        startTime: makeTime(14), // 2 PM
+        endTime: makeTime(17), // 5 PM
       }
     ]
   }
@@ -121,7 +126,7 @@ const mockChatMessages = [
     id: 1,
     role: "assistant",
     content: "👋 I'm your research assistant. I'll help you manage your goals and optimize your research timeline. What would you like to focus on today?",
-    timestamp: new Date("2024-12-09T10:00:00"),
+    timestamp: new Date(),
     metadata: {
       type: "welcome"
     }
@@ -129,52 +134,12 @@ const mockChatMessages = [
   {
     id: 2,
     role: "assistant",
-    content: "I noticed that the 'Research Data Analysis' goal is approaching its deadline. The current progress is at 60%. Based on the task dependencies, here's what I suggest:\n\n1. 🎯 Prioritize 'Model Selection' as it's blocking other tasks\n2. 🔄 Parallelize Feature Selection with Data Preprocessing\n3. ⏰ Consider extending the deadline by 2 days\n\nWould you like me to help adjust the timeline?",
-    timestamp: new Date("2024-12-09T10:01:00"),
+    content: "I noticed that the 'Research Data Analysis' goal is approaching its deadline. The current progress is at 60%. Based on the task dependencies, here's what I suggest:\n\n1. 🎯 Prioritize 'Model Selection' as it's blocking other tasks\n2. 🔄 Parallelize Feature Selection with Data Preprocessing\n3. ⏰ Consider extending the timeline\n\nWould you like me to help adjust the timeline?",
+    timestamp: new Date(),
     metadata: {
       goalId: "1",
       type: "timeline_optimization",
       suggestedAction: "adjust_timeline"
-    }
-  },
-  {
-    id: 3,
-    role: "user",
-    content: "Yes, please help optimize the timeline. Can you also suggest ways to speed up the model selection process?",
-    timestamp: new Date("2024-12-09T10:02:00")
-  },
-  {
-    id: 4,
-    role: "assistant",
-    content: "I've analyzed your model selection requirements. Here's a plan to accelerate the process:\n\n1. 📊 Use automated model selection techniques\n2. 🔍 Focus on top 3 performing algorithms\n3. 🤝 Leverage parallel processing for evaluation\n\nI've updated the timeline to reflect these optimizations. Would you like me to create subtasks for each of these steps?",
-    timestamp: new Date("2024-12-09T10:03:00"),
-    metadata: {
-      type: "optimization_suggestion",
-      taskId: "1-3",
-      suggestedActions: ["create_subtasks", "update_timeline"]
-    }
-  },
-  {
-    id: 5,
-    role: "system",
-    content: "✨ Task 'Data preprocessing' has been completed! The goal 'Research Data Analysis' is now 60% complete.",
-    timestamp: new Date("2024-12-09T10:04:00"),
-    metadata: {
-      type: "task_completion",
-      taskId: "1-1",
-      goalId: "1",
-      progress: 60
-    }
-  },
-  {
-    id: 6,
-    role: "assistant",
-    content: "Great progress! 🎉 I see you've completed the data preprocessing. Based on the results, the feature selection process could be simplified. Would you like me to:\n\n1. 🔄 Update the feature selection criteria\n2. 📋 Generate a summary of key features\n3. 📊 Create a feature importance visualization",
-    timestamp: new Date("2024-12-09T10:05:00"),
-    metadata: {
-      type: "task_suggestion",
-      relatedTasks: ["1-2"],
-      suggestedActions: ["update_criteria", "generate_summary", "create_visualization"]
     }
   }
 ];
@@ -185,8 +150,8 @@ export default function Goals() {
   const [newGoal, setNewGoal] = useState({
     title: "",
     description: "",
-    startDate: "",
-    endDate: "",
+    startTime: "",
+    endTime: "",
     priority: "medium"
   });
 
@@ -226,20 +191,20 @@ export default function Goals() {
   };
 
   const addNewGoal = () => {
-    if (!newGoal.title || !newGoal.startDate || !newGoal.endDate) return;
+    if (!newGoal.title || !newGoal.startTime || !newGoal.endTime) return;
 
-    const startDate = new Date(newGoal.startDate);
-    const endDate = new Date(newGoal.endDate);
+    const startTime = new Date(newGoal.startTime);
+    const endTime = new Date(newGoal.endTime);
     
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+    if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) return;
     
     const goal: Goal = {
       id: `goal-${goals.length + 1}`,
       title: newGoal.title,
       description: newGoal.description,
       status: "todo",
-      startDate,
-      endDate,
+      startTime,
+      endTime,
       progress: 0,
       tasks: []
     };
@@ -249,16 +214,10 @@ export default function Goals() {
     setNewGoal({
       title: "",
       description: "",
-      startDate: "",
-      endDate: "",
+      startTime: "",
+      endTime: "",
       priority: "medium"
     });
-  };
-
-  const updateGoalProgress = (goalId: string, progress: number) => {
-    setGoals(goals.map(goal => 
-      goal.id === goalId ? { ...goal, progress } : goal
-    ));
   };
 
   return (
@@ -300,22 +259,22 @@ export default function Goals() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Start Date</label>
+                    <label className="text-sm font-medium">Start Time</label>
                     <Input
-                      type="date"
-                      value={newGoal.startDate}
+                      type="time"
+                      value={newGoal.startTime}
                       onChange={(e) =>
-                        setNewGoal({ ...newGoal, startDate: e.target.value })
+                        setNewGoal({ ...newGoal, startTime: e.target.value })
                       }
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">End Date</label>
+                    <label className="text-sm font-medium">End Time</label>
                     <Input
-                      type="date"
-                      value={newGoal.endDate}
+                      type="time"
+                      value={newGoal.endTime}
                       onChange={(e) =>
-                        setNewGoal({ ...newGoal, endDate: e.target.value })
+                        setNewGoal({ ...newGoal, endTime: e.target.value })
                       }
                     />
                   </div>
@@ -364,26 +323,7 @@ export default function Goals() {
           </TabsContent>
 
           <TabsContent value="timeline">
-            <TimelineView 
-              goals={goals}
-              onTaskUpdate={(taskData) => {
-                const updatedGoals = goals.map(goal => {
-                  if (goal.id === taskData.goalId) {
-                    const daysDiff = differenceInDays(
-                      taskData.destinationDate,
-                      taskData.sourceDate
-                    );
-                    return {
-                      ...goal,
-                      startDate: addDays(goal.startDate, daysDiff),
-                      endDate: addDays(goal.endDate, daysDiff)
-                    };
-                  }
-                  return goal;
-                });
-                setGoals(updatedGoals);
-              }}
-            />
+            <TimelineView goals={goals} />
           </TabsContent>
         </Tabs>
       </main>
@@ -400,7 +340,6 @@ export default function Goals() {
           messages={mockChatMessages}
           onSendMessage={(message) => {
             console.log("Sending message:", message);
-            // Handle new message
           }}
         />
       </Suspense>
