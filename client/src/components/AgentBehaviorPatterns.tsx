@@ -24,7 +24,7 @@ export function AgentBehaviorPatterns() {
         {/* Individual Agent Behavior Analysis */}
         <Card className="p-4">
           <h3 className="font-medium mb-4">Agent Behavior Analysis</h3>
-          <ScrollArea className="h-[400px]">
+          <ScrollArea className="h-[calc(100vh-300px)]">
             <div className="space-y-6">
               {mockAnalytics.agentPerformance.map((agent) => {
                 const scores = getBehaviorScore(agent);

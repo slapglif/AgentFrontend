@@ -15,8 +15,8 @@ export function ChatDrawer({ className }: ChatDrawerProps) {
   return (
     <div
       className={cn(
-        "relative h-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out",
-        isExpanded ? "w-96" : "w-12",
+        "relative h-full bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out border-l",
+        isExpanded ? "w-[400px]" : "w-12",
         className
       )}
     >
@@ -46,7 +46,7 @@ export function ChatDrawer({ className }: ChatDrawerProps) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Agent Orchestration</h2>
           </div>
-          <Card className="h-[calc(100vh-8rem)] overflow-hidden">
+          <Card className="h-[calc(100vh-10rem)] overflow-hidden">
             <ChatInterface />
           </Card>
         </div>

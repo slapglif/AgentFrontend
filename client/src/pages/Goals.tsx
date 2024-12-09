@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertCircle, Calendar, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChatDrawer } from "@/components/ChatDrawer";
 
 interface Goal {
   id: number;
@@ -52,10 +53,6 @@ const mockGoals: Goal[] = [
 
 export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>(mockGoals);
-  const [view, setView] = useState<"kanban" | "timeline">("kanban");
-  
-  // Add ChatDrawer to handle agent orchestration
-  const ChatDrawer = React.lazy(() => import("@/components/ChatDrawer"));
 
   const goalsByStatus = {
     planning: goals.filter(goal => goal.status === "planning"),
@@ -66,8 +63,8 @@ export default function Goals() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 p-6 space-y-6 overflow-hidden">
-        <div className="flex items-center justify-between">
+      <main className="flex-1 p-6 overflow-hidden">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Goal Management</h1>
         </div>
 
@@ -77,13 +74,13 @@ export default function Goals() {
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="kanban">
-            <div className="grid grid-cols-4 gap-4">
+          <TabsContent value="kanban" className="h-[calc(100vh-200px)]">
+            <div className="grid grid-cols-4 gap-4 h-full">
               {Object.entries(goalsByStatus).map(([status, statusGoals]) => (
-                <Card key={status} className="p-4">
+                <Card key={status} className="p-4 flex flex-col h-full">
                   <h3 className="font-medium mb-4 capitalize">{status.replace("_", " ")}</h3>
-                  <ScrollArea className="h-[calc(100vh-250px)]">
-                    <div className="space-y-2">
+                  <ScrollArea className="flex-1 pr-4">
+                    <div className="space-y-4 pb-4">
                       {statusGoals.map((goal) => (
                         <Card key={goal.id} className="p-3">
                           <div className="space-y-2">
@@ -131,9 +128,14 @@ export default function Goals() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-      <Suspense fallback={<div className="p-4 border-l">Loading chat...</div>}>
-        <ChatDrawer className="border-l w-[400px] h-screen" />
+      </main>
+
+      <Suspense fallback={
+        <div className="w-[400px] border-l bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="p-4">Loading chat...</div>
+        </div>
+      }>
+        <ChatDrawer className="border-l" />
       </Suspense>
     </div>
   );

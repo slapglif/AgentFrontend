@@ -187,7 +187,7 @@ export default function AgentDetails() {
 
           <div className="flex-1 mt-4 overflow-hidden">
             <TabsContent value="overview" className="h-full">
-              <ScrollArea className="h-[calc(100vh-250px)]">
+              <ScrollArea className="h-[calc(100vh-240px)]">
                 <div className="grid grid-cols-2 gap-4 pb-6">
                   <Card className="p-4">
                     <h3 className="font-medium mb-4">Performance Metrics</h3>
@@ -273,16 +273,16 @@ export default function AgentDetails() {
             </TabsContent>
 
             <TabsContent value="memory" className="h-full">
-              <ScrollArea className="h-[calc(100vh-250px)]">
-                <div className="space-y-4">
+              <ScrollArea className="h-[calc(100vh-240px)]">
+                <div className="space-y-4 pr-4">
                   {isLoadingMemories ? (
                     <div className="flex items-center justify-center h-32">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
                   ) : memories?.length > 0 ? (
-                    memories.map((memory, index) => (
+                    memories.map((memory) => (
                       <MemoryCard 
-                        key={`${memory.id}-${index}`} 
+                        key={memory.id}
                         memory={memory} 
                       />
                     ))
@@ -296,16 +296,16 @@ export default function AgentDetails() {
             </TabsContent>
 
             <TabsContent value="resources" className="h-full">
-              <ScrollArea className="h-[calc(100vh-250px)]">
-                <div className="grid grid-cols-2 gap-4">
+              <ScrollArea className="h-[calc(100vh-240px)]">
+                <div className="grid grid-cols-2 gap-4 pr-4">
                   <ResourceMonitor agent={agent} />
                 </div>
               </ScrollArea>
             </TabsContent>
 
             <TabsContent value="learning" className="h-full">
-              <ScrollArea className="h-[calc(100vh-250px)]">
-                <div className="grid grid-cols-1 gap-4">
+              <ScrollArea className="h-[calc(100vh-240px)]">
+                <div className="grid grid-cols-1 gap-4 pr-4">
                   <ErrorBoundary>
                     <LearningProgress metrics={mockLearningMetrics} />
                   </ErrorBoundary>
