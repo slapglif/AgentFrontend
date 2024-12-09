@@ -1,16 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { mockMemoryData } from "@/lib/mockData";
 import { MemoryCard } from "./MemoryCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function AgentTimeline() {
   const { data: memories } = useQuery({
     queryKey: ["memories"],
-    queryFn: async () => {
-      const res = await fetch("/api/memories");
-      if (!res.ok) throw new Error("Failed to load memories");
-      return res.json();
-    },
-    refetchInterval: 1000,
+    queryFn: () => Promise.resolve(mockMemoryData),
+    refetchInterval: 5000,
   });
 
   return (

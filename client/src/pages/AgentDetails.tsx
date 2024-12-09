@@ -1,36 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { MemoryCard } from "@/components/MemoryCard";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Loader2 } from "lucide-react";
-import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
-import { LearningProgress } from "@/components/LearningProgress";
-import { 
-  AlertCircle,
-  Settings,
-  Activity,
-  Clock,
-  Database,
-  ChevronLeft,
-  Users,
-  BarChart2,
-  ListTodo,
-  Monitor,
-  HardDrive,
-  Cpu,
-  GraduationCap
-} from "lucide-react";
-import { ResourceMonitor } from "@/components/ResourceMonitor";
-import { DEFAULT_AGENTS } from "@/lib/agents";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MemoryCard } from "@/components/MemoryCard";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LearningProgress } from "@/components/LearningProgress";
+import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
+import { ResourceMonitor } from "@/components/ResourceMonitor";
+import { DEFAULT_AGENTS } from "@/lib/agents";
+import { mockPerformanceData, mockLearningMetrics, mockMemoryData } from "@/lib/mockData";
 import type { Agent } from "@/lib/agents";
+import {
+  Activity,
+  Settings,
+  Clock,
+  Database,
+  Users,
+  Monitor,
+  GraduationCap,
+  ChevronLeft,
+  AlertCircle,
+  Loader2,
+  ListTodo,
+  BarChart2,
+  HardDrive,
+  Cpu
+} from "lucide-react";
 
 export default function AgentDetails() {
   const [, setLocation] = useLocation();
@@ -49,6 +50,9 @@ export default function AgentDetails() {
         return {
           ...mockAgent,
           lastUpdated: new Date().toISOString(),
+          performance_metrics: mockPerformanceData.daily_metrics[6], // Get latest metrics
+          current_tasks: mockPerformanceData.current_tasks,
+          learningMetrics: mockLearningMetrics
         };
       } catch (err) {
         console.error('Error loading agent:', err);
@@ -65,14 +69,8 @@ export default function AgentDetails() {
 
   const { data: memories, isLoading: isLoadingMemories } = useQuery({
     queryKey: ["memories", id],
-    queryFn: () => {
-      // Use mock memories data instead of API call
-      return Promise.resolve([
-        { id: 1, type: "event", content: "Task completed successfully", timestamp: new Date() },
-        { id: 2, type: "interaction", content: "Collaborated with Research Lead", timestamp: new Date() }
-      ]);
-    },
-    enabled: !!agent, // Only fetch memories if we have an agent
+    queryFn: () => Promise.resolve(mockMemoryData),
+    enabled: !!agent,
   });
 
   if (isLoading) {
@@ -155,21 +153,9 @@ export default function AgentDetails() {
               <Activity className="h-4 w-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="configuration" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Configuration
-            </TabsTrigger>
-            <TabsTrigger value="history" className="gap-2">
-              <Clock className="h-4 w-4" />
-              History
-            </TabsTrigger>
             <TabsTrigger value="memory" className="gap-2">
               <Database className="h-4 w-4" />
               Memory
-            </TabsTrigger>
-            <TabsTrigger value="collaboration" className="gap-2">
-              <Users className="h-4 w-4" />
-              Collaboration
             </TabsTrigger>
             <TabsTrigger value="resources" className="gap-2">
               <Monitor className="h-4 w-4" />
@@ -182,9 +168,8 @@ export default function AgentDetails() {
           </TabsList>
 
           <div className="flex-1 mt-4">
-            <TabsContent value="overview">
+            <TabsContent value="overview" className="h-full">
               <div className="grid grid-cols-2 gap-4">
-                {/* Performance Metrics Card */}
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Performance Metrics</h3>
                   <div className="space-y-4">
@@ -202,58 +187,61 @@ export default function AgentDetails() {
                     </div>
                     <div>
                       <div className="flex justify-between mb-2">
-                        <span className="text-sm">Response Time</span>
+                        <span className="text-sm">Tasks Completed</span>
                         <span className="text-sm font-medium">
-                          {agent.performance_metrics.avg_response_time}ms
+                          {agent.performance_metrics.tasks_completed}
                         </span>
                       </div>
                       <Progress 
-                        value={100 - (agent.performance_metrics.avg_response_time / 5000) * 100} 
+                        value={(agent.performance_metrics.tasks_completed / 100) * 100}
                         className="animate-progress" 
                       />
                     </div>
                   </div>
                 </Card>
 
-                {/* Capabilities Card */}
                 <Card className="p-4">
-                  <h3 className="font-medium mb-4">Capabilities</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {agent.capabilities.map((capability) => (
-                      <div key={capability} className="p-2 bg-muted rounded-lg text-sm">
-                        {capability}
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* System Stats Card */}
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">System Stats</h3>
+                  <h3 className="font-medium mb-4">Resource Usage</h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Memory Usage</span>
-                      <span className="text-sm font-medium">
-                        {agent.memory_allocation.used} / {agent.memory_allocation.total} MB
-                      </span>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">CPU Usage</span>
+                        <span className="text-sm font-medium">
+                          {mockPerformanceData.resource_usage.cpu}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={mockPerformanceData.resource_usage.cpu}
+                        className="animate-progress" 
+                      />
                     </div>
-                    <Progress 
-                      value={(agent.memory_allocation.used / agent.memory_allocation.total) * 100}
-                      className="animate-progress"
-                    />
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm">Memory Usage</span>
+                        <span className="text-sm font-medium">
+                          {mockPerformanceData.resource_usage.memory}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={mockPerformanceData.resource_usage.memory}
+                        className="animate-progress" 
+                      />
+                    </div>
                   </div>
                 </Card>
 
-                {/* Tasks Overview Card */}
-                <Card className="p-4">
+                <Card className="p-4 col-span-2">
                   <h3 className="font-medium mb-4">Current Tasks</h3>
-                  <div className="space-y-2">
-                    {agent.current_tasks.map((task) => (
+                  <div className="grid grid-cols-2 gap-4">
+                    {mockPerformanceData.current_tasks.map((task) => (
                       <div 
                         key={task.id}
-                        className="flex items-center justify-between p-2 bg-muted rounded-lg"
+                        className="flex items-center justify-between p-3 bg-muted rounded-lg"
                       >
-                        <span className="text-sm">{task.type}</span>
+                        <div className="flex items-center gap-2">
+                          <ListTodo className="h-4 w-4" />
+                          <span className="text-sm font-medium">{task.type}</span>
+                        </div>
                         <Badge variant={task.priority === "high" ? "destructive" : "secondary"}>
                           {task.status}
                         </Badge>
@@ -264,47 +252,15 @@ export default function AgentDetails() {
               </div>
             </TabsContent>
 
-            <TabsContent value="configuration">
-              <div className="space-y-4">
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Agent Configuration</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm mb-2 block">Decision Threshold</label>
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.01"
-                          value={agent.configuration.decision_threshold}
-                          className="flex-1"
-                          onChange={(e) => {
-                            toast({
-                              title: "Configuration Updated",
-                              description: `Decision threshold set to ${e.target.value}`,
-                            });
-                          }}
-                        />
-                        <span className="text-sm font-mono w-16">
-                          {agent.configuration.decision_threshold}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </TabsContent>
-
             <TabsContent value="memory">
-              <ScrollArea className="h-full">
-                <div className="space-y-4 p-4">
+              <ScrollArea className="h-[calc(100vh-250px)]">
+                <div className="space-y-4">
                   {isLoadingMemories ? (
                     <div className="flex items-center justify-center h-32">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
                   ) : memories?.length > 0 ? (
-                    memories.map((memory: any) => (
+                    memories.map((memory) => (
                       <MemoryCard key={memory.id} memory={memory} />
                     ))
                   ) : (
@@ -316,96 +272,8 @@ export default function AgentDetails() {
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="history">
-              <Card className="p-4">
-                <h3 className="font-medium mb-4">Activity History</h3>
-                <div className="space-y-4">
-                  {agent.current_tasks.map((task) => (
-                    <div 
-                      key={task.id}
-                      className="flex items-center justify-between p-2 bg-muted rounded-lg"
-                    >
-                      <div className="flex items-center gap-2">
-                        <ListTodo className="h-4 w-4" />
-                        <span className="text-sm">{task.type}</span>
-                      </div>
-                      <Badge>{task.status}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="collaboration">
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Collaboration Metrics</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">Team Contribution</span>
-                        <span className="text-sm font-medium">
-                          {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                      <Progress 
-                        value={agent.performance_metrics.success_rate * 100} 
-                        className="animate-progress" 
-                      />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">Tasks Completed</span>
-                        <span className="text-sm font-medium">
-                          {agent.performance_metrics.tasks_completed}
-                        </span>
-                      </div>
-                      <Progress 
-                        value={(agent.performance_metrics.tasks_completed / 500) * 100}
-                        className="animate-progress" 
-                      />
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-4">
-                  <h3 className="font-medium mb-4">Specializations</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.specializations.map((spec, index) => (
-                      <Badge key={index} variant="outline">
-                        {spec}
-                      </Badge>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className="p-4 col-span-2">
-                  <h3 className="font-medium mb-4">Achievements</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {agent.achievements.map((achievement) => (
-                      <div key={achievement.id} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-                        <div className="mt-1">
-                          <span className="text-lg">🏆</span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{achievement.name}</h4>
-                          <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                <ErrorBoundary>
-                  <div className="col-span-2">
-                    <AgentCommunicationLog agentId={agent.id} />
-                  </div>
-                </ErrorBoundary>
-              </div>
-            </TabsContent>
-
             <TabsContent value="resources">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <ResourceMonitor agent={agent} />
               </div>
             </TabsContent>
@@ -413,7 +281,7 @@ export default function AgentDetails() {
             <TabsContent value="learning">
               <div className="grid grid-cols-1 gap-4">
                 <ErrorBoundary>
-                  <LearningProgress metrics={agent.learningMetrics} />
+                  <LearningProgress metrics={mockLearningMetrics} />
                 </ErrorBoundary>
               </div>
             </TabsContent>
