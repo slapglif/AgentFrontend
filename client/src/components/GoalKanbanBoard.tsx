@@ -39,7 +39,7 @@ interface GoalKanbanBoardProps {
 }
 
 export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanBoardProps) {
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [newTask, setNewTask] = useState({ title: "", description: "" });
@@ -81,6 +81,10 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
 
     const updatedGoals = goals.map(goal => {
       if (goal.id === selectedGoal.id) {
+        const taskStartDate = selectedDate || goal.startDate;
+        const taskEndDate = new Date(taskStartDate);
+        taskEndDate.setDate(taskStartDate.getDate() + 1); // Default 1-day duration
+
         const newTasks = [
           ...goal.tasks,
           {
@@ -88,7 +92,8 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
             title: newTask.title,
             description: newTask.description,
             completed: false,
-            dueDate: selectedDate
+            startDate: taskStartDate,
+            endDate: taskEndDate
           }
         ];
         return {
@@ -175,7 +180,11 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
                                         <p className="text-sm text-muted-foreground">{goal.description}</p>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                           <Clock className="h-4 w-4" />
-                                          <span>Due {format(goal.dueDate, 'MMM dd, yyyy')}</span>
+                                          <span>Due {format(goal.endDate, 'MMM dd, yyyy')}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                          <Calendar className="h-4 w-4" />
+                                          <span>Start: {format(goal.startDate, 'MMM dd')}</span>
                                         </div>
                                         <Progress value={goal.progress} className="h-2" />
                                         <div className="flex flex-wrap gap-2">
@@ -223,15 +232,20 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
                 .filter(
                   (goal) =>
                     goal.status !== "completed" &&
-                    goal.dueDate > new Date()
+                    goal.endDate > new Date()
                 )
-                .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
+                .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
                 .slice(0, 5)
                 .map((goal) => (
                   <Card key={goal.id} className="p-2">
                     <div className="text-sm">{goal.title}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Due {format(goal.dueDate, 'MMM dd, yyyy')}
+                    <div className="flex flex-col gap-1">
+                      <div className="text-xs text-muted-foreground">
+                        Start: {format(goal.startDate, 'MMM dd')}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Due: {format(goal.endDate, 'MMM dd, yyyy')}
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -247,11 +261,19 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">{selectedGoal?.description}</p>
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4" />
-              <span className="text-sm">
-                Due {selectedGoal?.dueDate.toLocaleDateString()}
-              </span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                <span className="text-sm">
+                  Start: {selectedGoal?.startDate ? format(selectedGoal.startDate, 'MMM dd, yyyy') : 'Not set'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span className="text-sm">
+                  Due: {selectedGoal?.endDate ? format(selectedGoal.endDate, 'MMM dd, yyyy') : 'Not set'}
+                </span>
+              </div>
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">

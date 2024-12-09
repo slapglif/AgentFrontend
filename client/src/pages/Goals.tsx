@@ -118,54 +118,61 @@ const mockChatMessages = [
   {
     id: 1,
     role: "assistant",
-    content: "I noticed that the 'Research Data Analysis' goal is approaching its deadline in 7 days. The current progress is at 60%. Would you like me to help optimize the timeline?",
+    content: "👋 I'm your research assistant. I'll help you manage your goals and optimize your research timeline. What would you like to focus on today?",
     timestamp: new Date("2024-12-09T10:00:00"),
     metadata: {
-      goalId: "1",
-      type: "deadline_alert",
-      suggestedAction: "timeline_optimization"
+      type: "welcome"
     }
   },
   {
     id: 2,
-    role: "user",
-    content: "Yes, what adjustments would you recommend?",
-    timestamp: new Date("2024-12-09T10:01:00")
+    role: "assistant",
+    content: "I noticed that the 'Research Data Analysis' goal is approaching its deadline. The current progress is at 60%. Based on the task dependencies, here's what I suggest:\n\n1. 🎯 Prioritize 'Model Selection' as it's blocking other tasks\n2. 🔄 Parallelize Feature Selection with Data Preprocessing\n3. ⏰ Consider extending the deadline by 2 days\n\nWould you like me to help adjust the timeline?",
+    timestamp: new Date("2024-12-09T10:01:00"),
+    metadata: {
+      goalId: "1",
+      type: "timeline_optimization",
+      suggestedAction: "adjust_timeline"
+    }
   },
   {
     id: 3,
-    role: "assistant",
-    content: "Based on the current progress and team velocity, I suggest:\n\n1. Prioritize 'Model Selection' task as it's blocking other dependencies\n2. Parallelize Feature Selection with Data Preprocessing\n3. Consider extending the deadline by 2 days to maintain quality\n\nWould you like me to adjust the timeline accordingly?",
-    timestamp: new Date("2024-12-09T10:02:00"),
-    metadata: {
-      type: "timeline_suggestion",
-      affectedTasks: ["1-1", "1-2", "1-3"],
-      suggestedChanges: {
-        deadline: new Date(new Date().getTime() + 9 * 24 * 60 * 60 * 1000)
-      }
-    }
+    role: "user",
+    content: "Yes, please help optimize the timeline. Can you also suggest ways to speed up the model selection process?",
+    timestamp: new Date("2024-12-09T10:02:00")
   },
   {
     id: 4,
     role: "assistant",
-    content: "I've also analyzed the 'Machine Learning Pipeline' goal. There's a potential optimization: we could start the data ingestion setup earlier while the research analysis is being completed. This would save approximately 3 days in the overall timeline.",
+    content: "I've analyzed your model selection requirements. Here's a plan to accelerate the process:\n\n1. 📊 Use automated model selection techniques\n2. 🔍 Focus on top 3 performing algorithms\n3. 🤝 Leverage parallel processing for evaluation\n\nI've updated the timeline to reflect these optimizations. Would you like me to create subtasks for each of these steps?",
     timestamp: new Date("2024-12-09T10:03:00"),
     metadata: {
       type: "optimization_suggestion",
-      goalId: "2",
-      potentialTimeSaved: "3 days"
+      taskId: "1-3",
+      suggestedActions: ["create_subtasks", "update_timeline"]
     }
   },
   {
     id: 5,
     role: "system",
-    content: "Task 'Data preprocessing' has been completed! 🎉 The goal 'Research Data Analysis' is now 60% complete.",
+    content: "✨ Task 'Data preprocessing' has been completed! The goal 'Research Data Analysis' is now 60% complete.",
     timestamp: new Date("2024-12-09T10:04:00"),
     metadata: {
       type: "task_completion",
       taskId: "1-1",
       goalId: "1",
       progress: 60
+    }
+  },
+  {
+    id: 6,
+    role: "assistant",
+    content: "Great progress! 🎉 I see you've completed the data preprocessing. Based on the results, the feature selection process could be simplified. Would you like me to:\n\n1. 🔄 Update the feature selection criteria\n2. 📋 Generate a summary of key features\n3. 📊 Create a feature importance visualization",
+    timestamp: new Date("2024-12-09T10:05:00"),
+    metadata: {
+      type: "task_suggestion",
+      relatedTasks: ["1-2"],
+      suggestedActions: ["update_criteria", "generate_summary", "create_visualization"]
     }
   }
 ];

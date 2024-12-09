@@ -29,7 +29,8 @@ interface Goal {
   title: string;
   description: string;
   status: "todo" | "in_progress" | "completed";
-  dueDate: Date;
+  startDate: Date;
+  endDate: Date;
   progress: number;
   tasks: Task[];
 }
@@ -54,23 +55,22 @@ export function TimelineView({ goals, onTaskUpdate }: TimelineViewProps) {
   };
 
   const timelineData = goals.length > 0 ? goals.map(goal => {
-    const startDate = new Date();
-    const endDate = goal.dueDate;
-
     return {
       id: goal.id,
       title: goal.title,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: goal.startDate,
+      endDate: goal.endDate,
       progress: goal.progress,
-      duration: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)),
+      duration: Math.ceil((goal.endDate.getTime() - goal.startDate.getTime()) / (1000 * 60 * 60 * 24)),
       subtasks: goal.tasks.map(task => ({
         id: task.id,
         title: task.title,
-        startDate: startDate,
-        endDate: endDate,
-        duration: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)),
+        startDate: task.startDate || goal.startDate,
+        endDate: task.endDate || goal.endDate,
+        duration: Math.ceil(((task.endDate || goal.endDate).getTime() - (task.startDate || goal.startDate).getTime()) / (1000 * 60 * 60 * 24)),
         progress: task.completed ? 100 : 0,
+        resourceId: task.assignedTo,
+        dependency: task.dependency
       }))
     };
   }) : [{
