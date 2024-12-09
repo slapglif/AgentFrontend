@@ -152,8 +152,8 @@ export default function AgentDetails() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <header className="border-b p-4 bg-muted/30 backdrop-blur-sm">
+    <div className="h-screen flex flex-col overflow-hidden">
+      <header className="border-b p-4 bg-muted/30 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
             <ChevronLeft className="h-4 w-4" />
@@ -166,7 +166,7 @@ export default function AgentDetails() {
       </header>
 
       <div className="flex-1 p-6 overflow-hidden">
-        <Tabs defaultValue="overview" className="h-full flex flex-col">
+        <Tabs defaultValue="overview" className="h-[calc(100vh-120px)] flex flex-col">
           <TabsList>
             <TabsTrigger value="overview" className="gap-2">
               <Activity className="h-4 w-4" />
@@ -186,8 +186,8 @@ export default function AgentDetails() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 mt-4">
-            <TabsContent value="overview" className="h-full">
+          <div className="flex-1 mt-4 overflow-auto">
+            <TabsContent value="overview" className="h-full overflow-auto">
               <div className="grid grid-cols-2 gap-4">
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Performance Metrics</h3>
@@ -279,8 +279,11 @@ export default function AgentDetails() {
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
                   ) : memories?.length > 0 ? (
-                    memories.map((memory) => (
-                      <MemoryCard key={memory.id} memory={memory} />
+                    memories.map((memory, index) => (
+                      <MemoryCard 
+                        key={`${memory.id}-${index}`} 
+                        memory={memory} 
+                      />
                     ))
                   ) : (
                     <div className="text-center text-muted-foreground">

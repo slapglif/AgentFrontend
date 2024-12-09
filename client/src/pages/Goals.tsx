@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";

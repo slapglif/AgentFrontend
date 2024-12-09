@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Brain, BookOpen, Target, Zap, GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { LearningMetrics } from "@/lib/mockAgents";
 
 interface LearningProgressProps {
@@ -20,53 +21,90 @@ interface MetricsState extends LearningMetrics {
 }
 
 export function LearningProgress({ metrics, className }: LearningProgressProps) {
-  const [metricsState, setMetricsState] = useState<MetricsState>({
+  const [metricsState, setMetricsState] = useState<MetricsState>(() => ({
     ...metrics,
+    skillsProficiency: metrics.skillsProficiency || {},
+    knowledgeAreas: metrics.knowledgeAreas || [],
+    learningRate: metrics.learningRate || 0,
+    adaptabilityScore: metrics.adaptabilityScore || 0,
+    completedLessons: metrics.completedLessons || 0,
+    totalLessons: metrics.totalLessons || 0,
+    retentionRate: metrics.retentionRate || 0,
     isLoading: false,
     lastUpdated: new Date().toISOString(),
     error: null
-  });
+  }));
 
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    let retryCount = 0;
+    const maxRetries = 3;
 
     const updateMetrics = async () => {
+      if (retryCount >= maxRetries) {
+        if (mounted) {
+          setMetricsState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: 'Maximum retry attempts reached. Please refresh the page.'
+          }));
+        }
+        return;
+      }
+
       try {
+        if (!mounted) return;
         setMetricsState(prev => ({ ...prev, isLoading: true, error: null }));
 
-        // Simulate real-time updates with error handling
+        // Simulate real-time updates
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         if (!mounted) return;
 
-        setMetricsState(prev => ({
-          ...prev,
-          skillsProficiency: Object.fromEntries(
-            Object.entries(prev.skillsProficiency).map(([key, value]) => [
-              key,
-              Math.min(100, Math.max(0, value + (Math.random() - 0.5) * 2))
-            ])
-          ),
-          learningRate: Math.min(100, Math.max(0, prev.learningRate + (Math.random() - 0.5) * 2)),
-          adaptabilityScore: Math.min(100, Math.max(0, prev.adaptabilityScore + (Math.random() - 0.5))),
-          isLoading: false,
-          lastUpdated: new Date().toISOString(),
-          error: null
-        }));
+        // Update metrics with more stable values
+        setMetricsState(prev => {
+          const currentValues = { ...prev };
+          
+          // Update skills proficiency
+          if (currentValues.skillsProficiency) {
+            Object.keys(currentValues.skillsProficiency).forEach(key => {
+              const currentValue = currentValues.skillsProficiency[key];
+              const maxChange = 1; // Limit the change to 1% per update
+              const change = (Math.random() - 0.5) * maxChange;
+              currentValues.skillsProficiency[key] = Math.min(100, Math.max(0, currentValue + change));
+            });
+          }
+
+          // Update other metrics with smaller variations
+          return {
+            ...currentValues,
+            learningRate: Math.min(100, Math.max(0, currentValues.learningRate + (Math.random() - 0.5))),
+            adaptabilityScore: Math.min(100, Math.max(0, currentValues.adaptabilityScore + (Math.random() - 0.5))),
+            isLoading: false,
+            lastUpdated: new Date().toISOString(),
+            error: null
+          };
+        });
+
+        // Reset retry count on successful update
+        retryCount = 0;
       } catch (err) {
         if (!mounted) return;
+        retryCount++;
+        
         setMetricsState(prev => ({
           ...prev,
           isLoading: false,
           error: err instanceof Error ? err.message : 'Failed to update learning progress'
         }));
 
-        // Retry after error with exponential backoff
+        // Retry with exponential backoff
+        const backoffTime = Math.min(1000 * Math.pow(2, retryCount), 5000);
         setTimeout(() => {
           if (mounted) updateMetrics();
-        }, 5000);
+        }, backoffTime);
       }
     };
 
@@ -79,7 +117,7 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
 
     return () => {
       mounted = false;
-      if (interval) clearInterval(interval);
+      if (intervalId) clearInterval(intervalId);
     };
   }, []);
   const getProgressColor = (value: number) => {
@@ -92,9 +130,15 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
   if (metricsState.error) {
     return (
       <Card className={cn("p-4", className)}>
-        <div className="flex items-center gap-2 text-destructive">
-          <AlertCircle className="h-4 w-4" />
-          <span>{metricsState.error}</span>
+        <div className="flex flex-col items-center gap-4 p-6">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div className="text-center">
+            <h3 className="font-semibold mb-1">Error Loading Learning Progress</h3>
+            <p className="text-sm text-muted-foreground">{metricsState.error}</p>
+          </div>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
         </div>
       </Card>
     );
@@ -117,7 +161,7 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
         </div>
       </div>
 
-      <ScrollArea className="h-[400px] pr-4">
+      <ScrollArea className="h-[calc(100vh-300px)] pr-4">
         <div className="space-y-6">
           {/* Overall Progress */}
           <div className="space-y-2">
