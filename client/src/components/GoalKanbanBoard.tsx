@@ -218,39 +218,7 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
             </div>
           </div>
 
-          <div className="w-[350px] border-l p-4">
-            <h3 className="font-semibold mb-4">Timeline</h3>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="mb-4"
-            />
-            <div className="space-y-4">
-              <h4 className="font-medium text-sm">Upcoming Goals</h4>
-              {goals
-                .filter(
-                  (goal) =>
-                    goal.status !== "completed" &&
-                    goal.endDate > new Date()
-                )
-                .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
-                .slice(0, 5)
-                .map((goal) => (
-                  <Card key={goal.id} className="p-2">
-                    <div className="text-sm">{goal.title}</div>
-                    <div className="flex flex-col gap-1">
-                      <div className="text-xs text-muted-foreground">
-                        Start: {format(goal.startDate, 'MMM dd')}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Due: {format(goal.endDate, 'MMM dd, yyyy')}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-            </div>
-          </div>
+          
         </div>
       </DragDropContext>
 

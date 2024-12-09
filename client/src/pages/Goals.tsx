@@ -5,6 +5,7 @@ import { ChatDrawer } from "@/components/ChatDrawer";
 import { GoalKanbanBoard } from "@/components/GoalKanbanBoard";
 import { TimelineView } from "@/components/TimelineView";
 import { Plus } from "lucide-react";
+import { addDays, differenceInDays } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -45,16 +46,17 @@ interface Goal {
 
 // Mock initial goals data
 const today = new Date();
-const twoWeeksFromNow = new Date(today);
+const twoWeeksFromNow = new Date();
 twoWeeksFromNow.setDate(today.getDate() + 14);
 
+// Ensure dates are properly instantiated
 const initialGoals: Goal[] = [
   {
     id: "1",
     title: "Research Data Analysis",
     description: "Analyze research data for patterns and insights",
     status: "in_progress",
-    startDate: today,
+    startDate: new Date(today.getTime()),
     endDate: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     progress: 60,
     tasks: [
@@ -191,14 +193,35 @@ export default function Goals() {
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
 
-    const updatedGoals = [...goals];
-    const sourceGoal = updatedGoals.find(g => g.id === result.source.droppableId);
-    const destGoal = updatedGoals.find(g => g.id === result.destination.droppableId);
-
-    if (sourceGoal && destGoal) {
-      const [removed] = sourceGoal.tasks.splice(result.source.index, 1);
-      destGoal.tasks.splice(result.destination.index, 0, removed);
+    if (result.type === "GOAL") {
+      const updatedGoals = [...goals];
+      const [removed] = updatedGoals.splice(result.source.index, 1);
+      updatedGoals.splice(result.destination.index, 0, removed);
       setGoals(updatedGoals);
+    } else {
+      const updatedGoals = [...goals];
+      const sourceGoal = updatedGoals.find(g => g.id === result.source.droppableId);
+      const destGoal = updatedGoals.find(g => g.id === result.destination.droppableId);
+
+      if (sourceGoal && destGoal) {
+        const [removed] = sourceGoal.tasks.splice(result.source.index, 1);
+        destGoal.tasks.splice(result.destination.index, 0, removed);
+        
+        // Update progress for both goals
+        const updateProgress = (goal: Goal) => {
+          const completedTasks = goal.tasks.filter(t => t.completed).length;
+          goal.progress = goal.tasks.length > 0 
+            ? Math.round((completedTasks / goal.tasks.length) * 100)
+            : 0;
+        };
+        
+        updateProgress(sourceGoal);
+        if (sourceGoal.id !== destGoal.id) {
+          updateProgress(destGoal);
+        }
+        
+        setGoals(updatedGoals);
+      }
     }
   };
 
@@ -344,8 +367,21 @@ export default function Goals() {
             <TimelineView 
               goals={goals}
               onTaskUpdate={(taskData) => {
-                console.log('Task updated:', taskData);
-                // Handle task updates from timeline
+                const updatedGoals = goals.map(goal => {
+                  if (goal.id === taskData.goalId) {
+                    const daysDiff = differenceInDays(
+                      taskData.destinationDate,
+                      taskData.sourceDate
+                    );
+                    return {
+                      ...goal,
+                      startDate: addDays(goal.startDate, daysDiff),
+                      endDate: addDays(goal.endDate, daysDiff)
+                    };
+                  }
+                  return goal;
+                });
+                setGoals(updatedGoals);
               }}
             />
           </TabsContent>
