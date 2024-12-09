@@ -205,11 +205,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'history' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.interactionHistory?.map((interaction: any, index: number) => {
-                  const uniqueKey = `interaction-${memory.id}-${interaction.id || index}-${Date.now()}`;
-                  return (
+                {memory.metadata.interactionHistory?.map((interaction: any, index: number) => (
                     <div 
-                      key={uniqueKey}
+                      key={`${memory.id}-${index}`}
                       className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                     >
                       <div className="flex flex-col">
@@ -229,8 +227,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
                         {formatDistance(new Date(interaction.timestamp), new Date(), { addSuffix: true })}
                       </span>
                     </div>
-                  );
-                })}
+                ))}
               </div>
             </div>
 

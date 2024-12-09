@@ -86,7 +86,7 @@ export function TimelineView({ goals }: TimelineViewProps) {
   }, []);
 
   return (
-    <div className="border rounded-lg bg-background">
+    <div className="border rounded-lg bg-background h-[calc(100vh-12rem)] flex flex-col">
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <Button
@@ -114,34 +114,34 @@ export function TimelineView({ goals }: TimelineViewProps) {
         </div>
       </div>
 
-      <div className="relative overflow-x-auto" ref={timelineRef}>
-        {/* Timeline header */}
-        <div 
-          className="sticky top-0 z-10 bg-background border-b flex"
-          style={{ height: headerHeight }}
-        >
-          <div className="flex-none w-48 border-r px-4 py-2">
-            Tasks
+      <ScrollArea className="flex-1">
+        <div className="relative min-w-fit" ref={timelineRef}>
+          {/* Timeline header */}
+          <div 
+            className="sticky top-0 z-10 bg-background border-b flex"
+            style={{ height: headerHeight }}
+          >
+            <div className="flex-none w-48 border-r px-4 py-2">
+              Tasks
+            </div>
+            <div className="flex" style={{ width: `${hourWidth * hoursToShow}px` }}>
+              {Array.from({ length: hoursToShow }, (_, i) => (
+                <div
+                  key={i}
+                  className={`flex-none border-r px-2 py-2 text-center ${
+                    i === currentHour ? 'bg-primary/10' : ''
+                  }`}
+                  style={{ width: hourWidth }}
+                >
+                  {i.toString().padStart(2, '0')}:00
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex">
-            {Array.from({ length: hoursToShow }, (_, i) => (
-              <div
-                key={i}
-                className={`flex-none border-r px-2 py-2 text-center ${
-                  i === currentHour ? 'bg-primary/10' : ''
-                }`}
-                style={{ width: hourWidth }}
-              >
-                {i.toString().padStart(2, '0')}:00
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <ScrollArea>
-          <div style={{ width: hourWidth * hoursToShow + 200 }}>
-            {/* Goals and tasks */}
-            {goals.map((goal, goalIndex) => (
+          {/* Goals and tasks */}
+          <div>
+            {goals.map((goal) => (
               <div key={goal.id} className="border-b">
                 {/* Goal row */}
                 <div 
@@ -180,13 +180,13 @@ export function TimelineView({ goals }: TimelineViewProps) {
                       className="absolute top-0 left-48 w-full h-full pointer-events-none"
                       style={{ overflow: 'visible' }}
                     >
-                      {goal.tasks.map((task, taskIndex) => {
+                      {goal.tasks.map((task) => {
                         if (task.dependencies) {
                           return task.dependencies.map(depId => {
                             const sourceTask = goal.tasks.find(t => t.id === depId);
                             if (sourceTask) {
                               const sourceY = rowHeight / 2;
-                              const targetY = (taskIndex + 1) * rowHeight + rowHeight / 2;
+                              const targetY = (rowHeight / 2) + rowHeight;
                               return (
                                 <path
                                   key={`${depId}-${task.id}`}
@@ -204,7 +204,7 @@ export function TimelineView({ goals }: TimelineViewProps) {
                     </svg>
 
                     {/* Tasks */}
-                    {goal.tasks.map((task, taskIndex) => (
+                    {goal.tasks.map((task) => (
                       <div key={task.id} className="flex items-center h-10 hover:bg-muted/50">
                         <div className="flex-none w-48 px-4 py-2 pl-10">
                           <span className="text-sm text-muted-foreground truncate">
@@ -230,8 +230,8 @@ export function TimelineView({ goals }: TimelineViewProps) {
               </div>
             ))}
           </div>
-        </ScrollArea>
-      </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 }

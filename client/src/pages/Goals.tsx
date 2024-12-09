@@ -221,8 +221,8 @@ export default function Goals() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <main className="flex-1 p-6">
+    <div className="flex h-screen overflow-hidden">
+      <main className="flex-1 p-6 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Goal Management</h1>
           <Dialog open={isAddingGoal} onOpenChange={setIsAddingGoal}>

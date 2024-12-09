@@ -1,0 +1,40 @@
+Warning: Encountered two children with the same key, &#x60;17-61&#x60;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at div
+    at div
+    at _c (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/ui/card.tsx:20:11)
+    at MemoryCard (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/MemoryCard.tsx:24:30)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/chunk-SUKFQWCK.js?v=5dd3a8de:41:13
+    at https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=5dd3a8de:112:13
+    at div
+    at https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/chunk-SUKFQWCK.js?v=5dd3a8de:41:13
+    at Provider (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/chunk-MIJTWO3B.js?v=5dd3a8de:48:15)
+    at https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=5dd3a8de:50:7
+    at _c (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/ui/scroll-area.tsx:21:11)
+    at div
+    at AgentTimeline (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/AgentTimeline.tsx:24:30)
+    at div
+    at main
+    at div
+    at Home (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/pages/Home.tsx:27:21)
+    at Route (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/wouter.js?v=5dd3a8de:323:16)
+    at Switch (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/wouter.js?v=5dd3a8de:379:17)
+    at main
+    at div
+    at PanelWithForwardedRef (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/react-resizable-panels.js?v=5dd3a8de:40:3)
+    at forwardRef(Panel)
+    at div
+    at PanelGroupWithForwardedRef (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/react-resizable-panels.js?v=5dd3a8de:1423:3)
+    at forwardRef(PanelGroup)
+    at div
+    at ThemeProvider (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/ThemeProvider.tsx:25:3)
+    at Layout (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/src/components/ui/layout/Layout.tsx:36:26)
+    at Router
+    at QueryClientProvider (https://0dde05c7-8b75-498f-a7de-417be2cc325b-00-1v4izl2nrmygb.spock.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=5dd3a8de:2797:3)

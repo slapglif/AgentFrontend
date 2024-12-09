@@ -76,7 +76,7 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
         const newTasks = [
           ...goal.tasks,
           {
-            id: `${goal.id}-${goal.tasks.length + 1}`,
+            id: `task-${goal.id}-${Date.now()}`,
             title: newTask.title,
             description: newTask.description,
             completed: false,
@@ -101,23 +101,25 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
   return (
     <ErrorBoundary>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-3 gap-4 h-full">
+        <div className="grid grid-cols-3 gap-4 h-[calc(100vh-12rem)] overflow-hidden">
           {columns.map((column) => (
-            <Droppable key={column.id} droppableId={column.id}>
-              {(provided) => (
+            <Droppable key={column.id} droppableId={column.id} type="GOAL">
+              {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex flex-col h-full"
+                  className={`flex flex-col h-full overflow-hidden bg-muted/30 rounded-lg p-4 ${
+                    snapshot.isDraggingOver ? "bg-muted" : ""
+                  }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4 flex-shrink-0">
                     <h3 className="font-semibold">{column.title}</h3>
                     <Badge variant="secondary">
                       {goals.filter((goal) => goal.status === column.id).length}
                     </Badge>
                   </div>
-                  <ScrollArea className="flex-1">
-                    <div className="space-y-4 p-1">
+                  <ScrollArea className="flex-1 w-full">
+                    <div className="space-y-4 p-1 min-h-[1px]">
                       {goals
                         .filter((goal) => goal.status === column.id)
                         .map((goal, index) => (
