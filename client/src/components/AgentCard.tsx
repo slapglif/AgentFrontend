@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Database, Atom, Brain } from "lucide-react";
+import { Trophy, Database, Atom, Brain, Leaf, Zap } from "lucide-react";
 import type { Agent } from "@/lib/agents";
 
 interface AgentCardProps {
@@ -11,16 +11,23 @@ interface AgentCardProps {
     name: string;
     type: string;
     status: 'active' | 'idle' | 'learning';
-    current_task: {
+    current_task?: {
       id: string;
       summary: string;
       progress: number;
       status: 'pending' | 'in_progress' | 'completed';
       priority: 'low' | 'medium' | 'high';
     };
-    currentTasks: number;
-    successRate: number;
-    skillLevel: number;
+    currentTasks?: number;
+    successRate?: number;
+    skillLevel?: number;
+    specializations?: string[];
+    achievements?: Array<{
+      id: number;
+      name: string;
+      icon: string;
+      description: string;
+    }>;
   };
 }
 
@@ -48,8 +55,12 @@ export function AgentCard({ agent }: AgentCardProps) {
         return <Atom className="h-4 w-4" />;
       case "brain":
         return <Brain className="h-4 w-4" />;
+      case "leaf":
+        return <Leaf className="h-4 w-4" />;
+      case "zap":
+        return <Zap className="h-4 w-4" />;
       default:
-        return null;
+        return <Brain className="h-4 w-4" />;
     }
   };
 
@@ -75,11 +86,23 @@ export function AgentCard({ agent }: AgentCardProps) {
             <span className="absolute inset-0 animate-ripple bg-current opacity-25" />
           </Badge>
         </div>
+
+        {agent.specializations && agent.specializations.length > 0 && (
+          <div className="mt-2">
+            <div className="flex flex-wrap gap-1">
+              {agent.specializations.map((spec, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {spec.replace(/_/g, ' ')}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
         
         {agent.current_task && (
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Current Task</span>
+              <span className="text-sm font-medium">Current Research</span>
               <Badge variant={agent.current_task.priority === 'high' ? 'destructive' : 'secondary'}>
                 {agent.current_task.priority}
               </Badge>
@@ -90,18 +113,20 @@ export function AgentCard({ agent }: AgentCardProps) {
                 <span>Progress</span>
                 <span>{agent.current_task.progress}%</span>
               </div>
-              <Progress value={agent.current_task.progress} className="h-1" />
+              <Progress value={agent.current_task.progress || 0} className="h-1" />
             </div>
           </div>
         )}
 
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Level {agent.skillLevel}</span>
-            <span className="text-sm text-muted-foreground">{(agent.successRate * 100).toFixed(1)}% Success Rate</span>
+            <span className="text-sm font-medium">Level {agent.skillLevel || 1}</span>
+            <span className="text-sm text-muted-foreground">
+              {agent.successRate ? `${(agent.successRate * 100).toFixed(1)}% Success Rate` : 'New Agent'}
+            </span>
           </div>
           <Progress 
-            value={agent.successRate * 100} 
+            value={agent.successRate ? agent.successRate * 100 : 0} 
             className="animate-progress relative overflow-hidden"
             style={{
               background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
@@ -110,10 +135,27 @@ export function AgentCard({ agent }: AgentCardProps) {
           />
         </div>
 
+        {agent.achievements && agent.achievements.length > 0 && (
+          <div className="mt-4">
+            <h4 className="text-sm font-medium mb-2">Research Achievements</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {agent.achievements.slice(0, 2).map((achievement) => (
+                <div key={achievement.id} className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                  {getAchievementIcon(achievement.icon)}
+                  <div>
+                    <div className="text-xs font-medium">{achievement.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">{achievement.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
-            <span>Active Tasks</span>
-            <span className="font-medium">{agent.currentTasks}</span>
+            <span>Active Research Tasks</span>
+            <span className="font-medium">{agent.currentTasks || 0}</span>
           </div>
         </div>
       </Card>

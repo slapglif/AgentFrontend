@@ -43,18 +43,18 @@ export interface Agent {
 }
 
 export const DEFAULT_AGENTS: Agent[] = [
-  // Data Analysis Agent
+  // Ayurvedic Research Agent
   {
     id: 7,
-    name: "Data Analysis Agent",
-    type: "analytics",
-    description: "Specializes in analyzing research data and extracting meaningful patterns",
+    name: "Ayurvedic Research Agent",
+    type: "traditional_medicine",
+    description: "Specializes in analyzing and synthesizing Ayurvedic medical knowledge and practices",
     capabilities: [
-      "statistical_analysis",
-      "pattern_recognition",
-      "data_visualization",
-      "hypothesis_testing",
-      "anomaly_detection"
+      "ayurvedic_analysis",
+      "herbal_knowledge",
+      "traditional_practices",
+      "holistic_healing",
+      "dosha_analysis"
     ],
     status: "active",
     level: 5,
@@ -63,15 +63,15 @@ export const DEFAULT_AGENTS: Agent[] = [
     achievements: [
       {
         id: 13,
-        name: "Pattern Master",
-        description: "Discovered 50 significant patterns in research data",
-        icon: "bar-chart"
+        name: "Vaidya Scholar",
+        description: "Mastered 100 traditional Ayurvedic formulations",
+        icon: "leaf"
       },
       {
         id: 14,
-        name: "Insight Oracle",
-        description: "Generated 100 actionable insights from complex datasets",
-        icon: "brain"
+        name: "Dosha Expert",
+        description: "Analyzed 1000+ constitutional profiles",
+        icon: "zap"
       }
     ],
     configuration: {
@@ -89,7 +89,7 @@ export const DEFAULT_AGENTS: Agent[] = [
       used: 2560,
       reserved: 512
     },
-    specializations: ["data_mining", "statistical_analysis", "pattern_recognition"],
+    specializations: ["ayurvedic_medicine", "herbal_formulation", "dosha_assessment", "traditional_healing"],
     current_tasks: [
       { id: 7, type: "data_analysis", status: "active", priority: "high" }
     ]
