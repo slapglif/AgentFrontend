@@ -12,11 +12,11 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { Panel, PanelGroup } from "react-resizable-panels";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -107,13 +107,15 @@ export function Layout({ children }: LayoutProps) {
           </ScrollArea>
         </aside>
         <main 
-          className="flex-1 h-screen overflow-hidden bg-background"
+          className={cn(
+            "flex-1 h-screen overflow-hidden bg-background",
+            isMounted ? "transition-[margin] duration-300 ease-in-out" : ""
+          )}
           style={{
-            marginLeft: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
-            transition: isMounted ? 'margin-left 300ms ease-in-out' : 'none'
+            marginLeft: isCollapsed ? `${SIDEBAR_COLLAPSED_WIDTH}px` : `${SIDEBAR_WIDTH}px`
           }}
         >
-          <div className="h-full">
+          <div className="h-full relative">
             {children}
           </div>
         </main>

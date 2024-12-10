@@ -1,0 +1,22 @@
+:root {
+  --panel-background: transparent;
+}
+
+[data-panel-group-direction="horizontal"] > [data-panel-resize-handle] {
+  width: 2px;
+  margin: 0 -1px;
+  background: var(--border);
+  transition: all 0.15s ease;
+}
+
+[data-panel-group-direction="horizontal"] > [data-panel-resize-handle]:hover {
+  background: var(--primary);
+  width: 4px;
+  margin: 0 -2px;
+  cursor: col-resize;
+}
+
+[data-panel-resize-handle][data-panel-group-direction="horizontal"]::before {
+  width: 8px;
+  margin: 0 -4px;
+}

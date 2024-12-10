@@ -4,8 +4,12 @@ import { AgentCard } from "@/components/AgentCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { mockOverview } from "@/lib/mockOverview";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+
+import "./styles.css";
 
 export default function Home() {
   const { toast } = useToast();
@@ -38,9 +42,9 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-full overflow-hidden">
-      <div className="w-[300px] flex-shrink-0 border-r bg-muted/30">
-        <div className="h-full">
+    <div className="h-full overflow-hidden">
+      <PanelGroup direction="horizontal" className="h-full">
+        <Panel defaultSize={25} minSize={20} maxSize={40} className="bg-muted/30 backdrop-blur-sm border-primary/10">
           <ScrollArea className="h-[calc(100vh-4rem)]">
             <div className="p-4 space-y-4">
               <div className="flex items-center justify-between">
@@ -67,14 +71,16 @@ export default function Home() {
               </div>
             </div>
           </ScrollArea>
-        </div>
-      </div>
-      
-      <main className="flex-1 p-6">
-        <div className="h-full overflow-hidden">
-          <AgentTimeline />
-        </div>
-      </main>
+        </Panel>
+        
+        <PanelResizeHandle className="bg-border hover:bg-primary transition-all duration-300" />
+        
+        <Panel defaultSize={75} className="bg-background">
+          <div className="h-full px-6 py-4">
+            <AgentTimeline />
+          </div>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }
