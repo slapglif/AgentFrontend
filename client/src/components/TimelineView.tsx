@@ -82,13 +82,27 @@ export function TimelineView({ goals }: TimelineViewProps) {
                   </div>
                   <div className="relative flex-1" style={{ height: rowHeight }}>
                     <div
-                      className="absolute h-6 rounded-md bg-primary/20"
+                      className="absolute h-6 rounded-md"
                       style={{
                         left: getPositionForTime(goal.startTime),
                         width: getWidthForDuration(goal.startTime, goal.endTime),
-                        top: '8px'
+                        top: '8px',
+                        background: 'linear-gradient(180deg, var(--primary), var(--primary-50), transparent)',
+                        backgroundSize: '200% 200%',
+                        animation: 'gradientShift 3s ease infinite',
+                        boxShadow: '0 0 8px var(--primary), 0 0 12px var(--primary)'
                       }}
-                    />
+                    >
+                      <div 
+                        className="absolute inset-0 bg-primary/20"
+                        style={{
+                          width: `${goal.progress}%`,
+                          background: 'linear-gradient(90deg, transparent, var(--primary-50), transparent)',
+                          backgroundSize: '200% 100%',
+                          animation: 'shimmer 3s linear infinite'
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -100,9 +114,41 @@ export function TimelineView({ goals }: TimelineViewProps) {
                       </span>
                     </div>
                     <div className="relative flex-1" style={{ height: rowHeight }}>
+                      {task.dependencies?.map((depId) => {
+                        const dependentTask = goal.tasks.find(t => t.id === depId);
+                        if (!dependentTask) return null;
+                        
+                        const startX = getPositionForTime(dependentTask.endTime);
+                        const endX = getPositionForTime(task.startTime);
+                        const width = endX - startX;
+                        
+                        return (
+                          <svg
+                            key={`${task.id}-${depId}`}
+                            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                            style={{ overflow: 'visible' }}
+                          >
+                            <path
+                              d={`M ${startX} 10 C ${startX + width/2} 10, ${startX + width/2} 10, ${endX} 10`}
+                              stroke="var(--primary)"
+                              strokeWidth="1"
+                              fill="none"
+                              strokeDasharray="4"
+                              className="animate-dash"
+                            />
+                            <circle
+                              cx={endX}
+                              cy="10"
+                              r="3"
+                              fill="var(--primary)"
+                              className="animate-pulse"
+                            />
+                          </svg>
+                        );
+                      })}
                       <div
-                        className={`absolute h-4 rounded-full group cursor-pointer transition-all duration-300 hover:scale-105 ${
-                          task.completed ? 'bg-primary shadow-glow' : 'border-2 border-primary bg-background'
+                        className={`absolute h-4 rounded-full group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                          task.completed ? 'bg-primary shadow-glow' : 'border-2 border-primary bg-background hover:border-primary/80 hover:bg-primary/5'
                         }`}
                         style={{
                           left: getPositionForTime(task.startTime),
@@ -111,7 +157,15 @@ export function TimelineView({ goals }: TimelineViewProps) {
                           boxShadow: task.completed ? '0 0 8px var(--primary)' : 'none'
                         }}
                         title={`${task.title} (${task.completed ? 'Completed' : 'In Progress'})`}
-                      />
+                      >
+                        <div 
+                          className="absolute inset-0 bg-primary/20 rounded-full transition-all duration-300"
+                          style={{
+                            width: task.completed ? '100%' : '0%',
+                            opacity: task.completed ? 0.5 : 0
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}

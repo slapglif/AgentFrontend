@@ -41,7 +41,6 @@ interface MemoryCardProps {
 }
 
 export function MemoryCard({ memory }: MemoryCardProps) {
-  // Remove unused state
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const getTypeColor = (type: string) => {
@@ -64,11 +63,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
   };
 
   const handleSectionClick = (section: string) => {
-    if (activeSection === section) {
-      setActiveSection(null);
-    } else {
-      setActiveSection(section);
-    }
+    setActiveSection(activeSection === section ? null : section);
   };
 
   return (
@@ -144,9 +139,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`grid grid-cols-2 gap-2 text-xs overflow-hidden transition-all duration-300 ${
                 activeSection === 'analysis' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {Object.entries(memory.metadata.detailedAnalysis || {}).map(([key, value]) => (
+                {Object.entries(memory.metadata.detailedAnalysis || {}).map(([key, value], index) => (
                   <div 
-                    key={key} 
+                    key={`analysis-${memory.id}-${key}-${index}`}
                     className="flex items-center gap-2 p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                     title={`${key}: ${value}%`}
                   >
@@ -172,9 +167,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'related' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.relatedMemories?.map((related: any) => (
+                {memory.metadata.relatedMemories?.map((related, index) => (
                   <div 
-                    key={`${memory.id}-${related.id}-${related.type}`} 
+                    key={`related-${memory.id}-${related.id}-${index}`}
                     className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                   >
                     <span className="text-xs text-muted-foreground capitalize">{related.type}</span>
@@ -205,28 +200,28 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'history' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.interactionHistory?.map((interaction: any, index: number) => (
-                    <div 
-                      key={`${memory.id}-${index}`}
-                      className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium capitalize flex items-center gap-1">
-                          <Badge variant="outline" className="h-4">
-                            {interaction.action}
+                {memory.metadata.interactionHistory?.map((interaction, index) => (
+                  <div 
+                    key={`interaction-${memory.id}-${interaction.id || index}`}
+                    className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium capitalize flex items-center gap-1">
+                        <Badge variant="outline" className="h-4">
+                          {interaction.action}
+                        </Badge>
+                        {interaction.doshaType && (
+                          <Badge variant="secondary" className="h-4">
+                            {interaction.doshaType}
                           </Badge>
-                          {interaction.doshaType && (
-                            <Badge variant="secondary" className="h-4">
-                              {interaction.doshaType}
-                            </Badge>
-                          )}
-                        </span>
-                        <span className="text-xs text-muted-foreground mt-1">{interaction.context}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistance(new Date(interaction.timestamp), new Date(), { addSuffix: true })}
+                        )}
                       </span>
+                      <span className="text-xs text-muted-foreground mt-1">{interaction.context}</span>
                     </div>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDistance(new Date(interaction.timestamp), new Date(), { addSuffix: true })}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>

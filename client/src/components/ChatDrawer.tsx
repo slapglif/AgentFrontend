@@ -32,6 +32,16 @@ export function ChatDrawer({ className, messages = [], onSendMessage }: ChatDraw
     if (inputValue.trim() && onSendMessage) {
       onSendMessage(inputValue.trim());
       setInputValue("");
+      
+      // Add a temporary processing message
+      const processingMessage = {
+        id: Date.now(),
+        role: 'system',
+        content: '⌛ Processing your request...',
+        timestamp: new Date(),
+        metadata: { type: 'processing' }
+      };
+      messages.push(processingMessage);
     }
   };
 

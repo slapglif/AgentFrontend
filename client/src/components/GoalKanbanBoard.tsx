@@ -81,8 +81,13 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
                               {...provided.dragHandleProps}
                               className={snapshot.isDragging ? "opacity-50" : ""}
                             >
-                              <Card className="p-4 hover:bg-muted/50 cursor-pointer">
-                                <h4 className="font-medium mb-2">{goal.title}</h4>
+                              <Card className="p-4 hover:bg-muted/50 cursor-pointer transform transition-all duration-200 hover:scale-105">
+                                <h4 className="font-medium mb-2 flex items-center justify-between">
+                                  {goal.title}
+                                  <Badge variant={goal.status === 'completed' ? "default" : "secondary"}>
+                                    {goal.tasks.filter(t => t.completed).length}/{goal.tasks.length}
+                                  </Badge>
+                                </h4>
                                 <p className="text-sm text-muted-foreground line-clamp-2">
                                   {goal.description}
                                 </p>
@@ -91,6 +96,7 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
                                     <Badge
                                       key={task.id}
                                       variant={task.completed ? "default" : "outline"}
+                                      className="cursor-pointer hover:bg-primary/20 transition-colors"
                                     >
                                       {task.title}
                                     </Badge>

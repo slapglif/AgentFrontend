@@ -151,6 +151,38 @@
   }
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: 8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+.animate-dash {
+  stroke-dasharray: 4;
+  animation: dash 1s linear infinite;
+}
+
 @keyframes progressFill {
   from {
     background-position: 200% 0;
