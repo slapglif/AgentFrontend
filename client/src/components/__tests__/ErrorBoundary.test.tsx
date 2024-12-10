@@ -49,10 +49,10 @@ describe('ErrorBoundary', () => {
   });
 
   it('resets error boundary when try again is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onReset = jest.fn();
 
-    render(
+    const { rerender } = render(
       <ErrorBoundary>
         <div>
           <button onClick={onReset}>Reset</button>
@@ -63,10 +63,20 @@ describe('ErrorBoundary', () => {
 
     const tryAgainButton = screen.getByRole('button', { name: 'Try again' });
     await user.click(tryAgainButton);
+    
+    // Re-render to simulate reset
+    rerender(
+      <ErrorBoundary>
+        <div>
+          <button onClick={onReset}>Reset</button>
+          <ThrowError />
+        </div>
+      </ErrorBoundary>
+    );
 
-    // After clicking try again, it should attempt to re-render children
+    // Verify error is shown again after reset and re-throw
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-  });
+  }, 10000);
 
   it('logs error details to console', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error');

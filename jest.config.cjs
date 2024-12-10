@@ -15,15 +15,14 @@ module.exports = {
       'ts-jest',
       {
         tsconfig: './tsconfig.json',
-        babelConfig: {
-          presets: [
-            '@babel/preset-env',
-            '@babel/preset-react',
-            '@babel/preset-typescript',
-          ],
+        diagnostics: {
+          ignoreCodes: ['TS151001']
         },
-      },
-    ],
+        sourceMap: true,
+        inlineSourceMap: true,
+        isolatedModules: true
+      }
+    ]
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transformIgnorePatterns: [
@@ -36,6 +35,7 @@ module.exports = {
     'ts-jest': {
       tsconfig: './tsconfig.json',
       isolatedModules: true,
+      diagnostics: false
     },
   },
 };

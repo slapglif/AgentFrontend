@@ -43,6 +43,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
                 size="icon"
                 className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10"
                 onClick={copyCode}
+                aria-label="Copy code"
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
@@ -51,6 +52,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
                 size="icon"
                 className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10"
                 onClick={() => setIsCollapsed(!isCollapsed)}
+                aria-label={isCollapsed ? "Expand code" : "Collapse code"}
               >
                 {isCollapsed ? (
                   <ChevronDown className="h-4 w-4" />

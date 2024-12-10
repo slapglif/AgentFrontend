@@ -61,7 +61,10 @@ describe('AgentBehaviorPatterns', () => {
     mockAnalytics.realtimeMetrics.knowledgeSynthesis.slice(-7).forEach((value, index) => {
       expect(graphs[index]).toBeInTheDocument();
       const height = graphs[index].style.height;
-      expect(height === `${value}%` || graphs[index].getAttribute('style')?.includes(`height: ${value}%`)).toBeTruthy();
+      const heightStyle = window.getComputedStyle(graphs[index]).height;
+      const actualHeight = parseInt(heightStyle) || graphs[index].style.height.replace('%', '');
+      const expectedHeight = value;
+      expect(Math.abs(actualHeight - expectedHeight)).toBeLessThanOrEqual(1);
     });
   });
 

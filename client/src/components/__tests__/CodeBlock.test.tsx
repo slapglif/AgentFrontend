@@ -21,7 +21,7 @@ describe('CodeBlock', () => {
 
   it('handles code copy functionality', async () => {
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const copyButton = screen.getByRole('button', { name: /copy/i });
+    const copyButton = screen.getByRole('button', { name: /copy code/i });
     
     fireEvent.click(copyButton);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(mockCode);
@@ -29,13 +29,15 @@ describe('CodeBlock', () => {
 
   it('toggles collapse state', () => {
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const collapseButton = screen.getByRole('button', { name: /chevron/i });
+    const collapseButton = screen.getByRole('button', { name: /collapse code/i });
     
     fireEvent.click(collapseButton);
     expect(screen.getByText(mockCode).closest('div')).toHaveClass('max-h-16');
+    expect(screen.getByRole('button', { name: /expand code/i })).toBeInTheDocument();
     
     fireEvent.click(collapseButton);
     expect(screen.getByText(mockCode).closest('div')).toHaveClass('max-h-[2000px]');
+    expect(screen.getByRole('button', { name: /collapse code/i })).toBeInTheDocument();
   });
 
   it('shows language label', () => {

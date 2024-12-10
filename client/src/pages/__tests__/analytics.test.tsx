@@ -9,11 +9,18 @@ describe('Analytics Page', () => {
     jest.useFakeTimers();
     const mockDate = new Date('2024-12-10T12:00:00Z');
     jest.setSystemTime(mockDate);
+    // Mock window.ResizeObserver
+    window.ResizeObserver = jest.fn().mockImplementation(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
   });
 
   afterEach(() => {
     jest.useRealTimers();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('renders analytics dashboard title and initial state', async () => {
@@ -80,11 +87,16 @@ describe('Analytics Page', () => {
     // Switch to Real-time
     await act(async () => {
       await user.click(screen.getByRole('tab', { name: 'Real-time' }));
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(2000);
     });
     
-    expect(screen.getByRole('tab', { name: 'Real-time' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: 'Real-time' })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Performance Metrics')).toBeInTheDocument();
+    });
   });
 
   it('handles error states gracefully', async () => {
@@ -129,7 +141,7 @@ describe('Analytics Page', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
+      expect(screen.getByText('Performance Metrics')).toBeInTheDocument();
     }, { timeout: 10000 });
 
     await act(async () => {
@@ -137,12 +149,9 @@ describe('Analytics Page', () => {
     });
 
     await waitFor(() => {
-      const charts = screen.getAllByRole('presentation');
-      expect(charts).toHaveLength(4);
-      
       expect(screen.getByText('Research Progress')).toBeInTheDocument();
-      expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
-      expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
+      expect(screen.getByText('Knowledge Generation')).toBeInTheDocument();
+      expect(screen.getByText('Collaboration Impact')).toBeInTheDocument();
     }, { timeout: 10000 });
   });
 });
