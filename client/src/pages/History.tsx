@@ -45,7 +45,7 @@ export default function History() {
         </Badge>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-200px)]">
+      <ScrollArea className="h-[calc(100vh-200px)] overflow-y-auto">
         <div className="space-y-4">
           {mockHistory.map((entry) => (
             <Card key={entry.id} className="p-4 transition-all hover:shadow-md">

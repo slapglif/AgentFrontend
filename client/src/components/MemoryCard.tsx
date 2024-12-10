@@ -68,10 +68,12 @@ export function MemoryCard({ memory }: MemoryCardProps) {
 
   return (
     <Card 
-      className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-500 hover:shadow-xl hover:scale-[1.02] hover:translate-y-[-2px] border-l-4 border-l-primary/50 group"
+      className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50 group"
       style={{
         transformStyle: 'preserve-3d',
-        perspective: '1000px'
+        perspective: '1000px',
+        backfaceVisibility: 'hidden',
+        willChange: 'transform'
       }}
       onMouseMove={(e) => {
         const card = e.currentTarget;
@@ -80,12 +82,16 @@ export function MemoryCard({ memory }: MemoryCardProps) {
         const y = e.clientY - rect.top;
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        const rotateX = ((y - centerY) / 20) * 0.5; // Reduced rotation
+        const rotateY = ((centerX - x) / 20) * 0.5;
+        requestAnimationFrame(() => {
+          card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        requestAnimationFrame(() => {
+          e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
       }}
     >
       <div className="flex items-start justify-between">
@@ -139,7 +145,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`grid grid-cols-2 gap-2 text-xs overflow-hidden transition-all duration-300 ${
                 activeSection === 'analysis' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {Object.entries(memory.metadata?.detailedAnalysis || {}).map(([key, value], idx) => (
+                {Object.entries(memory.metadata?.detailedAnalysis || {}).map(([key, value]) => (
                   <div 
                     key={`${memory.id}-${key}`}
                     className="flex items-center gap-2 p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
