@@ -1,28 +1,7 @@
 import '@testing-library/jest-dom';
+import 'jest-environment-jsdom';
 
-// Mock IntersectionObserver
-const mockIntersectionObserver = jest.fn();
-mockIntersectionObserver.mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-window.IntersectionObserver = mockIntersectionObserver;
-
-// Mock ResizeObserver
-window.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
-
-// Mock requestAnimationFrame
-window.requestAnimationFrame = jest.fn((callback: FrameRequestCallback) => {
-  callback(Date.now());
-  return 0;
-});
-
-// Mock matchMedia
+// Mock window properties and methods
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -37,5 +16,59 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Mock IntersectionObserver
+class MockIntersectionObserver {
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback;
+  }
+  callback: IntersectionObserverCallback;
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+  takeRecords = jest.fn();
+}
+window.IntersectionObserver = MockIntersectionObserver as any;
+
+// Mock ResizeObserver
+class MockResizeObserver {
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback;
+  }
+  callback: ResizeObserverCallback;
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+}
+window.ResizeObserver = MockResizeObserver as any;
+
+// Mock animations and timers
+window.requestAnimationFrame = (callback: FrameRequestCallback) => {
+  callback(Date.now());
+  return 0;
+};
+
+window.cancelAnimationFrame = jest.fn();
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
 // Enable fake timers
 jest.useFakeTimers();
+
+// Suppress console errors during tests
+const originalError = console.error;
+console.error = (...args: any[]) => {
+  if (
+    /Warning: ReactDOM.render is no longer supported in React 18/.test(args[0]) ||
+    /Warning: The current testing environment/.test(args[0])
+  ) {
+    return;
+  }
+  originalError.call(console, ...args);
+};

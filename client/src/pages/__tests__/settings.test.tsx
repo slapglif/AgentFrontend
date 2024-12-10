@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Settings from '../Settings';
 
@@ -23,32 +23,105 @@ describe('Settings Page', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   it('renders main settings sections', () => {
     renderSettings();
-    expect(screen.getByText('Settings')).toBeTruthy();
-    expect(screen.getByText('System Preferences')).toBeTruthy();
-    expect(screen.getByText('Agent Settings')).toBeTruthy();
-    expect(screen.getByText('Error Handling')).toBeTruthy();
+    
+    // Initially shows loading skeletons
+    expect(screen.getAllByTestId('skeleton')).toHaveLength(2);
+
+    // After loading
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Settings')).toBeInTheDocument();
+    expect(screen.getByText('Interface Preferences')).toBeInTheDocument();
+    expect(screen.getByText('Agent Behavior')).toBeInTheDocument();
+    expect(screen.getByText('System Performance')).toBeInTheDocument();
+    expect(screen.getByText('Error Handling')).toBeInTheDocument();
   });
 
-  it('renders all preference toggles', () => {
+  it('renders all preference toggles', async () => {
     renderSettings();
-    expect(screen.getByText('Auto-save Changes')).toBeTruthy();
-    expect(screen.getByText('Desktop Notifications')).toBeTruthy();
-    expect(screen.getByText('Detailed Error Logging')).toBeTruthy();
+    
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Dark Mode')).toBeInTheDocument();
+    expect(screen.getByText('Auto-save Changes')).toBeInTheDocument();
+    expect(screen.getByText('Desktop Notifications')).toBeInTheDocument();
+    expect(screen.getByText('Resource Monitoring')).toBeInTheDocument();
+    expect(screen.getByText('Detailed Error Logging')).toBeInTheDocument();
   });
 
-  it('renders select inputs', () => {
+  it('renders select inputs with correct options', async () => {
     renderSettings();
-    expect(screen.getByText('Update Frequency')).toBeTruthy();
-    expect(screen.getByText('Agent Verbosity')).toBeTruthy();
+    
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByText('Update Frequency')).toBeInTheDocument();
+    expect(screen.getByText('Verbosity Level')).toBeInTheDocument();
+    expect(screen.getByText('Learning Rate')).toBeInTheDocument();
+    expect(screen.getByText('Memory Retention')).toBeInTheDocument();
   });
 
-  it('renders reset button', () => {
+  it('handles reset functionality correctly', async () => {
+    const { toast } = require('@/components/ui/use-toast');
     renderSettings();
+    
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
     const resetButton = screen.getByText('Reset to Defaults');
-    expect(resetButton).toBeTruthy();
+    fireEvent.click(resetButton);
+
+    expect(toast).toHaveBeenCalledWith({
+      title: "Settings Reset",
+      description: "All settings have been restored to their default values.",
+    });
+  });
+
+  it('disables controls during loading state', () => {
+    renderSettings();
+    
+    const switches = screen.getAllByRole('switch');
+    const selects = screen.getAllByRole('combobox');
+    const resetButton = screen.getByText('Reset to Defaults');
+
+    switches.forEach(switchEl => {
+      expect(switchEl).toBeDisabled();
+    });
+
+    selects.forEach(select => {
+      expect(select).toBeDisabled();
+    });
+
+    expect(resetButton).toBeDisabled();
+    
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    switches.forEach(switchEl => {
+      expect(switchEl).not.toBeDisabled();
+    });
+
+    selects.forEach(select => {
+      expect(select).not.toBeDisabled();
+    });
+
+    expect(resetButton).not.toBeDisabled();
   });
 });

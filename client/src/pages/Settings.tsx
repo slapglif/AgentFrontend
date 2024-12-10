@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Settings() {
+  const [isLoading, setIsLoading] = useState(true);
   const [autoSave, setAutoSave] = useLocalStorage('settings-autosave', true);
   const [notificationsEnabled, setNotificationsEnabled] = useLocalStorage('settings-notifications', true);
   const [updateFrequency, setUpdateFrequency] = useLocalStorage('settings-update-frequency', '30');
@@ -21,21 +24,36 @@ export default function Settings() {
   const [learningRate, setLearningRate] = useLocalStorage('settings-learning-rate', 'adaptive');
   const [memoryRetention, setMemoryRetention] = useLocalStorage('settings-memory-retention', '7');
 
+  useEffect(() => {
+    // Simulate loading state for smoother transitions
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleReset = () => {
-    setAutoSave(true);
-    setNotificationsEnabled(true);
-    setUpdateFrequency('30');
-    setErrorLogging(true);
-    setAgentVerbosity('normal');
-    setDarkMode(false);
-    setAgentCollaboration(true);
-    setResourceMonitoring(true);
-    setLearningRate('adaptive');
-    setMemoryRetention('7');
-    toast({
-      title: "Settings Reset",
-      description: "All settings have been restored to their default values.",
-    });
+    try {
+      setAutoSave(true);
+      setNotificationsEnabled(true);
+      setUpdateFrequency('30');
+      setErrorLogging(true);
+      setAgentVerbosity('normal');
+      setDarkMode(false);
+      setAgentCollaboration(true);
+      setResourceMonitoring(true);
+      setLearningRate('adaptive');
+      setMemoryRetention('7');
+      
+      toast({
+        title: "Settings Reset",
+        description: "All settings have been restored to their default values.",
+      });
+    } catch (error) {
+      toast({
+        title: "Reset Failed",
+        description: "An error occurred while resetting settings. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -44,10 +62,26 @@ export default function Settings() {
         <div className="container py-6 space-y-6">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-semibold">Settings</h1>
-              <p className="text-sm text-muted-foreground mt-1">Manage your research system preferences</p>
+              {isLoading ? (
+                <>
+                  <Skeleton className="h-8 w-48 mb-2" />
+                  <Skeleton className="h-4 w-72" />
+                </>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-semibold animate-staggered-fade-in">Settings</h1>
+                  <p className="text-sm text-muted-foreground mt-1 animate-staggered-fade-in">
+                    Manage your research system preferences
+                  </p>
+                </>
+              )}
             </div>
-            <Button variant="outline" onClick={handleReset} className="hover:bg-destructive/10">
+            <Button 
+              variant="outline" 
+              onClick={handleReset} 
+              className="hover:bg-destructive/10 transition-all duration-300 ease-in-out hover:shadow-lg"
+              disabled={isLoading}
+            >
               Reset to Defaults
             </Button>
           </div>
@@ -69,6 +103,8 @@ export default function Settings() {
                   <Switch 
                     checked={darkMode}
                     onCheckedChange={setDarkMode}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
                 
@@ -84,6 +120,8 @@ export default function Settings() {
                   <Switch 
                     checked={autoSave}
                     onCheckedChange={setAutoSave}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
                 
@@ -99,6 +137,8 @@ export default function Settings() {
                   <Switch 
                     checked={notificationsEnabled}
                     onCheckedChange={setNotificationsEnabled}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
               </div>
@@ -120,6 +160,8 @@ export default function Settings() {
                   <Switch 
                     checked={agentCollaboration}
                     onCheckedChange={setAgentCollaboration}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
 
@@ -132,8 +174,8 @@ export default function Settings() {
                       Control how quickly agents adapt to new information
                     </p>
                   </div>
-                  <Select value={learningRate} onValueChange={setLearningRate}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select value={learningRate} onValueChange={setLearningRate} disabled={isLoading}>
+                    <SelectTrigger className="w-[180px] hover-glow">
                       <SelectValue placeholder="Select rate" />
                     </SelectTrigger>
                     <SelectContent>
@@ -154,8 +196,8 @@ export default function Settings() {
                       How long to retain agent memory (in days)
                     </p>
                   </div>
-                  <Select value={memoryRetention} onValueChange={setMemoryRetention}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select value={memoryRetention} onValueChange={setMemoryRetention} disabled={isLoading}>
+                    <SelectTrigger className="w-[180px] hover-glow">
                       <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
                     <SelectContent>
@@ -185,6 +227,8 @@ export default function Settings() {
                   <Switch 
                     checked={resourceMonitoring}
                     onCheckedChange={setResourceMonitoring}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
 
@@ -197,8 +241,8 @@ export default function Settings() {
                       How often to refresh agent states (in seconds)
                     </p>
                   </div>
-                  <Select value={updateFrequency} onValueChange={setUpdateFrequency}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select value={updateFrequency} onValueChange={setUpdateFrequency} disabled={isLoading}>
+                    <SelectTrigger className="w-[180px] hover-glow">
                       <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -219,8 +263,8 @@ export default function Settings() {
                       Set the detail level of system logs
                     </p>
                   </div>
-                  <Select value={agentVerbosity} onValueChange={setAgentVerbosity}>
-                    <SelectTrigger className="w-[180px]">
+                  <Select value={agentVerbosity} onValueChange={setAgentVerbosity} disabled={isLoading}>
+                    <SelectTrigger className="w-[180px] hover-glow">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -250,6 +294,8 @@ export default function Settings() {
                   <Switch 
                     checked={errorLogging}
                     onCheckedChange={setErrorLogging}
+                    disabled={isLoading}
+                    className="ease-spring"
                   />
                 </div>
               </div>

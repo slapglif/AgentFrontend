@@ -73,7 +73,7 @@ app.use((req, res, next) => {
   const HOST = "0.0.0.0";
 
   try {
-    server.listen(PORT, HOST, () => {
+    server.listen(Number(PORT), () => {
       log(`🚀 Server running at http://${HOST}:${PORT}`);
       log(`🔥 Environment: ${app.get("env")}`);
     });
