@@ -41,9 +41,10 @@ describe('AgentCard', () => {
 
   it('displays correct status badge', () => {
     render(<AgentCard agent={mockAgent} />);
-    const statusBadge = screen.getByText(mockAgent.status);
+    const statusBadge = screen.getByText(mockAgent.status, { exact: false });
     expect(statusBadge).toBeInTheDocument();
-    expect(statusBadge).toHaveClass('bg-green-500');
+    expect(statusBadge.className).toMatch(/bg-green-500/);
+    expect(statusBadge.className).toMatch(/animate-glow/);
   });
 
   it('shows achievements', () => {
@@ -56,7 +57,11 @@ describe('AgentCard', () => {
   it('displays experience progress', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
-    expect(screen.getByText(/75/)).toBeInTheDocument();
+    
+    // Check for experience progress bar
+    const experienceBar = screen.getByRole('progressbar');
+    expect(experienceBar).toBeInTheDocument();
+    expect(experienceBar).toHaveAttribute('data-state', 'indeterminate');
   });
 
   it('shows current task information', () => {

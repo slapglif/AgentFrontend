@@ -13,29 +13,32 @@ const setupMocks = () => {
 
   // Store originals for cleanup
   const originalRandom = Math.random;
-  const originalDate = Date;
 
   return { 
     mockRandom,
     mockDate,
     cleanup: () => {
       mockRandom.mockRestore();
-      jest.setSystemTime(originalDate);
+      jest.useRealTimers();
       Math.random = originalRandom;
+      jest.clearAllMocks();
     }
   };
 };
 
 describe('PerformanceMetrics', () => {
+  let mocks: ReturnType<typeof setupMocks>;
+  
   beforeEach(() => {
     jest.useFakeTimers();
-    setupMocks();
+    mocks = setupMocks();
   });
 
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
     jest.restoreAllMocks();
+    mocks.cleanup();
   });
 
   it('renders without crashing', () => {
@@ -63,42 +66,43 @@ describe('PerformanceMetrics', () => {
   it('updates metrics in real-time', async () => {
     render(<PerformanceMetrics />);
     
-    // Wait for initial loading to complete and charts to appear
+    // Wait for initial loading to complete
     await waitFor(() => {
       expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
-      const charts = screen.getAllByRole('presentation');
-      expect(charts).toHaveLength(4);
     }, { timeout: 10000 });
 
-    // Store initial values for comparison
+    // Verify initial chart state
     const initialCharts = screen.getAllByRole('presentation');
-    const initialTokenText = screen.getByText('Token Usage Trend');
     expect(initialCharts).toHaveLength(4);
-    expect(initialTokenText).toBeInTheDocument();
+    
+    const chartTitles = [
+      'Token Usage Trend',
+      'Research Progress',
+      'Knowledge Synthesis Rate',
+      'Collaboration Effectiveness'
+    ];
+    
+    chartTitles.forEach(title => {
+      expect(screen.getByText(title)).toBeInTheDocument();
+    });
 
-    // Advance time to trigger metric updates
+    // Advance time and verify updates
     await act(async () => {
       jest.advanceTimersByTime(2000);
     });
 
-    // Verify charts update with new data
+    // Verify charts are still present and updated
     await waitFor(() => {
-      // Check all charts are still present
       const updatedCharts = screen.getAllByRole('presentation');
       expect(updatedCharts).toHaveLength(4);
-
-      // Verify all chart titles are still visible
-      const chartTitles = [
-        'Token Usage Trend',
-        'Research Progress',
-        'Knowledge Synthesis Rate',
-        'Collaboration Effectiveness'
-      ];
-      
       chartTitles.forEach(title => {
         expect(screen.getByText(title)).toBeInTheDocument();
       });
     }, { timeout: 10000 });
+
+    // Verify tooltip data is updated
+    const tooltipText = `Tokens Used: ${mockAnalytics.systemMetrics.tokenMetrics.tokensUsed}`;
+    expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
   });
 
   it('calculates metrics correctly', async () => {
@@ -173,6 +177,11 @@ describe('PerformanceMetrics', () => {
       chartTitles.forEach(title => {
         expect(screen.getByText(title)).toBeInTheDocument();
       });
+
+      // Verify knowledge synthesis data is displayed
+      const knowledgeSynthesisChart = screen.getByText('Knowledge Synthesis Rate').closest('div');
+      expect(knowledgeSynthesisChart).toBeInTheDocument();
+      expect(knowledgeSynthesisChart).toHaveAttribute('role', 'presentation');
     }, { timeout: 10000 });
 
     // Update timer to trigger data refresh
@@ -184,6 +193,11 @@ describe('PerformanceMetrics', () => {
     await waitFor(() => {
       const updatedCharts = screen.getAllByRole('presentation');
       expect(updatedCharts.length).toBe(4);
+      
+      // Verify data points are present after update
+      const updatedSynthesisChart = screen.getByText('Knowledge Synthesis Rate').closest('div');
+      expect(updatedSynthesisChart).toBeInTheDocument();
+      expect(updatedSynthesisChart).toHaveAttribute('role', 'presentation');
     }, { timeout: 10000 });
   });
 
