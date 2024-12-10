@@ -45,13 +45,13 @@ export default function Home() {
       <PanelGroup direction="horizontal" className="h-full">
         <Panel defaultSize={25} minSize={20} maxSize={40}>
           <div className="h-full border-r bg-muted/30 backdrop-blur-sm overflow-y-auto">
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="p-2">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-semibold">Active Agents</h2>
                 <Badge variant="outline">{agents?.length || 0}</Badge>
               </div>
-              <Separator className="my-4" />
-              <div className="space-y-3">
+              <Separator className="mb-2" />
+              <div className="space-y-4">
                 {agents?.map((agent) => (
                   <AgentCard 
                     key={agent.id} 

@@ -25,7 +25,7 @@ interface MemoryMetadata {
 
 interface MemoryContent {
   text: string;
-  code: string | null | undefined;
+  code: string | null;
   language?: string;
 }
 
@@ -68,7 +68,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
 
   return (
     <Card 
-      className="p-4 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50 group"
+      className="p-3 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50 group"
       style={{
         transformStyle: 'preserve-3d',
         perspective: '1000px',

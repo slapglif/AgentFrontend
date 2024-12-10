@@ -67,7 +67,7 @@ export function AgentCard({ agent }: AgentCardProps) {
   return (
     <Link href={`/agents/${agent.id}`}>
       <Card 
-        className="p-4 hover-3d interactive-hover bg-gradient-to-br from-background to-muted/30 backdrop-blur-sm border-primary/10 overflow-hidden cursor-pointer"
+        className="p-3 hover-3d interactive-hover bg-gradient-to-br from-background to-muted/30 backdrop-blur-sm border-primary/10 overflow-hidden cursor-pointer"
         style={{
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}

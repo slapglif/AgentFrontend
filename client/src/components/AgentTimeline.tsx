@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { mockMemoryData } from "@/lib/mockData";
 import { MemoryCard } from "./MemoryCard";
-import type { MemoryEntry } from "@/types/memory";
+import { memorySchema, type MemoryEntry } from "../types/memory";
 
 export function AgentTimeline() {
   const { data: memories } = useQuery<MemoryEntry[]>({
@@ -12,17 +12,16 @@ export function AgentTimeline() {
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-xl font-semibold mb-4 flex-shrink-0">Memory Timeline</h2>
+      <h2 className="text-xl font-semibold mb-2 flex-shrink-0">Memory Timeline</h2>
       <div className="flex-1 overflow-y-auto">
-        <div className="space-y-4 px-4 pb-6">
+        <div className="space-y-2 px-4 pb-4">
           {memories?.map((memory, idx) => (
             <div 
               key={`${memory.id}-${idx}`} 
               className="relative animate-staggered-fade-in transition-all duration-500 hover:translate-x-2"
               style={{
-                animationDelay: `${idx * 150}ms`,
-                transformStyle: 'preserve-3d',
-                perspective: '1000px'
+                animationDelay: `${idx * 100}ms`,
+                transform: 'translateZ(0)'
               }}
             >
               <div 
