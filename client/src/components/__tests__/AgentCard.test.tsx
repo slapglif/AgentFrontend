@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AgentCard } from '../AgentCard';
 
-
 // Mock wouter's Link component
 jest.mock('wouter', () => ({
   Link: ({ children }: { children: React.ReactNode }) => children,
@@ -28,7 +27,9 @@ describe('AgentCard', () => {
       summary: 'Test task',
       progress: 50,
       status: 'in_progress' as const,
-      priority: 'medium' as const
+      priority: 'medium' as const,
+      started_at: new Date().toISOString(),
+      estimated_completion: new Date(Date.now() + 3600000).toISOString()
     }
   };
 
@@ -40,8 +41,9 @@ describe('AgentCard', () => {
 
   it('displays correct status badge', () => {
     render(<AgentCard agent={mockAgent} />);
-    const badge = screen.getByText(mockAgent.status);
-    expect(badge).toHaveClass('bg-green-500');
+    const statusBadge = screen.getByText(mockAgent.status);
+    expect(statusBadge).toBeInTheDocument();
+    expect(statusBadge).toHaveClass('bg-green-500');
   });
 
   it('shows achievements', () => {
@@ -54,6 +56,12 @@ describe('AgentCard', () => {
   it('displays experience progress', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
-    expect(screen.getByText(mockAgent.experience.toString(), { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/75/)).toBeInTheDocument();
+  });
+
+  it('shows current task information', () => {
+    render(<AgentCard agent={mockAgent} />);
+    expect(screen.getByText(mockAgent.current_task.summary)).toBeInTheDocument();
+    expect(screen.getByText(`${mockAgent.current_task.progress}%`)).toBeInTheDocument();
   });
 });
