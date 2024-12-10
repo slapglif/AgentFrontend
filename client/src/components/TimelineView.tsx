@@ -1,12 +1,19 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { differenceInMinutes } from "date-fns";
 
-interface Task {
+// Timeline-specific interfaces
+
+interface TaskBase {
   id: string;
   title: string;
+  description?: string;
   completed: boolean;
+}
+
+interface Task extends TaskBase {
   startTime: Date;
   endTime: Date;
+  dependencies?: string[];
 }
 
 interface Goal {
@@ -16,6 +23,7 @@ interface Goal {
   status: "todo" | "in_progress" | "completed";
   startTime: Date;
   endTime: Date;
+  progress: number;
   tasks: Task[];
 }
 
@@ -93,14 +101,16 @@ export function TimelineView({ goals }: TimelineViewProps) {
                     </div>
                     <div className="relative flex-1" style={{ height: rowHeight }}>
                       <div
-                        className={`absolute h-4 rounded-full ${
-                          task.completed ? 'bg-primary' : 'border-2 border-primary bg-background'
+                        className={`absolute h-4 rounded-full group cursor-pointer transition-all duration-300 hover:scale-105 ${
+                          task.completed ? 'bg-primary shadow-glow' : 'border-2 border-primary bg-background'
                         }`}
                         style={{
                           left: getPositionForTime(task.startTime),
                           width: getWidthForDuration(task.startTime, task.endTime),
-                          top: '8px'
+                          top: '8px',
+                          boxShadow: task.completed ? '0 0 8px var(--primary)' : 'none'
                         }}
+                        title={`${task.title} (${task.completed ? 'Completed' : 'In Progress'})`}
                       />
                     </div>
                   </div>

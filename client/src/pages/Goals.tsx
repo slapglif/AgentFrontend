@@ -27,18 +27,20 @@ interface Task {
   title: string;
   description?: string;
   completed: boolean;
-  assignedTo?: string;
   startTime: Date;
   endTime: Date;
   dependencies?: string[];
 }
 
-import { type Goal as KanbanGoal } from "@/components/GoalKanbanBoard";
-
-interface Goal extends KanbanGoal {
+interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  status: "todo" | "in_progress" | "completed";
   startTime: Date;
   endTime: Date;
   progress: number;
+  tasks: Task[];
 }
 
 // Mock initial goals data
@@ -55,8 +57,8 @@ const initialGoals: Goal[] = [
     title: "Research Data Analysis",
     description: "Analyze research data for patterns and insights",
     status: "in_progress",
-    startTime: makeTime(9), // 9 AM
-    endTime: makeTime(16), // 4 PM
+    startTime: makeTime(9),
+    endTime: makeTime(16),
     progress: 60,
     tasks: [
       {
@@ -64,8 +66,8 @@ const initialGoals: Goal[] = [
         title: "Data preprocessing",
         description: "Clean and prepare data for analysis",
         completed: true,
-        startTime: makeTime(9), // 9 AM
-        endTime: makeTime(11), // 11 AM
+        startTime: makeTime(9),
+        endTime: makeTime(11),
       },
       {
         id: "1-2",
@@ -73,8 +75,8 @@ const initialGoals: Goal[] = [
         description: "Select relevant features for analysis",
         completed: true,
         dependencies: ["1-1"],
-        startTime: makeTime(11), // 11 AM
-        endTime: makeTime(13), // 1 PM
+        startTime: makeTime(11),
+        endTime: makeTime(13),
       },
       {
         id: "1-3",
@@ -82,8 +84,8 @@ const initialGoals: Goal[] = [
         description: "Choose appropriate models for analysis",
         completed: false,
         dependencies: ["1-2"],
-        startTime: makeTime(14), // 2 PM
-        endTime: makeTime(16), // 4 PM
+        startTime: makeTime(14),
+        endTime: makeTime(16),
       }
     ]
   },
@@ -92,8 +94,8 @@ const initialGoals: Goal[] = [
     title: "Implement Machine Learning Pipeline",
     description: "Create end-to-end ML pipeline",
     status: "todo",
-    startTime: makeTime(10), // 10 AM
-    endTime: makeTime(17), // 5 PM
+    startTime: makeTime(10),
+    endTime: makeTime(17),
     progress: 0,
     tasks: [
       {
@@ -101,8 +103,8 @@ const initialGoals: Goal[] = [
         title: "Data ingestion",
         description: "Set up data ingestion pipeline",
         completed: false,
-        startTime: makeTime(10), // 10 AM
-        endTime: makeTime(13), // 1 PM
+        startTime: makeTime(10),
+        endTime: makeTime(13),
       },
       {
         id: "2-2",
@@ -110,14 +112,14 @@ const initialGoals: Goal[] = [
         description: "Implement model training pipeline",
         completed: false,
         dependencies: ["2-1"],
-        startTime: makeTime(14), // 2 PM
-        endTime: makeTime(17), // 5 PM
+        startTime: makeTime(14),
+        endTime: makeTime(17),
       }
     ]
   }
 ];
 
-// Mock chat messages with rich interactions
+// Mock chat messages
 const mockChatMessages = [
   {
     id: 1,
@@ -158,43 +160,36 @@ export default function Goals() {
       return;
     }
 
-    if (result.type === "GOAL") {
-      const updatedGoals = [...goals];
-      const [removed] = updatedGoals.splice(result.source.index, 1);
-      updatedGoals.splice(result.destination.index, 0, removed);
-      setGoals(updatedGoals);
-    } else {
-      const updatedGoals = [...goals];
-      const sourceGoal = updatedGoals.find(g => g.id === result.source.droppableId);
-      const destGoal = updatedGoals.find(g => g.id === result.destination.droppableId);
+    const updatedGoals = [...goals];
+    const [removed] = updatedGoals.splice(result.source.index, 1);
+    removed.status = result.destination.droppableId as "todo" | "in_progress" | "completed";
+    updatedGoals.splice(result.destination.index, 0, removed);
+    setGoals(updatedGoals);
+  };
 
-      if (sourceGoal && destGoal) {
-        const [removed] = sourceGoal.tasks.splice(result.source.index, 1);
-        destGoal.tasks.splice(result.destination.index, 0, removed);
-        
-        // Update progress for both goals
-        const updateProgress = (goal: Goal) => {
-          const completedTasks = goal.tasks.filter(t => t.completed).length;
-          goal.progress = goal.tasks.length > 0 
-            ? Math.round((completedTasks / goal.tasks.length) * 100)
-            : 0;
-        };
-        
-        updateProgress(sourceGoal);
-        if (sourceGoal.id !== destGoal.id) {
-          updateProgress(destGoal);
-        }
-        
-        setGoals(updatedGoals);
-      }
-    }
+  const mapGoalsToKanbanView = (goals: Goal[]) => {
+    return goals.map(({ id, title, description, status, tasks }) => ({
+      id,
+      title,
+      description,
+      status,
+      tasks: tasks.map(({ id, title, description, completed }) => ({
+        id,
+        title,
+        description,
+        completed
+      }))
+    }));
   };
 
   const addNewGoal = () => {
     if (!newGoal.title || !newGoal.startTime || !newGoal.endTime) return;
 
-    const startTime = new Date(newGoal.startTime);
-    const endTime = new Date(newGoal.endTime);
+    const startTime = new Date();
+    startTime.setHours(parseInt(newGoal.startTime.split(":")[0]), parseInt(newGoal.startTime.split(":")[1]));
+    
+    const endTime = new Date();
+    endTime.setHours(parseInt(newGoal.endTime.split(":")[0]), parseInt(newGoal.endTime.split(":")[1]));
     
     if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) return;
     
@@ -316,8 +311,29 @@ export default function Goals() {
 
           <TabsContent value="kanban">
             <GoalKanbanBoard 
-              goals={goals} 
-              onGoalsUpdate={(updatedGoals: Goal[]) => setGoals([...updatedGoals])}
+              goals={goals.map(({ id, title, description, status, tasks }) => ({
+                id,
+                title,
+                description,
+                status,
+                tasks: tasks.map(({ id, title, description, completed }) => ({
+                  id,
+                  title,
+                  description,
+                  completed
+                }))
+              }))}
+              onGoalsUpdate={(updatedGoals) => {
+                setGoals(goals.map(goal => {
+                  const updatedGoal = updatedGoals.find(g => g.id === goal.id);
+                  return updatedGoal ? {
+                    ...goal,
+                    status: updatedGoal.status,
+                    title: updatedGoal.title,
+                    description: updatedGoal.description,
+                  } : goal;
+                }));
+              }}
               onDragEnd={handleDragEnd}
             />
           </TabsContent>

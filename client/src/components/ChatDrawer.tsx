@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { formatDistance } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, ChevronRight, ChevronLeft } from "lucide-react";
 import { ChatInterface } from "@/components/ChatInterface";
 import { cn } from "@/lib/utils";
 
-interface ChatDrawerProps {
-  className?: string;
-}
-
 interface Message {
   id: number;
   role: string;
   content: string;
   timestamp: Date;
+  metadata?: {
+    type?: string;
+    goalId?: string;
+    suggestedAction?: string;
+  };
 }
 
 interface ChatDrawerProps {
@@ -75,7 +76,7 @@ export function ChatDrawer({ className, messages = [], onSendMessage }: ChatDraw
                   <div className={`max-w-[80%] p-3 rounded-lg ${message.role === 'assistant' ? 'bg-primary/10' : 'bg-muted'}`}>
                     <p className="text-sm">{message.content}</p>
                     <span className="text-xs text-muted-foreground">
-                      {formatDistance(new Date(message.timestamp), new Date(), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
                     </span>
                   </div>
                 </div>

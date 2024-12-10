@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 export interface Task {
   id: string;
   title: string;
+  description?: string;
   completed: boolean;
 }
 
@@ -24,7 +25,7 @@ interface GoalKanbanBoardProps {
   onDragEnd?: (result: DropResult) => void;
 }
 
-export function GoalKanbanBoard({ goals, onGoalsUpdate }: GoalKanbanBoardProps) {
+export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanBoardProps) {
   const columns = [
     { id: "todo", title: "To Do" },
     { id: "in_progress", title: "In Progress" },

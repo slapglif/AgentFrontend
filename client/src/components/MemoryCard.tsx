@@ -174,7 +174,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               }`}>
                 {memory.metadata.relatedMemories?.map((related: any) => (
                   <div 
-                    key={`${memory.id}-${related.id}`} 
+                    key={`${memory.id}-${related.id}-${related.type}`} 
                     className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                   >
                     <span className="text-xs text-muted-foreground capitalize">{related.type}</span>
