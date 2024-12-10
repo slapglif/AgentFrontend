@@ -12,11 +12,11 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { Panel, PanelGroup, PanelResizeHandle, ImperativePanelHandle } from "react-resizable-panels";
+import { Panel, PanelGroup } from "react-resizable-panels";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useRef } from "react";
+import { useState } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,11 +28,13 @@ interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+const SIDEBAR_WIDTH = 256;
+const SIDEBAR_COLLAPSED_WIDTH = 64;
+
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebar-collapsed', false);
-  const [sidebarSize, setSidebarSize] = useLocalStorage('sidebar-size', 20);
-  const panelRef = useRef<ImperativePanelHandle>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const navigationItems: NavigationItem[] = [
     { href: "/", label: "Overview", icon: LayoutIcon },
@@ -44,37 +46,30 @@ export function Layout({ children }: LayoutProps) {
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 
-  const handlePanelResize = (size: number) => {
-    setSidebarSize(size);
-  };
-
-  const handleCollapse = () => {
-    if (panelRef.current) {
-      const newCollapsed = !isCollapsed;
-      setIsCollapsed(newCollapsed);
-      if (newCollapsed) {
-        panelRef.current.collapse();
-      } else {
-        panelRef.current.expand();
-      }
-    }
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+    setIsMounted(true);
   };
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
-      <div className="flex h-screen bg-background">
+      <div className="flex h-screen overflow-hidden bg-background">
         <PanelGroup direction="horizontal" className="w-full">
-          <Panel 
-            ref={panelRef}
-            defaultSize={sidebarSize}
-            minSize={5}
-            maxSize={30}
-            collapsible
-            collapsedSize={0}
-            onResize={handlePanelResize}
-            className="transition-all duration-300"
+          <Panel
+            defaultSize={20}
+            style={{
+              flexBasis: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
+              flexGrow: 0,
+              flexShrink: 0,
+              transition: isMounted ? 'flex-basis 300ms ease-in-out' : 'none'
+            }}
           >
-            <aside className="h-full border-r bg-muted/30 backdrop-blur-sm">
+            <aside className="fixed top-0 left-0 h-screen border-r bg-muted/30 backdrop-blur-sm"
+              style={{
+                width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
+                transition: isMounted ? 'width 300ms ease-in-out' : 'none'
+              }}
+            >
               <ScrollArea className="h-full">
                 <div className="p-4 space-y-4">
                   <div className="mb-8 flex items-center justify-between">
@@ -88,8 +83,10 @@ export function Layout({ children }: LayoutProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={handleCollapse}
-                        className="shrink-0"
+                        onClick={toggleSidebar}
+                        className={`shrink-0 transition-all duration-300 ${
+                          isCollapsed ? 'fixed left-4 top-4 z-50 bg-background/50 backdrop-blur-sm hover:bg-background/80' : ''
+                        }`}
                       >
                         {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                       </Button>
@@ -121,10 +118,13 @@ export function Layout({ children }: LayoutProps) {
               </ScrollArea>
             </aside>
           </Panel>
-          <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 transition-colors" />
-          <Panel minSize={70}>
-            <main className="h-screen overflow-y-auto bg-background">
-              <div className="container mx-auto py-6 px-4">
+          <Panel>
+            <main className="flex-1 h-screen overflow-y-auto bg-background ml-[var(--sidebar-width)]"
+              style={{
+                '--sidebar-width': `${isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH}px`
+              } as React.CSSProperties}
+            >
+              <div className="container mx-auto py-6 px-4 min-h-full">
                 {children}
               </div>
             </main>
