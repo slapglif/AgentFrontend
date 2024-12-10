@@ -14,7 +14,6 @@ import {
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -43,10 +42,10 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
-      <div className="flex h-full">
+      <div className="flex min-h-screen">
         <aside 
           className={cn(
-            "sticky top-0 h-screen shrink-0 border-r bg-muted/30 backdrop-blur-sm transition-[width] duration-300",
+            "fixed top-0 h-screen shrink-0 border-r bg-background/95 backdrop-blur-sm transition-[width] duration-300 z-30",
             isCollapsed ? "w-16" : "w-64"
           )}
         >
@@ -96,7 +95,10 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </div>
         </aside>
-        <main className="flex-1 h-screen overflow-auto">
+        <main className={cn(
+          "flex-1 min-h-screen transition-[margin] duration-300",
+          isCollapsed ? "ml-16" : "ml-64"
+        )}>
           {children}
         </main>
       </div>

@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgentTimeline } from "@/components/AgentTimeline";
 import { AgentCard } from "@/components/AgentCard";
-
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-// Removed unused import
-// Removed unused import
 import { mockOverview } from "@/lib/mockOverview";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
@@ -41,47 +39,51 @@ export default function Home() {
   }
 
   return (
-    <div className="h-full">
-      <PanelGroup direction="horizontal">
-        <Panel defaultSize={30} minSize={20}>
-          <div className="h-full">
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold">Active Agents</h2>
-                <Badge variant="outline">{agents?.length || 0}</Badge>
-              </div>
-              <Separator className="mb-3" />
-              <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-8rem)] pr-2">
-                {agents?.map((agent) => (
-                  <AgentCard 
-                    key={agent.id}
-                    agent={{
-                      id: agent.id,
-                      name: agent.name,
-                      type: agent.type,
-                      status: agent.status,
-                      current_task: agent.current_task,
-                      currentTasks: agent.currentTasks,
-                      successRate: agent.successRate,
-                      skillLevel: agent.skillLevel
-                    }} 
-                  />
-                ))}
+    <div className="h-full relative">
+      <ErrorBoundary>
+        <PanelGroup direction="horizontal" autoSaveId="home-panel-layout">
+          <Panel defaultSize={30} minSize={20} className="overflow-hidden">
+            <div className="h-full flex flex-col">
+              <div className="p-4 flex-1 overflow-hidden">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold">Active Agents</h2>
+                  <Badge variant="outline">{agents?.length || 0}</Badge>
+                </div>
+                <Separator className="mb-3" />
+                <div className="space-y-3 overflow-y-auto h-[calc(100%-3rem)] pr-2">
+                  {agents?.map((agent) => (
+                    <AgentCard 
+                      key={agent.id}
+                      agent={{
+                        id: agent.id,
+                        name: agent.name,
+                        type: agent.type,
+                        status: agent.status,
+                        current_task: agent.current_task,
+                        currentTasks: agent.currentTasks,
+                        successRate: agent.successRate,
+                        skillLevel: agent.skillLevel
+                      }} 
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </Panel>
-        
-        <PanelResizeHandle className="w-px bg-border hover:bg-primary hover:w-0.5 transition-all duration-150" />
-        
-        <Panel defaultSize={70} minSize={50}>
-          <div className="h-full">
-            <div className="p-4">
-              <AgentTimeline />
+          </Panel>
+          
+          <PanelResizeHandle className="w-1 bg-border hover:bg-primary hover:w-1.5 transition-all duration-150 relative">
+            <div className="absolute inset-y-0 -left-1 -right-1 cursor-col-resize" />
+          </PanelResizeHandle>
+          
+          <Panel defaultSize={70} minSize={50} className="overflow-hidden">
+            <div className="h-full flex flex-col">
+              <div className="p-4 flex-1 overflow-hidden">
+                <AgentTimeline />
+              </div>
             </div>
-          </div>
-        </Panel>
-      </PanelGroup>
+          </Panel>
+        </PanelGroup>
+      </ErrorBoundary>
     </div>
   );
 }
