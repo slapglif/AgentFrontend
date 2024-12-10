@@ -1,4 +1,3 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Code, MessageSquare, Database, FileText, Clock } from "lucide-react";
@@ -45,7 +44,7 @@ export default function History() {
         </Badge>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="h-[calc(100vh-200px)] overflow-y-auto">
         <div className="space-y-4">
           {mockHistory.map((entry) => (
             <Card key={entry.id} className="p-4 transition-all hover:shadow-md">
@@ -99,7 +98,7 @@ export default function History() {
             </Card>
           ))}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

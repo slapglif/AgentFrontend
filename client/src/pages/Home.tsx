@@ -1,18 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { AgentTimeline } from "@/components/AgentTimeline";
 import { AgentCard } from "@/components/AgentCard";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+// Removed unused import
+// Removed unused import
 import { mockOverview } from "@/lib/mockOverview";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import "./styles.css";
 
 export default function Home() {
-  const { toast } = useToast();
   const { data: agents, isLoading } = useQuery({
     queryKey: ["agents"],
     queryFn: () => Promise.resolve(mockOverview.agents),
@@ -42,10 +41,10 @@ export default function Home() {
   }
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full overflow-hidden bg-background">
       <PanelGroup direction="horizontal" className="h-full">
-        <Panel defaultSize={25} minSize={20} maxSize={40} className="bg-muted/30 backdrop-blur-sm border-primary/10">
-          <ScrollArea className="h-[calc(100vh-4rem)]">
+        <Panel defaultSize={25} minSize={20} maxSize={40}>
+          <div className="h-full border-r bg-muted/30 backdrop-blur-sm overflow-y-auto">
             <div className="p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Active Agents</h2>
@@ -70,14 +69,16 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </Panel>
         
         <PanelResizeHandle className="bg-border hover:bg-primary transition-all duration-300" />
         
-        <Panel defaultSize={75} className="bg-background">
-          <div className="h-full px-6 py-4">
-            <AgentTimeline />
+        <Panel defaultSize={75}>
+          <div className="h-full bg-background overflow-hidden">
+            <div className="h-full px-6 py-4">
+              <AgentTimeline />
+            </div>
           </div>
         </Panel>
       </PanelGroup>

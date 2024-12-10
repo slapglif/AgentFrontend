@@ -1,16 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
-import { useToast } from "@/components/ui/use-toast";
+import { useParams } from "wouter";
+// Removed unused import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MemoryCard } from "@/components/MemoryCard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LearningProgress } from "@/components/LearningProgress";
-import { AgentCommunicationLog } from "@/components/AgentCommunicationLog";
 import { ResourceMonitor } from "@/components/ResourceMonitor";
 import { DEFAULT_AGENTS } from "@/lib/agents";
 import { mockPerformanceData, mockLearningMetrics, mockMemoryData } from "@/lib/mockData";
@@ -18,24 +16,16 @@ import { mockOverview } from "@/lib/mockOverview";
 import type { Agent } from "@/lib/agents";
 import {
   Activity,
-  Settings,
-  Clock,
   Database,
-  Users,
   Monitor,
   GraduationCap,
   ChevronLeft,
   AlertCircle,
   Loader2,
-  ListTodo,
-  BarChart2,
-  HardDrive,
-  Cpu
+  ListTodo
 } from "lucide-react";
 
 export default function AgentDetails() {
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
   const { id } = useParams();
 
   const { data: agent, isLoading, isError, error } = useQuery<Agent>({

@@ -3,20 +3,82 @@
 }
 
 [data-panel-group-direction="horizontal"] > [data-panel-resize-handle] {
-  width: 2px;
-  margin: 0 -1px;
+  width: 1px;
   background: var(--border);
   transition: all 0.15s ease;
+  position: relative;
+}
+
+[data-panel-group-direction="horizontal"] > [data-panel-resize-handle]::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  height: 100%;
+  cursor: col-resize;
 }
 
 [data-panel-group-direction="horizontal"] > [data-panel-resize-handle]:hover {
   background: var(--primary);
-  width: 4px;
-  margin: 0 -2px;
-  cursor: col-resize;
+  width: 2px;
 }
 
-[data-panel-resize-handle][data-panel-group-direction="horizontal"]::before {
+@keyframes gradientShift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(1.5) translateX(-2px);
+    opacity: 0;
+  }
+}
+
+@keyframes staggered-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-progress {
+  animation: shimmer 2s linear infinite;
+}
+
+/* Smooth scrolling for all scrollable containers */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
   width: 8px;
-  margin: 0 -4px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  opacity: 0.8;
 }

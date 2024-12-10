@@ -183,7 +183,7 @@ export default function Agents() {
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-auto">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin" />
@@ -256,7 +256,7 @@ export default function Agents() {
               ))}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </div>
     </ErrorBoundary>
   );

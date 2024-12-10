@@ -1,5 +1,4 @@
 import { Link, useLocation } from "wouter";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { 
   Layout as LayoutIcon, 
@@ -55,13 +54,13 @@ export function Layout({ children }: LayoutProps) {
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
       <div className="flex h-screen overflow-hidden bg-background">
         <aside 
-          className="fixed top-0 left-0 h-screen border-r bg-muted/30 backdrop-blur-sm z-50"
+          className="relative h-screen border-r bg-muted/30 backdrop-blur-sm"
           style={{
             width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
             transition: isMounted ? 'width 300ms ease-in-out' : 'none'
           }}
         >
-          <ScrollArea className="h-full">
+          <div className="h-full overflow-auto">
             <div className="p-4 space-y-4">
               <div className="mb-8 flex items-center justify-between">
                 {!isCollapsed && (
@@ -104,7 +103,7 @@ export function Layout({ children }: LayoutProps) {
                 })}
               </nav>
             </div>
-          </ScrollArea>
+          </div>
         </aside>
         <main 
           className={cn(

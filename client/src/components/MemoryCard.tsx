@@ -8,12 +8,12 @@ import { CodeBlock } from "./CodeBlock";
 interface MemoryMetadata {
   detailedAnalysis?: Record<string, number>;
   relatedMemories?: Array<{
-    id: string;
+    id: number | string;
     type: string;
     relevanceScore: number;
   }>;
   interactionHistory?: Array<{
-    id?: string;
+    id?: string | number;
     action: string;
     timestamp: string;
     context: string;
@@ -25,7 +25,7 @@ interface MemoryMetadata {
 
 interface MemoryContent {
   text: string;
-  code?: string;
+  code: string | null | undefined;
   language?: string;
 }
 
