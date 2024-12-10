@@ -27,13 +27,9 @@ interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const SIDEBAR_WIDTH = 256;
-const SIDEBAR_COLLAPSED_WIDTH = 64;
-
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebar-collapsed', false);
-  const [isMounted, setIsMounted] = useState(false);
 
   const navigationItems: NavigationItem[] = [
     { href: "/", label: "Overview", icon: LayoutIcon },
@@ -45,21 +41,16 @@ export function Layout({ children }: LayoutProps) {
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-    setIsMounted(true);
-  };
-
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
-      <div className="relative flex min-h-screen bg-background">
+      <div className="flex h-full">
         <aside 
           className={cn(
-            "fixed top-0 left-0 z-30 h-full border-r bg-muted/30 backdrop-blur-sm transition-all duration-300",
+            "sticky top-0 h-screen shrink-0 border-r bg-muted/30 backdrop-blur-sm transition-[width] duration-300",
             isCollapsed ? "w-16" : "w-64"
           )}
         >
-          <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex h-full flex-col">
             <div className="p-4">
               <div className="flex items-center justify-between">
                 {!isCollapsed && (
@@ -72,7 +63,7 @@ export function Layout({ children }: LayoutProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={toggleSidebar}
+                    onClick={() => setIsCollapsed(!isCollapsed)}
                     className="shrink-0"
                   >
                     {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -105,12 +96,7 @@ export function Layout({ children }: LayoutProps) {
             </nav>
           </div>
         </aside>
-        <main 
-          className="flex-1 transition-all duration-300"
-          style={{
-            marginLeft: isCollapsed ? "4rem" : "16rem"
-          }}
-        >
+        <main className="flex-1 h-screen overflow-auto">
           {children}
         </main>
       </div>
