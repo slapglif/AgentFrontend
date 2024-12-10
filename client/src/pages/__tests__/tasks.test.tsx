@@ -1,32 +1,60 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Tasks from '../Tasks';
 import { mockTasks } from '@/lib/mockTasks';
 
-describe('Tasks Page', () => {
-  it('renders all task columns', () => {
+describe('Tasks', () => {
+  it('renders task columns', () => {
     render(<Tasks />);
     expect(screen.getByText('To Do')).toBeInTheDocument();
     expect(screen.getByText('In Progress')).toBeInTheDocument();
     expect(screen.getByText('Completed')).toBeInTheDocument();
   });
 
-  it('displays tasks in correct columns', () => {
+  it('shows tasks with correct priority badges', () => {
     render(<Tasks />);
-    mockTasks.todo.forEach(task => {
-      expect(screen.getByText(task.title)).toBeInTheDocument();
-      expect(screen.getByText(task.assignee)).toBeInTheDocument();
-      expect(screen.getByText(task.priority)).toBeInTheDocument();
+    const allTasks = [...mockTasks.todo, ...mockTasks.inProgress, ...mockTasks.completed];
+    
+    allTasks.forEach(task => {
+      const badge = screen.getByText(task.priority);
+      switch (task.priority) {
+        case 'high':
+          expect(badge.closest('[class*="Badge"]')).toHaveClass('variant-destructive');
+          break;
+        case 'medium':
+          expect(badge.closest('[class*="Badge"]')).toHaveClass('variant-default');
+          break;
+        case 'low':
+          expect(badge.closest('[class*="Badge"]')).toHaveClass('variant-secondary');
+          break;
+      }
     });
   });
 
-  it('shows tasks with correct priority badges', () => {
+  it('renders scroll areas with correct height', () => {
     render(<Tasks />);
-    const highPriorityTasks = [...mockTasks.todo, ...mockTasks.inProgress, ...mockTasks.completed]
-      .filter(task => task.priority === 'high');
+    const scrollAreas = screen.getAllByRole('region');
+    expect(scrollAreas).toHaveLength(3); // One for each column
+    scrollAreas.forEach(area => {
+      expect(area).toHaveClass('h-[calc(100vh-250px)]');
+    });
+  });
+
+  it('renders scroll area for task columns', () => {
+    render(<Tasks />);
+    const scrollAreas = screen.getAllByRole('region');
+    expect(scrollAreas).toHaveLength(3); // One for each column
+    scrollAreas.forEach(area => {
+      expect(area).toHaveClass('h-[calc(100vh-250px)]');
+    });
+  });
+
+  it('displays task titles and assignees', () => {
+    render(<Tasks />);
+    const allTasks = [...mockTasks.todo, ...mockTasks.inProgress, ...mockTasks.completed];
     
-    highPriorityTasks.forEach(task => {
-      const badge = screen.getByText(task.priority);
-      expect(badge).toHaveClass('destructive');
+    allTasks.forEach(task => {
+      expect(screen.getByText(task.title)).toBeInTheDocument();
+      expect(screen.getByText(task.assignee)).toBeInTheDocument();
     });
   });
 });

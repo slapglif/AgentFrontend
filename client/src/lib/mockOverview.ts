@@ -152,7 +152,7 @@ export const mockOverview: SystemOverview = {
       network: Math.floor(Math.random() * 100)
     }
   },
-  agents: DEFAULT_AGENTS.map((agent, agentIndex) => ({
+  agents: DEFAULT_AGENTS.map((agent) => ({
     id: agent.id,
     name: agent.name,
     type: agent.type,
@@ -180,7 +180,7 @@ export const mockOverview: SystemOverview = {
     skillLevel: Math.floor(Math.random() * 10) + 1,
     activeTime: Math.floor(Math.random() * 1000) + 100, // Hours active
     recentAchievements: Array.from({ length: Math.floor(Math.random() * 2) + 3 }, (_, i) => ({ // 3-5 achievements
-      id: i + 1,
+      id: `${i + 1}`,
       name: [
         'Task Master',
         'Collaboration Expert',
@@ -354,11 +354,9 @@ export const mockOverview: SystemOverview = {
         memoryUsage: Math.floor(Math.random() * 100),
         timeSpent: Math.floor(Math.random() * 120) + 30
       },
-      relatedAgents: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () => ({
-        agentId: Math.floor(Math.random() * DEFAULT_AGENTS.length) + 1,
-        role: ['collaborator', 'mentor', 'learner'][Math.floor(Math.random() * 3)],
-        contributionScore: Math.floor(Math.random() * 100)
-      })),
+      relatedAgents: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () => 
+        Math.floor(Math.random() * DEFAULT_AGENTS.length) + 1
+      ),
       subTasks: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, (_, j) => ({
         id: `${agent.id}-${i}-${j}`,
         name: `Subtask ${j + 1}`,

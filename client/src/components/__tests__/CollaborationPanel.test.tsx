@@ -1,4 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
 
@@ -9,9 +10,26 @@ jest.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+const renderWithQueryClient = (component: React.ReactNode) => {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      {component}
+    </QueryClientProvider>
+  );
+};
+});
+
+
+
 describe('CollaborationPanel', () => {
   it('renders collaboration list', async () => {
-    render(<CollaborationPanel />);
+    renderWithQueryClient(<CollaborationPanel />);
     
     await waitFor(() => {
       mockCollaborations.forEach(collab => {
@@ -22,12 +40,12 @@ describe('CollaborationPanel', () => {
   });
 
   it('shows loading state initially', () => {
-    render(<CollaborationPanel />);
+    renderWithQueryClient(<CollaborationPanel />);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('handles collaboration selection', async () => {
-    render(<CollaborationPanel />);
+    renderWithQueryClient(<CollaborationPanel />);
     
     await waitFor(() => {
       const participantsButton = screen.getAllByText('Participants')[0];
@@ -37,7 +55,7 @@ describe('CollaborationPanel', () => {
   });
 
   it('displays new collaboration dialog', () => {
-    render(<CollaborationPanel />);
+    renderWithQueryClient(<CollaborationPanel />);
     const newButton = screen.getByText('New Collaboration');
     fireEvent.click(newButton);
     
@@ -47,7 +65,7 @@ describe('CollaborationPanel', () => {
   });
 
   it('shows real-time updates', async () => {
-    render(<CollaborationPanel />);
+    renderWithQueryClient(<CollaborationPanel />);
     
     await waitFor(() => {
       expect(screen.getByText('Active participants will appear here in real-time')).toBeInTheDocument();

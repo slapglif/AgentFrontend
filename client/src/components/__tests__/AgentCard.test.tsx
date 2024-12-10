@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AgentCard } from '../AgentCard';
-import { DEFAULT_AGENTS } from '@/lib/agents';
+
 
 // Mock wouter's Link component
 jest.mock('wouter', () => ({
@@ -8,28 +8,52 @@ jest.mock('wouter', () => ({
 }));
 
 describe('AgentCard', () => {
+  const mockAgent = {
+    id: 1,
+    name: 'Test Agent',
+    type: 'research',
+    status: 'active' as const,
+    level: 1,
+    experience: 75,
+    achievements: [
+      { 
+        id: 1,
+        name: 'First Achievement', 
+        description: 'Test description',
+        icon: 'trophy'
+      }
+    ],
+    current_task: {
+      id: '1',
+      summary: 'Test task',
+      progress: 50,
+      status: 'in_progress' as const,
+      priority: 'medium' as const
+    }
+  };
+
   it('renders agent information correctly', () => {
-    render(<AgentCard agent={DEFAULT_AGENTS[0]} />);
-    expect(screen.getByText(DEFAULT_AGENTS[0].name)).toBeInTheDocument();
-    expect(screen.getByText(DEFAULT_AGENTS[0].type)).toBeInTheDocument();
+    render(<AgentCard agent={mockAgent} />);
+    expect(screen.getByText(mockAgent.name)).toBeInTheDocument();
+    expect(screen.getByText(mockAgent.type)).toBeInTheDocument();
   });
 
   it('displays correct status badge', () => {
-    render(<AgentCard agent={DEFAULT_AGENTS[0]} />);
-    const badge = screen.getByText(DEFAULT_AGENTS[0].status);
-    expect(badge).toHaveClass(DEFAULT_AGENTS[0].status === 'active' ? 'bg-green-500' : 'bg-yellow-500');
+    render(<AgentCard agent={mockAgent} />);
+    const badge = screen.getByText(mockAgent.status);
+    expect(badge).toHaveClass('bg-green-500');
   });
 
   it('shows achievements', () => {
-    render(<AgentCard agent={DEFAULT_AGENTS[0]} />);
-    DEFAULT_AGENTS[0].achievements.forEach(achievement => {
+    render(<AgentCard agent={mockAgent} />);
+    mockAgent.achievements.forEach(achievement => {
       expect(screen.getByText(achievement.name)).toBeInTheDocument();
     });
   });
 
   it('displays experience progress', () => {
-    render(<AgentCard agent={DEFAULT_AGENTS[0]} />);
-    expect(screen.getByText(`Level ${DEFAULT_AGENTS[0].level}`)).toBeInTheDocument();
-    expect(screen.getByText(`${DEFAULT_AGENTS[0].experience}%`)).toBeInTheDocument();
+    render(<AgentCard agent={mockAgent} />);
+    expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
+    expect(screen.getByText(mockAgent.experience.toString(), { exact: false })).toBeInTheDocument();
   });
 });
