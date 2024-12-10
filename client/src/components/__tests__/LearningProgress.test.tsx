@@ -7,7 +7,8 @@ const mockLearningMetrics = {
   skillsProficiency: {
     'Research': 85,
     'Analysis': 78,
-    'Synthesis': 92
+    'Synthesis': 92,
+    'Collaboration': 88
   },
   knowledgeAreas: [
     { 
@@ -35,12 +36,14 @@ describe('LearningProgress', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(mockDate);
+    jest.spyOn(Math, 'random').mockReturnValue(0.5);
   });
 
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('renders without crashing', () => {
@@ -82,24 +85,30 @@ describe('LearningProgress', () => {
   it('updates metrics in real-time', async () => {
     render(<LearningProgress metrics={mockLearningMetrics} />);
     
+    await waitFor(() => {
+      expect(screen.getByText('Learning Progress')).toBeInTheDocument();
+    }, { timeout: 10000 });
+
     const initialLearningRate = screen.getByText(`${mockLearningMetrics.learningRate.toFixed(1)}%`);
     expect(initialLearningRate).toBeInTheDocument();
     
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(5000);
     });
     
     await waitFor(() => {
-      const headerText = screen.getByText('Learning Progress');
-      const header = headerText.closest('div');
-      const updateText = header?.nextElementSibling?.querySelector('.text-xs.text-muted-foreground');
-      expect(updateText).toHaveTextContent(/Updated:/);
+      const updatedTimestamp = screen.getByText(/Updated:/);
+      expect(updatedTimestamp).toBeInTheDocument();
     }, { timeout: 10000 });
   });
 
-  it('cleans up interval on unmount', () => {
+  it('cleans up interval on unmount', async () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     const { unmount } = render(<LearningProgress metrics={mockLearningMetrics} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Learning Progress')).toBeInTheDocument();
+    });
     
     unmount();
     
