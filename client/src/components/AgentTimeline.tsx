@@ -17,7 +17,7 @@ export function AgentTimeline() {
         <div className="space-y-4 p-4">
           {memories?.map((memory: any, idx: number) => (
             <div 
-              key={`timeline-memory-${memory.id}-${idx}`} 
+              key={`${memory.id}-${idx}`} 
               className="relative animate-staggered-fade-in transition-all duration-500 hover:translate-x-2"
               style={{
                 animationDelay: `${idx * 150}ms`,

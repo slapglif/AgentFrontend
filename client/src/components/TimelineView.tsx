@@ -82,7 +82,7 @@ export function TimelineView({ goals }: TimelineViewProps) {
                   </div>
                   <div className="relative flex-1" style={{ height: rowHeight }}>
                     <div
-                      className="absolute h-6 rounded-md"
+                      className="absolute h-6 rounded-md hover:scale-105 transition-transform duration-300"
                       style={{
                         left: getPositionForTime(goal.startTime),
                         width: getWidthForDuration(goal.startTime, goal.endTime),

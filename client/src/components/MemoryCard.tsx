@@ -139,9 +139,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`grid grid-cols-2 gap-2 text-xs overflow-hidden transition-all duration-300 ${
                 activeSection === 'analysis' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {Object.entries(memory.metadata.detailedAnalysis || {}).map(([key, value], index) => (
+                {Object.entries(memory.metadata?.detailedAnalysis || {}).map(([key, value], idx) => (
                   <div 
-                    key={`analysis-${memory.id}-${key}-${index}`}
+                    key={`${memory.id}-${key}`}
                     className="flex items-center gap-2 p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                     title={`${key}: ${value}%`}
                   >
@@ -167,9 +167,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'related' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.relatedMemories?.map((related, index) => (
+                {memory.metadata?.relatedMemories?.map((related, idx) => (
                   <div 
-                    key={`related-${memory.id}-${related.id}-${index}`}
+                    key={`${memory.id}-${related.id}-${idx}`}
                     className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                   >
                     <span className="text-xs text-muted-foreground capitalize">{related.type}</span>
@@ -200,9 +200,9 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               <div className={`space-y-2 overflow-hidden transition-all duration-300 ${
                 activeSection === 'history' ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}>
-                {memory.metadata.interactionHistory?.map((interaction, index) => (
+                {memory.metadata?.interactionHistory?.map((interaction, idx) => (
                   <div 
-                    key={`interaction-${memory.id}-${interaction.id || index}`}
+                    key={`${memory.id}-${interaction.id || idx}`}
                     className="flex items-center justify-between p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
                   >
                     <div className="flex flex-col">

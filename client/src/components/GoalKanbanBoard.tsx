@@ -79,9 +79,15 @@ export function GoalKanbanBoard({ goals, onGoalsUpdate, onDragEnd }: GoalKanbanB
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={snapshot.isDragging ? "opacity-50" : ""}
+                              className={`transition-all duration-300 ${snapshot.isDragging ? "opacity-50 scale-105" : ""}`}
                             >
-                              <Card className="p-4 hover:bg-muted/50 cursor-pointer transform transition-all duration-200 hover:scale-105">
+                              <Card 
+                                className="p-4 hover:bg-muted/50 cursor-pointer transform transition-all duration-300 hover:scale-105 animate-staggered-fade-in"
+                                style={{
+                                  animationDelay: `${index * 150}ms`,
+                                  opacity: 0
+                                }}
+                              >
                                 <h4 className="font-medium mb-2 flex items-center justify-between">
                                   {goal.title}
                                   <Badge variant={goal.status === 'completed' ? "default" : "secondary"}>

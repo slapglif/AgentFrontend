@@ -219,6 +219,9 @@
 .animate-staggered-fade-in {
   opacity: 0;
   animation: staggeredFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .animate-float {
@@ -256,7 +259,18 @@
 }
 
 .animate-message {
-  animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: messageSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .type-indicator {

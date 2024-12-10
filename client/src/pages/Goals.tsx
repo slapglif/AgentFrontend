@@ -163,6 +163,15 @@ export default function Goals() {
     const updatedGoals = [...goals];
     const [removed] = updatedGoals.splice(result.source.index, 1);
     removed.status = result.destination.droppableId as "todo" | "in_progress" | "completed";
+    
+    // Update progress when moving to completed
+    if (result.destination.droppableId === "completed") {
+      removed.progress = 100;
+      removed.tasks.forEach(task => task.completed = true);
+    } else if (result.source.droppableId === "completed") {
+      removed.progress = removed.tasks.filter(t => t.completed).length / removed.tasks.length * 100;
+    }
+    
     updatedGoals.splice(result.destination.index, 0, removed);
     setGoals(updatedGoals);
   };
@@ -182,8 +191,12 @@ export default function Goals() {
     }));
   };
 
-  const addNewGoal = () => {
+  const [isAddingNewGoal, setIsAddingNewGoal] = useState(false);
+  
+  const addNewGoal = async () => {
     if (!newGoal.title || !newGoal.startTime || !newGoal.endTime) return;
+    
+    setIsAddingNewGoal(true);
 
     const startTime = new Date();
     startTime.setHours(parseInt(newGoal.startTime.split(":")[0]), parseInt(newGoal.startTime.split(":")[1]));
@@ -191,7 +204,10 @@ export default function Goals() {
     const endTime = new Date();
     endTime.setHours(parseInt(newGoal.endTime.split(":")[0]), parseInt(newGoal.endTime.split(":")[1]));
     
-    if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) return;
+    if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+      setIsAddingNewGoal(false);
+      return;
+    }
     
     const goal: Goal = {
       id: `goal-${goals.length + 1}`,
@@ -296,7 +312,20 @@ export default function Goals() {
                   <Button variant="outline" onClick={() => setIsAddingGoal(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={addNewGoal}>Create Goal</Button>
+                  <Button 
+                  onClick={addNewGoal} 
+                  disabled={isAddingNewGoal}
+                  className="relative"
+                >
+                  {isAddingNewGoal ? (
+                    <>
+                      <div className="absolute inset-0 bg-primary/20 animate-pulse rounded-md" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create Goal'
+                  )}
+                </Button>
                 </div>
               </div>
             </DialogContent>
