@@ -15,15 +15,19 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['<rootDir>/**/*.test.{ts,tsx}'],
   transform: {
-    '^.+\\.(t|j)sx?$': ['@swc/jest', {
-      jsc: {
-        transform: {
-          react: {
-            runtime: 'automatic',
-          },
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: './tsconfig.json',
+        babelConfig: {
+          presets: [
+            '@babel/preset-env',
+            '@babel/preset-react',
+            '@babel/preset-typescript',
+          ],
         },
       },
-    }],
+    ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transformIgnorePatterns: [
@@ -31,6 +35,12 @@ const config: Config = {
   ],
   testEnvironmentOptions: {
     customExportConditions: [''],
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: './tsconfig.json',
+      isolatedModules: true,
+    },
   },
 };
 

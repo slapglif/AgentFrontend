@@ -46,7 +46,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && npx jest --watchAll"
+args = "cd client && NODE_ENV=test npx jest --config=../jest.config.ts --watchAll"
 
 [[workflows.workflow]]
 name = "Development Server"
