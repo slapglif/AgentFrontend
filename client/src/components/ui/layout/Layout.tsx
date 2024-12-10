@@ -52,20 +52,19 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
-      <div className="flex h-screen overflow-hidden bg-background">
+      <div className="relative flex min-h-screen bg-background">
         <aside 
-          className="relative h-screen border-r bg-muted/30 backdrop-blur-sm"
-          style={{
-            width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
-            transition: isMounted ? 'width 300ms ease-in-out' : 'none'
-          }}
+          className={cn(
+            "fixed top-0 left-0 z-30 h-full border-r bg-muted/30 backdrop-blur-sm transition-all duration-300",
+            isCollapsed ? "w-16" : "w-64"
+          )}
         >
-          <div className="h-full overflow-auto">
-            <div className="p-4 space-y-4">
-              <div className="mb-8 flex items-center justify-between">
+          <div className="flex h-full flex-col overflow-hidden">
+            <div className="p-4">
+              <div className="flex items-center justify-between">
                 {!isCollapsed && (
-                  <div>
-                    <h2 className="text-lg font-semibold tracking-tight">Research System</h2>
+                  <div className="space-y-1">
+                    <h2 className="text-lg font-semibold">Research System</h2>
                     <p className="text-sm text-muted-foreground">Multi-agent platform</p>
                   </div>
                 )}
@@ -74,49 +73,45 @@ export function Layout({ children }: LayoutProps) {
                     variant="ghost"
                     size="icon"
                     onClick={toggleSidebar}
-                    className="shrink-0 transition-all duration-300"
+                    className="shrink-0"
                   >
                     {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                   </Button>
                   {!isCollapsed && <ThemeToggle />}
                 </div>
               </div>
-              <nav className="space-y-1.5">
-                {navigationItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location === item.href;
-                  return (
-                    <Link key={item.href} href={item.href}>
-                      <Button
-                        variant={isActive ? "secondary" : "ghost"}
-                        className={`w-full justify-start gap-2.5 transition-all ${
-                          isCollapsed ? 'px-2' : ''
-                        }`}
-                      >
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {!isCollapsed && (
-                          <span className="truncate">{item.label}</span>
-                        )}
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </nav>
             </div>
+            <nav className="flex-1 space-y-1 p-4 pt-0">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location === item.href;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant={isActive ? "secondary" : "ghost"}
+                      className={cn(
+                        "w-full justify-start gap-2",
+                        isCollapsed && "px-2"
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      {!isCollapsed && (
+                        <span className="truncate">{item.label}</span>
+                      )}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
         </aside>
         <main 
-          className={cn(
-            "flex-1 h-screen overflow-hidden bg-background",
-            isMounted ? "transition-[margin] duration-300 ease-in-out" : ""
-          )}
+          className="flex-1 transition-all duration-300"
           style={{
-            marginLeft: isCollapsed ? `${SIDEBAR_COLLAPSED_WIDTH}px` : `${SIDEBAR_WIDTH}px`
+            marginLeft: isCollapsed ? "4rem" : "16rem"
           }}
         >
-          <div className="h-full relative">
-            {children}
-          </div>
+          {children}
         </main>
       </div>
     </ThemeProvider>

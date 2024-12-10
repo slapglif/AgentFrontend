@@ -41,20 +41,20 @@ export default function Home() {
   }
 
   return (
-    <div className="h-full overflow-hidden bg-background">
-      <PanelGroup direction="horizontal" className="h-full">
-        <Panel defaultSize={25} minSize={20} maxSize={40}>
-          <div className="h-full border-r bg-muted/30 backdrop-blur-sm overflow-y-auto">
-            <div className="p-2">
-              <div className="flex items-center justify-between mb-2">
+    <div className="flex flex-col h-full">
+      <PanelGroup direction="horizontal">
+        <Panel defaultSize={30}>
+          <div className="h-full border-r bg-muted/30 backdrop-blur-sm">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold">Active Agents</h2>
                 <Badge variant="outline">{agents?.length || 0}</Badge>
               </div>
-              <Separator className="mb-2" />
-              <div className="space-y-4">
+              <Separator className="mb-3" />
+              <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-8rem)]">
                 {agents?.map((agent) => (
                   <AgentCard 
-                    key={agent.id} 
+                    key={agent.id}
                     agent={{
                       id: agent.id,
                       name: agent.name,
@@ -72,11 +72,11 @@ export default function Home() {
           </div>
         </Panel>
         
-        <PanelResizeHandle className="bg-border hover:bg-primary transition-all duration-300" />
+        <PanelResizeHandle className="w-1 bg-border hover:bg-primary hover:w-1.5 transition-all duration-150" />
         
-        <Panel defaultSize={75}>
-          <div className="h-full bg-background overflow-hidden">
-            <div className="h-full px-6 py-4">
+        <Panel defaultSize={70}>
+          <div className="h-full bg-background">
+            <div className="h-full p-4">
               <AgentTimeline />
             </div>
           </div>
