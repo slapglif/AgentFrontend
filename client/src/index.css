@@ -76,6 +76,24 @@
     color: hsl(var(--foreground));
   }
 }
+@keyframes spring {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.ease-spring {
+  animation: spring 0.3s ease-in-out;
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 0 4px hsl(var(--ring)/0.1);
+}
+
 
 @keyframes float {
   0% {
