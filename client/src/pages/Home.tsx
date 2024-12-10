@@ -3,6 +3,7 @@ import { AgentTimeline } from "@/components/AgentTimeline";
 import { AgentCard } from "@/components/AgentCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { mockOverview } from "@/lib/mockOverview";
 
@@ -37,33 +38,40 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      <aside className="w-64 border-r flex-shrink-0">
-        <ScrollArea className="h-full">
-          <div className="p-4 space-y-4">
-            <h2 className="text-lg font-semibold">Agents</h2>
-            <Separator />
-            {agents?.map((agent) => (
-              <AgentCard 
-                key={agent.id} 
-                agent={{
-                  id: agent.id,
-                  name: agent.name,
-                  type: agent.type,
-                  status: agent.status,
-                  current_task: agent.current_task,
-                  currentTasks: agent.currentTasks,
-                  successRate: agent.successRate,
-                  skillLevel: agent.skillLevel
-                }} 
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </aside>
+    <div className="flex h-full overflow-hidden">
+      <div className="w-[300px] flex-shrink-0 border-r bg-muted/30">
+        <div className="h-full">
+          <ScrollArea className="h-[calc(100vh-4rem)]">
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Active Agents</h2>
+                <Badge variant="outline">{agents?.length || 0}</Badge>
+              </div>
+              <Separator className="my-4" />
+              <div className="space-y-3">
+                {agents?.map((agent) => (
+                  <AgentCard 
+                    key={agent.id} 
+                    agent={{
+                      id: agent.id,
+                      name: agent.name,
+                      type: agent.type,
+                      status: agent.status,
+                      current_task: agent.current_task,
+                      currentTasks: agent.currentTasks,
+                      successRate: agent.successRate,
+                      skillLevel: agent.skillLevel
+                    }} 
+                  />
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
       
-      <main className="flex-1 overflow-hidden">
-        <div className="h-full p-6">
+      <main className="flex-1 p-6">
+        <div className="h-full overflow-hidden">
           <AgentTimeline />
         </div>
       </main>

@@ -54,82 +54,69 @@ export function Layout({ children }: LayoutProps) {
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
       <div className="flex h-screen overflow-hidden bg-background">
-        <PanelGroup direction="horizontal" className="w-full">
-          <Panel
-            defaultSize={20}
-            style={{
-              flexBasis: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
-              flexGrow: 0,
-              flexShrink: 0,
-              transition: isMounted ? 'flex-basis 300ms ease-in-out' : 'none'
-            }}
-          >
-            <aside className="fixed top-0 left-0 h-screen border-r bg-muted/30 backdrop-blur-sm"
-              style={{
-                width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
-                transition: isMounted ? 'width 300ms ease-in-out' : 'none'
-              }}
-            >
-              <ScrollArea className="h-full">
-                <div className="p-4 space-y-4">
-                  <div className="mb-8 flex items-center justify-between">
-                    {!isCollapsed && (
-                      <div>
-                        <h2 className="text-lg font-semibold tracking-tight">Research System</h2>
-                        <p className="text-sm text-muted-foreground">Multi-agent platform</p>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2">
+        <aside 
+          className="fixed top-0 left-0 h-screen border-r bg-muted/30 backdrop-blur-sm z-50"
+          style={{
+            width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
+            transition: isMounted ? 'width 300ms ease-in-out' : 'none'
+          }}
+        >
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-4">
+              <div className="mb-8 flex items-center justify-between">
+                {!isCollapsed && (
+                  <div>
+                    <h2 className="text-lg font-semibold tracking-tight">Research System</h2>
+                    <p className="text-sm text-muted-foreground">Multi-agent platform</p>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleSidebar}
+                    className="shrink-0 transition-all duration-300"
+                  >
+                    {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                  </Button>
+                  {!isCollapsed && <ThemeToggle />}
+                </div>
+              </div>
+              <nav className="space-y-1.5">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location === item.href;
+                  return (
+                    <Link key={item.href} href={item.href}>
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={toggleSidebar}
-                        className={`shrink-0 transition-all duration-300 ${
-                          isCollapsed ? 'fixed left-4 top-4 z-50 bg-background/50 backdrop-blur-sm hover:bg-background/80' : ''
+                        variant={isActive ? "secondary" : "ghost"}
+                        className={`w-full justify-start gap-2.5 transition-all ${
+                          isCollapsed ? 'px-2' : ''
                         }`}
                       >
-                        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                        <Icon className="h-4 w-4 shrink-0" />
+                        {!isCollapsed && (
+                          <span className="truncate">{item.label}</span>
+                        )}
                       </Button>
-                      {!isCollapsed && <ThemeToggle />}
-                    </div>
-                  </div>
-                  <nav className="space-y-1.5">
-                    {navigationItems.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = location === item.href;
-                      return (
-                        <Link key={item.href} href={item.href}>
-                          <Button
-                            variant={isActive ? "secondary" : "ghost"}
-                            className={`w-full justify-start gap-2.5 transition-all ${
-                              isCollapsed ? 'px-2' : ''
-                            }`}
-                          >
-                            <Icon className="h-4 w-4 shrink-0" />
-                            {!isCollapsed && (
-                              <span className="truncate">{item.label}</span>
-                            )}
-                          </Button>
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                </div>
-              </ScrollArea>
-            </aside>
-          </Panel>
-          <Panel>
-            <main className="flex-1 h-screen overflow-y-auto bg-background ml-[var(--sidebar-width)]"
-              style={{
-                '--sidebar-width': `${isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH}px`
-              } as React.CSSProperties}
-            >
-              <div className="container mx-auto py-6 px-4 min-h-full">
-                {children}
-              </div>
-            </main>
-          </Panel>
-        </PanelGroup>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          </ScrollArea>
+        </aside>
+        <main 
+          className="flex-1 h-screen overflow-hidden bg-background"
+          style={{
+            marginLeft: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
+            transition: isMounted ? 'margin-left 300ms ease-in-out' : 'none'
+          }}
+        >
+          <div className="h-full">
+            {children}
+          </div>
+        </main>
       </div>
     </ThemeProvider>
   );
