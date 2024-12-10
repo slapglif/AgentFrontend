@@ -1,10 +1,39 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { LearningProgress } from '../LearningProgress';
-import { mockAgents } from '@/lib/mockAgents';
 import { vi } from 'vitest';
 
+interface LearningMetrics {
+  completedLessons: number;
+  totalLessons: number;
+  skillsProficiency: Record<string, number>;
+  learningRate: number;
+  adaptabilityScore: number;
+  retentionRate: number;
+  knowledgeAreas: Array<{
+    name: string;
+    progress: number;
+    lastUpdated: string;
+  }>;
+}
+
 describe('LearningProgress', () => {
-  const mockLearningMetrics = mockAgents[0].learningMetrics;
+  const mockLearningMetrics: LearningMetrics = {
+    completedLessons: 42,
+    totalLessons: 100,
+    skillsProficiency: {
+      'Research': 85,
+      'Analysis': 78,
+      'Synthesis': 92
+    },
+    learningRate: 89,
+    adaptabilityScore: 94,
+    retentionRate: 88,
+    knowledgeAreas: [
+      { name: 'Machine Learning', progress: 75, lastUpdated: new Date().toISOString() },
+      { name: 'Natural Language Processing', progress: 82, lastUpdated: new Date().toISOString() },
+      { name: 'Computer Vision', progress: 68, lastUpdated: new Date().toISOString() }
+    ]
+  };
 
   beforeEach(() => {
     vi.useFakeTimers();

@@ -89,6 +89,7 @@ export function AgentBehaviorPatterns() {
                     className="h-16 bg-primary/10 rounded-sm relative overflow-hidden"
                   >
                     <div
+                      data-testid="knowledge-graph"
                       className="absolute bottom-0 w-full bg-primary transition-all duration-500"
                       style={{ height: `${value}%` }}
                     />

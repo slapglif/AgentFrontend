@@ -19,11 +19,7 @@ interface MetricPoint {
   tooltip?: string;
 }
 
-interface PerformanceMetricsProps {
-  agentId?: number;
-}
-
-export function PerformanceMetrics({ agentId }: PerformanceMetricsProps) {
+export function PerformanceMetrics() {
   const [tokenUsage, setTokenUsage] = useState<MetricPoint[]>([]);
   const [researchProgress, setResearchProgress] = useState<MetricPoint[]>([]);
   const [knowledgeSynthesis, setKnowledgeSynthesis] = useState<MetricPoint[]>([]);
@@ -115,7 +111,7 @@ export function PerformanceMetrics({ agentId }: PerformanceMetricsProps) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-4">
+          <Card key={i} className="p-4" data-testid="loading-card">
             <div className="h-[200px] animate-pulse bg-muted rounded-lg" />
           </Card>
         ))}
