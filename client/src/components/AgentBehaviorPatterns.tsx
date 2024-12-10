@@ -2,9 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { mockAnalytics } from "@/lib/mockAnalytics";
-import { DEFAULT_AGENTS } from "@/lib/agents";
 
-import { Brain, GitMerge, Target, Zap } from "lucide-react";
+import { Brain, Target, Zap } from "lucide-react";
 
 export function AgentBehaviorPatterns() {
   const getBehaviorScore = (agent: any) => {

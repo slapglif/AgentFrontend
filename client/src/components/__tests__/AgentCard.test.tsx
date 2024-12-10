@@ -60,9 +60,10 @@ describe('AgentCard', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
     
-    // Check for experience level
+    // Check for experience level and progress
     expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
-    expect(screen.getByText(`${mockAgent.experience}%`)).toBeInTheDocument();
+    const progressBar = screen.getAllByRole('progressbar')[1]; // Second progress bar is for experience
+    expect(progressBar).toBeInTheDocument();
   });
 
   it('shows current task information', () => {

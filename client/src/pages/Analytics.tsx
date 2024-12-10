@@ -1,4 +1,4 @@
-import { BarChart2, TrendingUp, Users, Activity, Server, Brain, Database, GitMerge } from "lucide-react";
+import { Activity, Brain, GitMerge } from "lucide-react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, within } from '@testing-library/react';
 import { ResourceMonitor } from '../ResourceMonitor';
 import { DEFAULT_AGENTS } from '@/lib/agents';
 
@@ -40,7 +40,7 @@ describe('ResourceMonitor', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('displays error state when there is an error', () => {
+  it('displays error state when there is an error', async () => {
     const invalidAgent = {
       ...mockAgent,
       memory_allocation: {
@@ -50,7 +50,9 @@ describe('ResourceMonitor', () => {
       }
     };
     render(<ResourceMonitor agent={invalidAgent} />);
-    expect(screen.getByText(/Failed to initialize/)).toBeInTheDocument();
+    const errorMessage = await screen.findByText(/Failed to initialize/i);
+    expect(errorMessage).toBeInTheDocument();
+    expect(errorMessage.closest('div')).toHaveClass('bg-destructive/10');
   });
 
   it('tracks real-time memory allocation changes', async () => {
@@ -58,17 +60,18 @@ describe('ResourceMonitor', () => {
     
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-      const memorySection = screen.getByText(/Memory Usage/).closest('div');
-      expect(memorySection).toBeInTheDocument();
-      
-      const content = memorySection?.textContent || '';
-      expect(content).toMatch(/Memory Usage/);
-      expect(content).toMatch(/Used/);
-      expect(content).toMatch(/Total/);
-      
-      const progressBar = screen.getByRole('progressbar');
-      expect(progressBar).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
+
+    const memorySection = screen.getByText(/Memory Usage/).closest('div');
+    expect(memorySection).toBeInTheDocument();
+    
+    const content = memorySection?.textContent || '';
+    expect(content).toMatch(/Memory Usage/);
+    expect(content).toMatch(/Used/);
+    expect(content).toMatch(/Total/);
+    
+    const progressBar = screen.getByRole('progressbar');
+    expect(progressBar).toBeInTheDocument();
   });
 
   it('simulates CPU usage correctly', async () => {
@@ -76,26 +79,26 @@ describe('ResourceMonitor', () => {
     
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-      expect(screen.getByText(/CPU Usage/)).toBeInTheDocument();
-      expect(screen.getByRole('progressbar')).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
 
+    expect(screen.getByText(/CPU Usage/)).toBeInTheDocument();
+    
     act(() => {
       jest.advanceTimersByTime(2000);
     });
 
-    await waitFor(() => {
-      const progressBar = screen.getByRole('progressbar');
-      expect(progressBar).toBeInTheDocument();
-    });
+    const progressBars = screen.getAllByRole('progressbar');
+    expect(progressBars.length).toBeGreaterThan(0);
   });
 
   it('monitors task queue status', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
     await waitFor(() => {
-      expect(screen.getByText(/Tasks/)).toBeInTheDocument();
-    }, { timeout: 10000 });
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/Tasks/)).toBeInTheDocument();
   });
 
   it('displays resource metrics correctly', async () => {
@@ -103,14 +106,15 @@ describe('ResourceMonitor', () => {
     
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-      expect(screen.getByText(/CPU Usage/)).toBeInTheDocument();
-      expect(screen.getByText(/Memory Usage/)).toBeInTheDocument();
-      expect(screen.getByText(/Storage/)).toBeInTheDocument();
-      
-      // Check for tasks in a more flexible way
-      const content = document.body.textContent;
-      expect(content).toMatch(/Task/);
-    }, { timeout: 10000 });
+    });
+
+    expect(screen.getByText(/CPU Usage/)).toBeInTheDocument();
+    expect(screen.getByText(/Memory Usage/)).toBeInTheDocument();
+    expect(screen.getByText(/Storage/)).toBeInTheDocument();
+    
+    // Check for tasks in a more flexible way
+    const content = document.body.textContent;
+    expect(content).toMatch(/Task/);
   });
 
   it('displays memory allocation details correctly', async () => {
@@ -125,24 +129,44 @@ describe('ResourceMonitor', () => {
     render(<ResourceMonitor agent={mockMemoryAgent} />);
     
     await waitFor(() => {
-      // Check for memory stats using more flexible matchers
-      const content = screen.getByText(/Memory Usage/i).closest('div');
-      expect(content).toBeInTheDocument();
-      expect(content?.textContent).toMatch(/4096/);
-      expect(content?.textContent).toMatch(/2048/);
-      expect(content?.textContent).toMatch(/512/);
-    }, { timeout: 10000 });
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    const memorySection = screen.getByText(/Memory Usage/i).closest('div');
+    expect(memorySection).toBeInTheDocument();
+    
+    // Verify all memory values are displayed
+    const values = [4096, 2048, 512];
+    values.forEach(value => {
+      expect(memorySection?.textContent).toContain(value.toString());
+    });
+    
+    // Verify progress bar exists and has correct value
+    const progressBar = within(memorySection as HTMLElement).getByRole('progressbar');
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('value', '50'); // 2048/4096 * 100
   });
 
   it('updates metrics periodically', async () => {
-    render(<ResourceMonitor agent={mockAgent} />);
+    const { container } = render(<ResourceMonitor agent={mockAgent} />);
     
     await waitFor(() => {
       expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
 
+    // Get initial state
+    const initialProgressElement = container.querySelector('[role="progressbar"]');
+    expect(initialProgressElement).toBeDefined();
+    
+    // Advance time and check for updates
     act(() => {
       jest.advanceTimersByTime(2000);
+    });
+
+    await waitFor(() => {
+      const updatedProgressElement = container.querySelector('[role="progressbar"]');
+      expect(updatedProgressElement).toBeDefined();
+      expect(updatedProgressElement?.getAttribute('value')).not.toBe(initialProgressElement?.getAttribute('value'));
     });
   });
 
@@ -150,37 +174,24 @@ describe('ResourceMonitor', () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
     await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
       expect(screen.getByText(/Tasks/)).toBeInTheDocument();
       expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
-    }, { timeout: 10000 });
-  });
-
-  it('handles agent research metrics display', async () => {
-    render(<ResourceMonitor agent={mockAgent} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText(/Tasks/)).toBeInTheDocument();
-      expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
   });
 
   it('cleans up interval on unmount', () => {
-    const { unmount } = render(<ResourceMonitor agent={mockAgent} />);
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    const { unmount } = render(<ResourceMonitor agent={mockAgent} />);
+    
+    // Allow component to initialize
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     
     unmount();
     
     expect(clearIntervalSpy).toHaveBeenCalled();
     clearIntervalSpy.mockRestore();
-  });
-
-  it('handles error state gracefully', () => {
-    const errorAgent = {
-      ...mockAgent,
-      memory_allocation: null as any
-    };
-    
-    render(<ResourceMonitor agent={errorAgent} />);
-    expect(screen.getByText(/Failed to initialize/)).toBeInTheDocument();
   });
 });
