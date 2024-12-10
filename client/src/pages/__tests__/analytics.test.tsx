@@ -1,19 +1,18 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
 import Analytics from '../Analytics';
 import { mockAnalytics } from '@/lib/mockAnalytics';
 
 describe('Analytics Page', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
     const mockDate = new Date('2024-12-10T12:00:00Z');
-    vi.setSystemTime(mockDate);
+    jest.setSystemTime(mockDate);
   });
 
   afterEach(() => {
-    vi.useRealTimers();
-    vi.clearAllMocks();
+    jest.useRealTimers();
+    jest.clearAllMocks();
   });
 
   it('renders analytics dashboard title and initial state', () => {
@@ -105,13 +104,15 @@ describe('Analytics Page', () => {
 
   it('handles error states gracefully using ErrorBoundary', async () => {
     // Mock a component error
-    console.error = vi.fn();
+    console.error = jest.fn();
     const ThrowError = () => { throw new Error('Test error'); };
     
+    console.error = jest.fn();
     render(
-      <Analytics>
+      <div>
+        <Analytics />
         <ThrowError />
-      </Analytics>
+      </div>
     );
 
     await waitFor(() => {
@@ -121,6 +122,7 @@ describe('Analytics Page', () => {
   });
 
   it('updates real-time metrics periodically', async () => {
+    const user = userEvent.setup();
     render(<Analytics />);
     await user.click(screen.getByRole('tab', { name: 'Real-time' }));
     
@@ -129,11 +131,40 @@ describe('Analytics Page', () => {
     
     // Advance timers to trigger updates
     await act(async () => {
-      vi.advanceTimersByTime(2000);
+      jest.advanceTimersByTime(2000);
     });
     
     // Verify charts are updated
     const charts = screen.getAllByRole('presentation');
     expect(charts).toHaveLength(4);
+    
+    // Verify specific metrics are displayed
+    expect(screen.getByText('Research Progress')).toBeInTheDocument();
+    expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
+    expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
+  });
+
+  it('displays correct research metrics calculations', async () => {
+    render(<Analytics />);
+    
+    const completedGoals = mockAnalytics.systemMetrics.researchMetrics.goalsCompleted;
+    const totalGoals = mockAnalytics.systemMetrics.researchMetrics.totalGoals;
+    const progressPercentage = Math.round((completedGoals / totalGoals) * 100);
+    
+    expect(screen.getByText(`${completedGoals} / ${totalGoals}`)).toBeInTheDocument();
+    expect(screen.getByText(`${progressPercentage}%`)).toBeInTheDocument();
+  });
+
+  it('renders agent performance metrics correctly', async () => {
+    render(<Analytics />);
+    
+    mockAnalytics.agentPerformance.forEach(agent => {
+      expect(screen.getByText(agent.agent)).toBeInTheDocument();
+      expect(screen.getByText(`Level ${agent.level}`)).toBeInTheDocument();
+      
+      // Verify research impact and collaboration scores
+      expect(screen.getByText(`${agent.taskComplexity}%`)).toBeInTheDocument();
+      expect(screen.getByText(`${agent.collaborationScore}%`)).toBeInTheDocument();
+    });
   });
 });

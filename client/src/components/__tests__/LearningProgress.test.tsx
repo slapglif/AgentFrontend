@@ -1,6 +1,6 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { LearningProgress } from '../LearningProgress';
-import { vi } from 'vitest';
+
 
 interface LearningMetrics {
   completedLessons: number;
@@ -36,12 +36,12 @@ describe('LearningProgress', () => {
   };
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.clearAllTimers();
-    vi.useRealTimers();
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
 
   it('renders without crashing', () => {
@@ -71,7 +71,7 @@ describe('LearningProgress', () => {
     render(<LearningProgress metrics={mockLearningMetrics} />);
     
     act(() => {
-      vi.advanceTimersByTime(100);
+      jest.advanceTimersByTime(100);
     });
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('LearningProgress', () => {
   it('handles error states correctly', () => {
     const invalidMetrics = {
       ...mockLearningMetrics,
-      skillsProficiency: null
+      skillsProficiency: {} as Record<string, number> // Empty object but maintains type
     };
     
     render(<LearningProgress metrics={invalidMetrics} />);
@@ -106,7 +106,7 @@ describe('LearningProgress', () => {
 
   it('cleans up interval on unmount', () => {
     const { unmount } = render(<LearningProgress metrics={mockLearningMetrics} />);
-    const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     
     unmount();
     

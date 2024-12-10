@@ -1,19 +1,19 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { PerformanceMetrics } from '../PerformanceMetrics';
 import { mockAnalytics } from '@/lib/mockAnalytics';
-import { vi } from 'vitest';
+
 
 describe('PerformanceMetrics', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
     // Mock Math.random to return consistent values
-    vi.spyOn(Math, 'random').mockImplementation(() => 0.5);
+    jest.spyOn(Math, 'random').mockImplementation(() => 0.5);
   });
 
   afterEach(() => {
-    vi.clearAllTimers();
-    vi.useRealTimers();
-    vi.restoreAllMocks();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it('renders without crashing', () => {
@@ -51,7 +51,7 @@ describe('PerformanceMetrics', () => {
 
     // Advance time to trigger update
     act(() => {
-      vi.advanceTimersByTime(2000);
+      jest.advanceTimersByTime(2000);
     });
 
     // Verify charts are updated with new data points
@@ -77,7 +77,7 @@ describe('PerformanceMetrics', () => {
 
   it('formats time correctly', async () => {
     const now = new Date('2024-01-01T12:00:00');
-    vi.setSystemTime(now);
+    jest.setSystemTime(now);
 
     render(<PerformanceMetrics />);
     
@@ -107,7 +107,7 @@ describe('PerformanceMetrics', () => {
 
   it('cleans up interval on unmount', () => {
     const { unmount } = render(<PerformanceMetrics />);
-    const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     
     unmount();
     

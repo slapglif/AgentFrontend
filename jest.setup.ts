@@ -1,19 +1,18 @@
 import '@testing-library/jest-dom';
 import 'jest-environment-jsdom';
-import { vi } from 'vitest';
 
 // Mock window properties and methods
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
   })),
 });
 
@@ -23,10 +22,10 @@ class MockIntersectionObserver {
     this.callback = callback;
   }
   callback: IntersectionObserverCallback;
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-  takeRecords = vi.fn();
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+  takeRecords = jest.fn();
 }
 window.IntersectionObserver = MockIntersectionObserver as any;
 
@@ -36,9 +35,9 @@ class MockResizeObserver {
     this.callback = callback;
   }
   callback: ResizeObserverCallback;
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
 }
 window.ResizeObserver = MockResizeObserver as any;
 
@@ -48,24 +47,24 @@ window.requestAnimationFrame = (callback: FrameRequestCallback) => {
   return 0;
 };
 
-window.cancelAnimationFrame = vi.fn();
+window.cancelAnimationFrame = jest.fn();
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock SVG elements that might not be in jsdom
-document.createElementNS = vi.fn().mockImplementation((namespace, tagName) => {
+document.createElementNS = jest.fn().mockImplementation((namespace, tagName) => {
   return document.createElement(tagName);
 });
 
 // Enable fake timers
-vi.useFakeTimers();
+jest.useFakeTimers();
 
 // Suppress console errors during tests
 const originalError = console.error;
