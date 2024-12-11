@@ -78,19 +78,6 @@ export function AgentBehaviorPatterns() {
                         aria-label="Collaboration Impact Progress"
                       />
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm">
-                        <span>Knowledge Synthesis</span>
-                        <span>{scores.knowledgeSynthesis}%</span>
-                      </div>
-                      <Progress 
-                        value={scores.knowledgeSynthesis} 
-                        max={100} 
-                        className="h-1"
-                        data-testid="knowledge-synthesis-progress"
-                        aria-label="Knowledge Synthesis Progress"
-                      />
-                    </div>
                   </div>
                 </div>
               );

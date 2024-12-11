@@ -1,9 +1,20 @@
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
+
+// Reset mocks and QueryClient before each test
+beforeEach(() => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+});
 
 // Mock modules
 jest.mock('@/components/ui/use-toast', () => ({

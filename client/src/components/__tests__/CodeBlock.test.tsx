@@ -1,17 +1,17 @@
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CodeBlock } from '../CodeBlock';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
+// Mock Prism.highlight
 jest.mock('prismjs', () => ({
-  default: {
-    highlight: (code: string) => code,
-    languages: {
-      javascript: {},
-      python: {},
-      text: {}
-    }
+  highlight: jest.fn((code) => code),
+  languages: {
+    javascript: {},
+    typescript: {},
+    python: {},
+    text: {}
   }
 }));
 
@@ -35,7 +35,7 @@ describe('CodeBlock', () => {
     const codeContainer = screen.getByRole('code-container');
     expect(codeContainer).toBeInTheDocument();
     expect(codeContainer.querySelector('code.language-javascript')).toBeInTheDocument();
-    expect(codeContainer.querySelector('code')?.textContent).toBe(mockCode);
+    expect(screen.getByText(mockCode)).toBeInTheDocument();
   });
 
   it('handles code copy functionality', async () => {
@@ -49,8 +49,8 @@ describe('CodeBlock', () => {
   it('toggles collapse state', async () => {
     const user = userEvent.setup();
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const codeContainer = screen.getByRole('code-container');
     const collapseButton = screen.getByRole('button', { name: /collapse code/i });
+    const codeContainer = screen.getByRole('code-container');
     
     expect(codeContainer).toHaveClass('max-h-[2000px]');
     await user.click(collapseButton);
@@ -70,6 +70,6 @@ describe('CodeBlock', () => {
     const pythonCode = 'print("Hello World")';
     render(<CodeBlock code={pythonCode} language="python" />);
     expect(screen.getByText('python')).toBeInTheDocument();
-    expect(screen.getByRole('code-container')).toBeInTheDocument();
+    expect(screen.getByText(pythonCode)).toBeInTheDocument();
   });
 });
