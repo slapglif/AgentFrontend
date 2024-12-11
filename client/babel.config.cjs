@@ -8,12 +8,24 @@ module.exports = {
     ['@babel/preset-react', {
       runtime: 'automatic'
     }],
-    ['@babel/preset-typescript', {
-      isTSX: true,
-      allExtensions: true
-    }]
+    '@babel/preset-typescript'
   ],
   plugins: [
     '@babel/plugin-transform-modules-commonjs'
-  ]
+  ],
+  env: {
+    test: {
+      presets: [
+        ['@babel/preset-env', {
+          targets: {
+            node: 'current'
+          }
+        }],
+        ['@babel/preset-react', {
+          runtime: 'automatic'
+        }],
+        '@babel/preset-typescript'
+      ]
+    }
+  }
 };

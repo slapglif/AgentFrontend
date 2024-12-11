@@ -20,25 +20,21 @@
     },
     "transform": {
       "^.+\\.(t|j)sx?$": ["babel-jest", {
-        "configFile": "./babel.config.cjs"
+        "presets": [
+          ["@babel/preset-env", { "targets": { "node": "current" } }],
+          ["@babel/preset-react", { "runtime": "automatic" }],
+          "@babel/preset-typescript"
+        ]
       }]
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!(@tanstack|lucide-react|react-day-picker))"
+      "node_modules/(?!(@tanstack|lucide-react|react-day-picker|wouter)/)"
     ],
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
     "testMatch": ["**/__tests__/**/*.test.(ts|tsx|js|jsx)"],
+    "moduleDirectories": ["node_modules", "src"],
     "testEnvironmentOptions": {
       "customExportConditions": [""]
-    },
-    "roots": ["<rootDir>/src"],
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}",
-      "!src/**/*.d.ts"
-    ],
-    "globals": {
-      "React": true
-    },
-    "moduleDirectories": ["node_modules", "src"]
+    }
   }
 }

@@ -1,39 +1,18 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import '@testing-library/jest-dom';
+import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'text-encoding';
 
-// Make React available globally
+// Add React and testing utilities globally
+import React from 'react';
 global.React = React;
-global.ReactDOM = ReactDOM;
 
-// Fix window.matchMedia
-window.matchMedia = window.matchMedia || function() {
-  return {
-    matches: false,
-    addListener: function() {},
-    removeListener: function() {},
-    addEventListener: function() {},
-    removeEventListener: function() {},
-    dispatchEvent: function() {},
-  };
-};
-
-// Mock ResizeObserver
-window.ResizeObserver = window.ResizeObserver || class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
-
-// Mock IntersectionObserver
-window.IntersectionObserver = window.IntersectionObserver || class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
-
-// Set up canvas mock
-HTMLCanvasElement.prototype.getContext = jest.fn();
+// Set up TextEncoder/Decoder
+if (typeof TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder;
+}
+if (typeof TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder;
+}
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -64,30 +43,36 @@ window.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
-// Set up SVG mock
-const createElementNSOrig = global.document.createElementNS
-global.document.createElementNS = function(namespaceURI, qualifiedName) {
-  if (namespaceURI==='http://www.w3.org/2000/svg' && qualifiedName==='svg'){
-    const element = createElementNSOrig.apply(this,arguments)
-    element.createSVGRect = function(){}
+// Mock SVG elements
+const createElementNSOrig = document.createElementNS;
+document.createElementNS = function(namespaceURI: string, qualifiedName: string) {
+  if (namespaceURI === 'http://www.w3.org/2000/svg') {
+    const element = createElementNSOrig.apply(this, [namespaceURI, qualifiedName]);
+    element.createSVGRect = jest.fn();
     return element;
   }
-  return createElementNSOrig.apply(this,arguments)
-}
-
-// Mock window functions
-Object.defineProperty(window, 'scroll', {
-  value: jest.fn(),
-});
+  return createElementNSOrig.apply(this, [namespaceURI, qualifiedName]);
+} as any;
 
 // Mock canvas
 HTMLCanvasElement.prototype.getContext = jest.fn();
 
+// Mock Prismjs
+jest.mock('prismjs', () => ({
+  default: {
+    highlight: (code: string) => code,
+    languages: {
+      javascript: {},
+      typescript: {},
+      python: {},
+      text: {}
+    }
+  }
+}));
+
 // Suppress React 18 console warnings
 const originalError = console.error;
 console.error = (...args) => {
-  if (/Warning.*not wrapped in act/.test(args[0])) {
-    return;
-  }
+  if (/Warning.*not wrapped in act/.test(args[0])) return;
   originalError.call(console, ...args);
 };
