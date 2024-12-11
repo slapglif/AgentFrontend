@@ -22,24 +22,62 @@ class MockIntersectionObserver {
     this.callback = callback;
   }
   callback: IntersectionObserverCallback;
-  observe = jest.fn();
+  observe = jest.fn().mockImplementation((element: Element) => {
+    // Simulate an intersection observation
+    const entry = {
+      boundingClientRect: element.getBoundingClientRect(),
+      intersectionRatio: 1,
+      intersectionRect: element.getBoundingClientRect(),
+      isIntersecting: true,
+      rootBounds: document.documentElement.getBoundingClientRect(),
+      target: element,
+      time: Date.now()
+    };
+    this.callback([entry], this);
+  });
   unobserve = jest.fn();
   disconnect = jest.fn();
-  takeRecords = jest.fn();
+  takeRecords = jest.fn().mockReturnValue([]);
+  root: Element | null = null;
+  rootMargin: string = '0px';
+  thresholds: ReadonlyArray<number> = [0];
 }
 window.IntersectionObserver = MockIntersectionObserver as any;
 
 // Mock ResizeObserver
-class MockResizeObserver {
+class MockResizeObserver implements ResizeObserver {
   constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
   }
   callback: ResizeObserverCallback;
-  observe = jest.fn();
+  observe = jest.fn().mockImplementation((element: Element) => {
+    // Simulate a resize observation
+    const entry: ResizeObserverEntry = {
+      target: element,
+      contentRect: element.getBoundingClientRect(),
+      borderBoxSize: [{
+        blockSize: 100,
+        inlineSize: 100
+      }],
+      contentBoxSize: [{
+        blockSize: 100,
+        inlineSize: 100
+      }],
+      devicePixelContentBoxSize: [{
+        blockSize: 100,
+        inlineSize: 100
+      }]
+    } as ResizeObserverEntry;
+    this.callback([entry], this);
+  });
   unobserve = jest.fn();
   disconnect = jest.fn();
 }
-window.ResizeObserver = MockResizeObserver as any;
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  configurable: true,
+  value: MockResizeObserver
+});
 
 // Mock animations and timers
 window.requestAnimationFrame = (callback: FrameRequestCallback) => {
@@ -78,6 +116,33 @@ console.error = (...args: any[]) => {
   }
   originalError.call(console, ...args);
 };
+// Define clipboard mock only if it doesn't exist
+if (!navigator.clipboard) {
+  const mockClipboard = {
+    writeText: jest.fn().mockImplementation(() => Promise.resolve()),
+    readText: jest.fn().mockImplementation(() => Promise.resolve('')),
+  };
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: mockClipboard,
+  });
+}
+
+// Mock getComputedStyle
+window.getComputedStyle = jest.fn().mockImplementation((element) => ({
+  getPropertyValue: jest.fn().mockReturnValue(''),
+  ...element,
+}));
+
+// Mock scrollTo
+window.scrollTo = jest.fn();
+
+// Add missing requestAnimationFrame polyfill
+global.requestAnimationFrame = function(callback) {
+  setTimeout(callback, 0);
+  return 0;
+};
+
 
 // Add missing TextEncoder/TextDecoder
 if (typeof TextEncoder === 'undefined') {

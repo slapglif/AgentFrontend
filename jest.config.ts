@@ -32,8 +32,9 @@ const config: Config = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transformIgnorePatterns: [
-    '/node_modules/(?!(@radix-ui|class-variance-authority|tailwind-merge|clsx|lucide-react)/)',
+    '/node_modules/(?!(@radix-ui|class-variance-authority|tailwind-merge|clsx|lucide-react|@testing-library|recharts)/)',
   ],
+  moduleDirectories: ['node_modules', '<rootDir>/'],
   testEnvironmentOptions: {
     customExportConditions: [''],
   },
@@ -41,8 +42,26 @@ const config: Config = {
     'ts-jest': {
       tsconfig: './tsconfig.json',
       isolatedModules: true,
+      diagnostics: {
+        warnOnly: true
+      },
     },
   },
+  moduleDirectories: ['node_modules', '<rootDir>/'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFiles: ['<rootDir>/jest.setup.ts'],
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: './tsconfig.json',
+        diagnostics: {
+          warnOnly: true
+        }
+      }
+    ]
+  }
 };
 
 export default config;

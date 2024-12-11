@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import { CodeBlock } from '../CodeBlock';
 import '@testing-library/jest-dom';
@@ -6,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 // Mock Prism
 jest.mock('prismjs', () => ({
-  highlight: jest.fn((code) => code),
+  highlight: jest.fn((code: string) => code),
   languages: {
     javascript: {},
     typescript: {},
