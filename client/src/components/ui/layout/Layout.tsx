@@ -9,7 +9,8 @@ import {
   BarChart,
   MessageSquare,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Menu
 } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -46,7 +47,9 @@ export function Layout({ children }: LayoutProps) {
         <aside 
           className={cn(
             "fixed top-0 h-screen shrink-0 border-r bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 z-30 shadow-sm",
-            isCollapsed ? "w-16 hover:w-64 group" : "w-64"
+            isCollapsed ? "w-16 hover:w-64 group md:hover:w-64" : "w-64",
+            "max-sm:w-full max-sm:transform max-sm:translate-x-full max-sm:transition-transform",
+            !isCollapsed && "max-sm:translate-x-0"
           )}
         >
           <div className="flex h-full flex-col">
@@ -107,9 +110,20 @@ export function Layout({ children }: LayoutProps) {
         </aside>
         <main className={cn(
           "flex-1 min-h-screen transition-all duration-300 ease-in-out",
-          isCollapsed ? "ml-16" : "ml-64"
+          isCollapsed ? "md:ml-16" : "md:ml-64",
+          "max-sm:ml-0 relative"
         )}>
-          <div className="container mx-auto h-full">
+          <div className="sticky top-0 z-20 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            <div className="container mx-auto flex h-16 items-center px-4">
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+          <div className="container mx-auto px-4 py-6 h-[calc(100vh-4rem)]">
             {children}
           </div>
         </main>
