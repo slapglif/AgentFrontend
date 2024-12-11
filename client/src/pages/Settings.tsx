@@ -62,15 +62,15 @@ export default function Settings() {
       <TooltipProvider>
         <div className="container py-6 space-y-6 relative overflow-hidden min-h-screen bg-background/80">
           <DotPattern 
-            width={24} 
-            height={24}
+            width={20} 
+            height={20}
             x={0}
             y={0}
             cx={2}
             cy={2}
-            cr={1}
-            className="opacity-70 fixed inset-0"
-            svgClassName="transform scale-[2] rotate-12"
+            cr={1.5}
+            className="opacity-80 fixed inset-0"
+            svgClassName="transform scale-[2.5] rotate-12 animate-pulse"
           />
           <div className="flex items-center justify-between mb-8">
             <div>

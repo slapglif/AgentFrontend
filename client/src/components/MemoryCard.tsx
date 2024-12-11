@@ -42,25 +42,36 @@ interface MemoryCardProps {
 
 export function MemoryCard({ memory }: MemoryCardProps) {
   const [activeSection, setActiveSection] = React.useState<string | null>(null);
+  const [transform, setTransform] = React.useState('');
 
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case "research_analysis":
-        return "bg-emerald-500";
-      case "ayurvedic_analysis":
-        return "bg-sage-500";
-      case "dosha_assessment":
-        return "bg-amber-500";
-      case "herbal_research":
-        return "bg-green-500";
-      case "traditional_practice":
-        return "bg-indigo-500";
-      case "holistic_healing":
-        return "bg-violet-500";
-      default:
-        return "bg-slate-500";
+      case "research_analysis": return "bg-emerald-500";
+      case "ayurvedic_analysis": return "bg-sage-500";
+      case "dosha_assessment": return "bg-amber-500";
+      case "herbal_research": return "bg-green-500";
+      case "traditional_practice": return "bg-indigo-500";
+      case "holistic_healing": return "bg-violet-500";
+      default: return "bg-slate-500";
     }
   };
+
+  const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / 20) * 0.5;
+    const rotateY = ((centerX - x) / 20) * 0.5;
+    
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+  }, []);
+
+  const handleMouseLeave = React.useCallback(() => {
+    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg)');
+  }, []);
 
   const handleSectionClick = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
@@ -70,43 +81,11 @@ export function MemoryCard({ memory }: MemoryCardProps) {
     <Card 
       className="p-3 bg-gradient-to-br from-background to-muted/50 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border-l-4 border-l-primary/50 group"
       style={{
-        transformStyle: 'preserve-3d',
-        perspective: '1000px',
-        backfaceVisibility: 'hidden',
-        willChange: 'transform'
+        transform,
+        transition: 'transform 0.3s ease-out',
       }}
-      onMouseMove={(e) => {
-        const card = e.currentTarget;
-        if (!card) return;
-        
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / 20) * 0.5;
-        const rotateY = ((centerX - x) / 20) * 0.5;
-        
-        // Store reference to avoid closure issues
-        const element = card;
-        requestAnimationFrame(() => {
-          if (element && element.style) {
-            element.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-          }
-        });
-      }}
-      onMouseLeave={(e) => {
-        const card = e.currentTarget;
-        if (!card) return;
-        
-        // Store reference to avoid closure issues
-        const element = card;
-        requestAnimationFrame(() => {
-          if (element && element.style) {
-            element.style.transform = 'rotateX(0deg) rotateY(0deg)';
-          }
-        });
-      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="flex items-start justify-between">
         <Badge className={getTypeColor(memory.type)}>{memory.type}</Badge>
@@ -130,15 +109,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
       <div className="mt-4 space-y-3">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Confidence</span>
-          <Progress 
-            value={memory.confidence} 
-            className="flex-1 transition-all duration-500" 
-            style={{
-              background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 2s linear infinite'
-            }}
-          />
+          <Progress value={memory.confidence} className="flex-1" />
           <span className="text-sm font-medium">{memory.confidence}%</span>
         </div>
 
@@ -161,9 +132,8 @@ export function MemoryCard({ memory }: MemoryCardProps) {
               }`}>
                 {Object.entries(memory.metadata?.detailedAnalysis || {}).map(([key, value]) => (
                   <div 
-                    key={`${memory.id}-${key}`}
+                    key={key}
                     className="flex items-center gap-2 p-2 rounded bg-primary/5 hover:bg-primary/10 transition-colors duration-200"
-                    title={`${key}: ${value}%`}
                   >
                     <span className="text-muted-foreground capitalize">{key}:</span>
                     <span className="font-medium">{value}%</span>

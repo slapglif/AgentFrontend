@@ -28,11 +28,12 @@ export const DotPattern = ({
   return (
     <div className={cn("absolute inset-0 -z-10 pointer-events-none select-none", className)}>
       <svg
-        className={cn("absolute inset-0 w-full h-full opacity-50", svgClassName)}
+        className={cn("absolute inset-0 w-full h-full", svgClassName)}
         style={{ 
           minHeight: '100vh',
-          maskImage: 'radial-gradient(ellipse at center, black, transparent)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent)'
+          opacity: 0.8,
+          mixBlendMode: 'soft-light',
+          filter: 'blur(0.5px)',
         }}
       >
         <defs>
@@ -48,7 +49,8 @@ export const DotPattern = ({
               cx={cx} 
               cy={cy} 
               r={cr} 
-              className="fill-primary/30" 
+              fill="currentColor"
+              className="text-primary"
             />
           </pattern>
         </defs>
@@ -56,7 +58,7 @@ export const DotPattern = ({
           width="100%" 
           height="100%" 
           fill={`url(#${patternId})`}
-          className="[mask-image:radial-gradient(ellipse_at_center,black,transparent)]"
+          className="text-primary"
         />
       </svg>
     </div>
