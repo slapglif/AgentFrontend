@@ -24,11 +24,12 @@ export const DotPattern = ({
   svgClassName,
 }: DotPatternProps) => {
   return (
-    <div className={cn("absolute inset-0 -z-10", className)}>
+    <div className={cn("absolute inset-0 -z-10 overflow-hidden", className)}>
       <svg
-        className={cn("[mask-image:radial-gradient(ellipse_at_center,black,transparent)] absolute inset-0", svgClassName)}
+        className={cn("[mask-image:radial-gradient(ellipse_at_center,black,transparent)] absolute inset-0 opacity-25", svgClassName)}
         width="100%"
         height="100%"
+        style={{ minHeight: '100vh' }}
       >
         <defs>
           <pattern
