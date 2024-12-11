@@ -1,6 +1,35 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { PerformanceMetrics } from '../PerformanceMetrics';
 import { mockAnalytics } from '@/lib/mockAnalytics';
+
+// Wrapper component to provide fixed dimensions for charts
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <div 
+    style={{ 
+      width: '800px', 
+      height: '600px',
+      position: 'relative',
+      display: 'block'
+    }}
+    data-testid="chart-container"
+  >
+    {children}
+  </div>
+);
+
+// Mock ResizeObserver
+beforeAll(() => {
+  window.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+});
+
+afterAll(() => {
+  // @ts-ignore
+  window.ResizeObserver = undefined;
+});
 
 const setupMocks = () => {
   // Mock random for consistent values
@@ -41,19 +70,28 @@ describe('PerformanceMetrics', () => {
     mocks.cleanup();
   });
 
-  it('renders without crashing', () => {
-    render(<PerformanceMetrics />);
+  it('renders without crashing', async () => {
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
+    const container = screen.getByTestId('chart-container');
+    expect(container).toBeInTheDocument();
+    expect(container).toHaveStyle({ width: '800px', height: '600px' });
+    
+    // Wait for charts to render
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
     expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
   });
 
   it('displays loading state initially', () => {
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     const loadingElements = screen.getAllByTestId('loading-card');
     expect(loadingElements).toHaveLength(4);
   });
 
   it('shows all metric charts', () => {
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Handle initial loading state
     expect(screen.getAllByTestId('loading-card')).toHaveLength(4);
@@ -73,7 +111,7 @@ describe('PerformanceMetrics', () => {
   it('updates metrics in real-time', () => {
     const { mockRandom } = setupMocks();
     
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward initial load
     act(() => {
@@ -111,7 +149,7 @@ describe('PerformanceMetrics', () => {
   });
 
   it('calculates metrics correctly', () => {
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward timers
     act(() => {
@@ -131,7 +169,7 @@ describe('PerformanceMetrics', () => {
     const mockDate = new Date('2024-12-10T12:00:00Z');
     jest.setSystemTime(mockDate);
     
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward timers
     act(() => {
@@ -146,7 +184,7 @@ describe('PerformanceMetrics', () => {
   });
 
   it('handles tooltips correctly', () => {
-    render(<PerformanceMetrics />);
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward timers
     act(() => {
@@ -183,7 +221,7 @@ describe('PerformanceMetrics', () => {
 
   it('cleans up interval on unmount', () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
-    const { unmount } = render(<PerformanceMetrics />);
+    const { unmount } = render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward initial load
     act(() => {

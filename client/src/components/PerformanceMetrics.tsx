@@ -109,10 +109,10 @@ export function PerformanceMetrics() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4" data-testid="loading-grid">
         {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="p-4" data-testid="loading-card">
-            <div className="h-[200px] animate-pulse bg-muted rounded-lg" />
+            <div className="h-[200px] animate-pulse bg-muted rounded-lg" style={{ minHeight: "200px" }} />
           </Card>
         ))}
       </div>
@@ -124,8 +124,8 @@ export function PerformanceMetrics() {
       <Card className="p-4">
         <h3 className="font-medium mb-4">Token Usage Trend</h3>
         <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={tokenUsage}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+            <AreaChart data={tokenUsage} data-testid="token-usage-chart">
               <defs>
                 <linearGradient id="tokenGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -154,8 +154,8 @@ export function PerformanceMetrics() {
       <Card className="p-4">
         <h3 className="font-medium mb-4">Research Progress</h3>
         <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={researchProgress}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+            <AreaChart data={researchProgress} data-testid="research-progress-chart">
               <defs>
                 <linearGradient id="researchGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -184,8 +184,8 @@ export function PerformanceMetrics() {
       <Card className="p-4">
         <h3 className="font-medium mb-4">Knowledge Synthesis Rate</h3>
         <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={knowledgeSynthesis}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+            <LineChart data={knowledgeSynthesis} data-testid="knowledge-synthesis-chart">
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="timestamp"
@@ -209,8 +209,8 @@ export function PerformanceMetrics() {
       <Card className="p-4">
         <h3 className="font-medium mb-4">Collaboration Effectiveness</h3>
         <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={collaborationEffectiveness}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
+            <LineChart data={collaborationEffectiveness} data-testid="collaboration-effectiveness-chart">
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis
                 dataKey="timestamp"
