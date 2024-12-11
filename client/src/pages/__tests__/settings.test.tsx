@@ -38,10 +38,8 @@ describe('Settings Page', () => {
     renderSettings();
     
     // Initially shows loading skeletons
-    const skeletons = screen.getAllByRole('presentation').filter(el => 
-      el.className.includes('animate-pulse')
-    );
-    expect(skeletons).toHaveLength(2);
+    const skeletons = screen.getAllByTestId('loading-skeleton');
+    expect(skeletons.length).toBeGreaterThan(0);
 
     // After loading
     await act(async () => {

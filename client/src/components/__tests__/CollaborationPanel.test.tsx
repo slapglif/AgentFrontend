@@ -30,32 +30,37 @@ jest.mock('@/hooks/use-toast', () => ({
 }));
 
 // Mock tanstack query hooks and client
-const mockQueryClient = new QueryClient({
+const defaultQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      staleTime: Infinity,
+      cacheTime: Infinity,
     },
   },
 });
 
-const mockUseQuery = jest.fn().mockReturnValue({
+const mockQueryData = {
   data: mockCollaborations,
   isLoading: false,
   error: null,
-});
+};
 
+// Create mocks before using them
+const mockUseQuery = jest.fn().mockReturnValue(mockQueryData);
+const mockMutate = jest.fn();
 const mockUseMutation = jest.fn().mockReturnValue({
-  mutate: jest.fn(),
+  mutate: mockMutate,
   isPending: false,
 });
-
 const mockInvalidateQueries = jest.fn();
 const mockSetQueryData = jest.fn();
 
+// Mock the entire module
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQuery: () => mockUseQuery(),
-  useMutation: () => mockUseMutation(),
+  useQuery: (options: any) => mockUseQuery(options),
+  useMutation: (options: any) => mockUseMutation(options),
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
     setQueryData: mockSetQueryData,

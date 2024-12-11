@@ -76,8 +76,8 @@ export default function Settings() {
             <div>
               {isLoading ? (
                 <>
-                  <Skeleton className="h-8 w-48 mb-2" />
-                  <Skeleton className="h-4 w-72" />
+                  <Skeleton data-testid="loading-skeleton" className="h-8 w-48 mb-2" />
+                  <Skeleton data-testid="loading-skeleton" className="h-4 w-72" />
                 </>
               ) : (
                 <>

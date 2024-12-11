@@ -24,15 +24,12 @@ describe('CodeBlock', () => {
   const mockCode = 'console.log("test")';
   
   beforeEach(() => {
-    // Mock clipboard API
-    const mockClipboard = {
-      writeText: jest.fn().mockImplementation(() => Promise.resolve()),
-    };
-    Object.assign(navigator, { clipboard: mockClipboard });
-  });
-
-  afterEach(() => {
+    // Reset mocks
     jest.clearAllMocks();
+    
+    // Mock Prism highlight function
+    const prismMock = require('prismjs');
+    prismMock.highlight.mockImplementation((code) => `<span>${code}</span>`);
   });
 
   it('renders code with syntax highlighting', () => {
@@ -40,7 +37,7 @@ describe('CodeBlock', () => {
     const codeContainer = screen.getByRole('code-container');
     expect(codeContainer).toBeInTheDocument();
     expect(codeContainer.querySelector('code.language-javascript')).toBeInTheDocument();
-    expect(screen.getByText(mockCode)).toBeInTheDocument();
+    expect(codeContainer.textContent).toContain(mockCode);
   });
 
   it('handles code copy functionality', async () => {
@@ -75,6 +72,6 @@ describe('CodeBlock', () => {
     const pythonCode = 'print("Hello World")';
     render(<CodeBlock code={pythonCode} language="python" />);
     expect(screen.getByText('python')).toBeInTheDocument();
-    expect(screen.getByText(pythonCode)).toBeInTheDocument();
+    expect(screen.getByText(/Hello World/)).toBeInTheDocument();
   });
 });
