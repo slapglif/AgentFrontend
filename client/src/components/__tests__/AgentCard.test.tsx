@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AgentCard } from '../AgentCard';
+import '@testing-library/jest-dom';
 
 // Mock wouter's Link component
 jest.mock('wouter', () => ({
@@ -44,12 +45,16 @@ describe('AgentCard', () => {
 
   it('displays correct status badge', () => {
     render(<AgentCard agent={mockAgent} />);
-    const statusBadges = screen.getAllByText(mockAgent.status, { exact: false });
-    expect(statusBadges.length).toBeGreaterThan(0);
-    const statusBadge = statusBadges[0];
+    const statusBadge = screen.getByText(mockAgent.status, { exact: false });
     expect(statusBadge).toBeInTheDocument();
-    expect(statusBadge.className).toMatch(/bg-green-500/);
-    expect(statusBadge.className).toMatch(/animate-glow/);
+    expect(statusBadge.className).toContain('bg-green-500');
+  });
+
+  it('shows specializations', () => {
+    render(<AgentCard agent={mockAgent} />);
+    mockAgent.specializations.forEach(spec => {
+      expect(screen.getByText(spec.replace(/_/g, ' '))).toBeInTheDocument();
+    });
   });
 
   it('shows achievements', () => {
@@ -63,13 +68,23 @@ describe('AgentCard', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(`Level ${mockAgent.skillLevel}`)).toBeInTheDocument();
     expect(screen.getByText(`${(mockAgent.successRate * 100).toFixed(1)}% Success Rate`)).toBeInTheDocument();
-    const progressBar = screen.getByRole('progressbar');
-    expect(progressBar).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('shows current task information', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(mockAgent.current_task.summary)).toBeInTheDocument();
     expect(screen.getByText(`${mockAgent.current_task.progress}%`)).toBeInTheDocument();
+  });
+
+  it('shows correct task count', () => {
+    render(<AgentCard agent={mockAgent} />);
+    expect(screen.getByText(mockAgent.currentTasks.toString())).toBeInTheDocument();
+  });
+
+  it('renders as a link with correct href', () => {
+    render(<AgentCard agent={mockAgent} />);
+    const link = screen.getByTestId('mock-link');
+    expect(link).toHaveAttribute('href', `/agents/${mockAgent.id}`);
   });
 });

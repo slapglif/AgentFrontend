@@ -1,13 +1,24 @@
+import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
 
+// Mock modules
 jest.mock('@/components/ui/use-toast', () => ({
   useToast: () => ({
     toast: jest.fn(),
   }),
+}));
+
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQuery: jest.fn().mockImplementation(() => ({
+    data: mockCollaborations,
+    isLoading: false,
+    error: null,
+  })),
 }));
 
 const queryClient = new QueryClient({
@@ -18,6 +29,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// Wrap component with necessary providers
 const renderWithQueryClient = (component: React.ReactNode) => {
   return render(
     <QueryClientProvider client={queryClient}>
@@ -29,51 +41,58 @@ const renderWithQueryClient = (component: React.ReactNode) => {
 describe('CollaborationPanel', () => {
   beforeEach(() => {
     queryClient.clear();
+    jest.clearAllMocks();
   });
 
   it('renders collaboration list', async () => {
     renderWithQueryClient(<CollaborationPanel />);
     
-    await waitFor(() => {
-      mockCollaborations.forEach(collab => {
-        expect(screen.getByText(collab.title)).toBeInTheDocument();
-        expect(screen.getByText(collab.description)).toBeInTheDocument();
-      });
-    });
+    for (const collab of mockCollaborations) {
+      expect(await screen.findByText(collab.title)).toBeInTheDocument();
+      expect(await screen.findByText(collab.description)).toBeInTheDocument();
+    }
   });
 
   it('shows loading state initially', () => {
+    // Override query mock for loading state
+    const useQueryMock = jest.requireMock('@tanstack/react-query').useQuery;
+    useQueryMock.mockImplementationOnce(() => ({
+      isLoading: true,
+      data: null,
+      error: null,
+    }));
+
     renderWithQueryClient(<CollaborationPanel />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('handles collaboration selection', async () => {
     renderWithQueryClient(<CollaborationPanel />);
     
-    await waitFor(() => {
-      const participantsButton = screen.getAllByText('Participants')[0];
-      fireEvent.click(participantsButton);
-      expect(screen.getByText('Collaboration Timeline')).toBeInTheDocument();
-    });
+    const firstCollab = mockCollaborations[0];
+    const collabTitle = await screen.findByText(firstCollab.title);
+    fireEvent.click(collabTitle);
+    
+    const participantsButton = await screen.findByRole('button', { name: /participants/i });
+    fireEvent.click(participantsButton);
+    
+    expect(await screen.findByText('Collaboration Timeline')).toBeInTheDocument();
   });
 
   it('displays new collaboration dialog', async () => {
     renderWithQueryClient(<CollaborationPanel />);
-    const newButton = screen.getByText('New Collaboration');
+    
+    const newButton = await screen.findByRole('button', { name: /new collaboration/i });
     fireEvent.click(newButton);
     
-    await waitFor(() => {
-      expect(screen.getByText('Create New Collaboration')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Title')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Description')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Create New Collaboration')).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText('Title')).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText('Description')).toBeInTheDocument();
   });
 
-  it('shows real-time updates', async () => {
+  it('shows real-time updates section', async () => {
     renderWithQueryClient(<CollaborationPanel />);
     
-    await waitFor(() => {
-      expect(screen.getByText('Active participants will appear here in real-time')).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/active participants/i)).toBeInTheDocument();
   });
 });

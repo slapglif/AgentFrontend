@@ -47,7 +47,7 @@ export function AgentBehaviorPatterns() {
                       <Progress 
                         value={scores.researchDepth} 
                         max={100} 
-                        className="h-1"
+                        className="h-1" 
                         data-testid="research-depth-progress"
                         aria-label="Research Depth Progress"
                       />
