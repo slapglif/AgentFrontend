@@ -77,20 +77,34 @@ export function MemoryCard({ memory }: MemoryCardProps) {
       }}
       onMouseMove={(e) => {
         const card = e.currentTarget;
+        if (!card) return;
+        
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / 20) * 0.5; // Reduced rotation
+        const rotateX = ((y - centerY) / 20) * 0.5;
         const rotateY = ((centerX - x) / 20) * 0.5;
+        
+        // Store reference to avoid closure issues
+        const element = card;
         requestAnimationFrame(() => {
-          card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          if (element && element.style) {
+            element.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          }
         });
       }}
       onMouseLeave={(e) => {
+        const card = e.currentTarget;
+        if (!card) return;
+        
+        // Store reference to avoid closure issues
+        const element = card;
         requestAnimationFrame(() => {
-          e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg)';
+          if (element && element.style) {
+            element.style.transform = 'rotateX(0deg) rotateY(0deg)';
+          }
         });
       }}
     >
