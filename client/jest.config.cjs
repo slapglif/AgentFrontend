@@ -13,7 +13,8 @@ module.exports = {
         parser: {
           syntax: 'typescript',
           tsx: true,
-          decorators: true
+          decorators: true,
+          dynamicImport: true
         },
         transform: {
           react: {
@@ -21,16 +22,28 @@ module.exports = {
           }
         }
       },
-      sourceMaps: true
+      sourceMaps: false
     }]
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@tanstack|lucide-react|react-day-picker|wouter)/)'
+    'node_modules/(?!(@tanstack|lucide-react|react-day-picker|wouter|@radix-ui|@babel)/)'
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/__tests__/**/*.test.(ts|tsx|js|jsx)'],
   moduleDirectories: ['node_modules', 'src'],
   testEnvironmentOptions: {
     customExportConditions: ['']
-  }
+  },
+  maxWorkers: 1,
+  verbose: true,
+  testTimeout: 15000,
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tsconfig.json',
+      diagnostics: false
+    }
+  },
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true
 };

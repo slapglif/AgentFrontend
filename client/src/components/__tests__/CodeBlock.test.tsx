@@ -4,7 +4,7 @@ import { CodeBlock } from '../CodeBlock';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-// Mock Prism.highlight
+// Mock Prism
 jest.mock('prismjs', () => ({
   highlight: jest.fn((code) => code),
   languages: {
@@ -13,7 +13,12 @@ jest.mock('prismjs', () => ({
     python: {},
     text: {}
   }
-}));
+}), { virtual: true });
+
+// Mock Prism CSS imports
+jest.mock('prismjs/themes/prism-tomorrow.css', () => ({}), { virtual: true });
+jest.mock('prismjs/components/prism-typescript', () => ({}), { virtual: true });
+jest.mock('prismjs/components/prism-python', () => ({}), { virtual: true });
 
 describe('CodeBlock', () => {
   const mockCode = 'console.log("test")';

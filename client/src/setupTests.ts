@@ -22,6 +22,10 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Mock requestAnimationFrame
+global.requestAnimationFrame = (callback: FrameRequestCallback) => setTimeout(callback, 0);
+global.cancelAnimationFrame = jest.fn();
+
 // Mock ResizeObserver
 class MockResizeObserver {
   observe = jest.fn();
@@ -29,34 +33,18 @@ class MockResizeObserver {
   disconnect = jest.fn();
 }
 
-window.ResizeObserver = MockResizeObserver;
+global.ResizeObserver = MockResizeObserver;
 
 // Mock IntersectionObserver
-class MockIntersectionObserver implements IntersectionObserver {
-  root = null;
-  rootMargin = '';
-  thresholds = [];
+class MockIntersectionObserver {
+  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
   observe = jest.fn();
   unobserve = jest.fn();
   disconnect = jest.fn();
   takeRecords = () => [];
-  readonly _callback: IntersectionObserverCallback = () => {};
-  readonly _options: IntersectionObserverInit = {};
-
-  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
-    this._callback = callback;
-    this._options = options || {};
-  }
 }
 
-Object.defineProperty(window, 'IntersectionObserver', {
-  writable: true,
-  configurable: true,
-  value: MockIntersectionObserver
-});
-
-// Mock canvas
-HTMLCanvasElement.prototype.getContext = jest.fn();
+global.IntersectionObserver = MockIntersectionObserver;
 
 // Mock Prismjs
 jest.mock('prismjs', () => ({
@@ -69,23 +57,66 @@ jest.mock('prismjs', () => ({
   }
 }));
 
+// Mock canvas
+HTMLCanvasElement.prototype.getContext = jest.fn();
+HTMLCanvasElement.prototype.toBlob = jest.fn();
+
 // Mock SVG elements
 const createElementNSOrig = global.document.createElementNS;
-Object.defineProperty(global.document, 'createElementNS', {
-  value: function(namespaceURI: string, qualifiedName: string) {
-    const element = createElementNSOrig.call(document, namespaceURI, qualifiedName);
-    if (namespaceURI === 'http://www.w3.org/2000/svg') {
-      Object.defineProperty(element, 'createSVGRect', {
-        value: jest.fn()
-      });
-    }
-    return element;
+global.document.createElementNS = function(namespaceURI: string, qualifiedName: string) {
+  const element = createElementNSOrig.call(document, namespaceURI, qualifiedName);
+  if (namespaceURI === 'http://www.w3.org/2000/svg') {
+    element.createSVGRect = jest.fn();
   }
+  return element;
+};
+
+// Mock clipboard API
+Object.defineProperty(navigator, 'clipboard', {
+  writable: true,
+  value: {
+    writeText: jest.fn().mockImplementation(() => Promise.resolve()),
+    readText: jest.fn().mockImplementation(() => Promise.resolve('')),
+  },
 });
 
-// Suppress React 18 console warnings about act()
+// Suppress specific console warnings
 const originalError = console.error;
+const originalWarn = console.warn;
+
 console.error = (...args) => {
-  if (/Warning.*not wrapped in act/.test(args[0])) return;
+  if (
+    /Warning.*not wrapped in act/.test(args[0]) ||
+    /Warning.*ReactDOM.render is no longer supported/.test(args[0])
+  ) {
+    return;
+  }
   originalError.call(console, ...args);
 };
+
+console.warn = (...args) => {
+  if (/Warning.*componentWillMount/.test(args[0])) {
+    return;
+  }
+  originalWarn.call(console, ...args);
+};
+
+// Extend Jest matchers
+expect.extend({
+  toHaveBeenCalledBefore(received: jest.Mock, other: jest.Mock) {
+    const receivedCalls = received.mock.invocationCallOrder;
+    const otherCalls = other.mock.invocationCallOrder;
+    
+    if (!receivedCalls.length || !otherCalls.length) {
+      return {
+        message: () => 'Expected both functions to have been called',
+        pass: false,
+      };
+    }
+    
+    return {
+      message: () => `Expected ${received.getMockName()} to have been called before ${other.getMockName()}`,
+      pass: Math.min(...receivedCalls) < Math.min(...otherCalls),
+    };
+  },
+});

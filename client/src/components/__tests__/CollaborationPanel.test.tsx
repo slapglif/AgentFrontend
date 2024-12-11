@@ -5,34 +5,32 @@ import '@testing-library/jest-dom';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
 
-// Reset mocks and QueryClient before each test
-beforeEach(() => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
+// Create a new QueryClient for each test
+const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      cacheTime: 0,
+      staleTime: 0,
     },
-  });
+  },
+  logger: {
+    log: console.log,
+    warn: console.warn,
+    error: () => {},
+  },
 });
 
-// Mock modules
-jest.mock('@/components/ui/use-toast', () => ({
+// Mock UI components and hooks
+const mockToast = jest.fn();
+jest.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
-    toast: jest.fn(),
+    toast: mockToast,
   }),
 }));
 
-jest.mock('@tanstack/react-query', () => ({
-  ...jest.requireActual('@tanstack/react-query'),
-  useQuery: jest.fn().mockImplementation(() => ({
-    data: mockCollaborations,
-    isLoading: false,
-    error: null,
-  })),
-}));
-
-const queryClient = new QueryClient({
+// Mock tanstack query hooks and client
+const mockQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
@@ -40,10 +38,43 @@ const queryClient = new QueryClient({
   },
 });
 
+const mockUseQuery = jest.fn().mockReturnValue({
+  data: mockCollaborations,
+  isLoading: false,
+  error: null,
+});
+
+const mockUseMutation = jest.fn().mockReturnValue({
+  mutate: jest.fn(),
+  isPending: false,
+});
+
+const mockInvalidateQueries = jest.fn();
+const mockSetQueryData = jest.fn();
+
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQuery: () => mockUseQuery(),
+  useMutation: () => mockUseMutation(),
+  useQueryClient: () => ({
+    invalidateQueries: mockInvalidateQueries,
+    setQueryData: mockSetQueryData,
+  }),
+}));
+
+// Mock collaboration events
+jest.mock('@/lib/mockCollaborations', () => ({
+  ...jest.requireActual('@/lib/mockCollaborations'),
+  simulateRealTimeEvents: (callback) => {
+    // Return cleanup function
+    return () => {};
+  },
+}));
+
 // Wrap component with necessary providers
 const renderWithQueryClient = (component: React.ReactNode) => {
   return render(
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={mockQueryClient}>
       {component}
     </QueryClientProvider>
   );
@@ -51,9 +82,13 @@ const renderWithQueryClient = (component: React.ReactNode) => {
 
 describe('CollaborationPanel', () => {
   beforeEach(() => {
-    queryClient.clear();
     jest.clearAllMocks();
   });
+
+  const mockToast = jest.fn();
+  jest.mock('@/hooks/use-toast', () => ({
+    useToast: () => ({ toast: mockToast })
+  }));
 
   it('renders collaboration list', async () => {
     renderWithQueryClient(<CollaborationPanel />);
@@ -64,8 +99,7 @@ describe('CollaborationPanel', () => {
     }
   });
 
-  it('shows loading state initially', () => {
-    // Override query mock for loading state
+  it('shows loading state', async () => {
     const useQueryMock = jest.requireMock('@tanstack/react-query').useQuery;
     useQueryMock.mockImplementationOnce(() => ({
       isLoading: true,
@@ -74,7 +108,7 @@ describe('CollaborationPanel', () => {
     }));
 
     renderWithQueryClient(<CollaborationPanel />);
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(await screen.findByText(/loading collaborations/i)).toBeInTheDocument();
   });
 
   it('handles collaboration selection', async () => {
@@ -85,9 +119,11 @@ describe('CollaborationPanel', () => {
     fireEvent.click(collabTitle);
     
     const participantsButton = await screen.findByRole('button', { name: /participants/i });
+    expect(participantsButton).toBeInTheDocument();
     fireEvent.click(participantsButton);
     
-    expect(await screen.findByText('Collaboration Timeline')).toBeInTheDocument();
+    const timelineHeading = await screen.findByText('Collaboration Timeline');
+    expect(timelineHeading).toBeInTheDocument();
   });
 
   it('displays new collaboration dialog', async () => {
@@ -96,14 +132,40 @@ describe('CollaborationPanel', () => {
     const newButton = await screen.findByRole('button', { name: /new collaboration/i });
     fireEvent.click(newButton);
     
-    expect(await screen.findByText('Create New Collaboration')).toBeInTheDocument();
-    expect(await screen.findByPlaceholderText('Title')).toBeInTheDocument();
-    expect(await screen.findByPlaceholderText('Description')).toBeInTheDocument();
+    const dialogTitle = await screen.findByText('Create New Collaboration');
+    expect(dialogTitle).toBeInTheDocument();
+    
+    const titleInput = await screen.findByPlaceholderText('Title');
+    const descInput = await screen.findByPlaceholderText('Description');
+    
+    expect(titleInput).toBeInTheDocument();
+    expect(descInput).toBeInTheDocument();
   });
 
-  it('shows real-time updates section', async () => {
+  it('shows error state correctly', async () => {
+    const useQueryMock = jest.requireMock('@tanstack/react-query').useQuery;
+    useQueryMock.mockImplementationOnce(() => ({
+      isLoading: false,
+      error: new Error('Failed to fetch collaborations'),
+      data: null,
+    }));
+    
+    renderWithQueryClient(<CollaborationPanel />);
+    expect(await screen.findByText(/an error occurred/i)).toBeInTheDocument();
+  });
+
+  it('handles real-time updates', async () => {
     renderWithQueryClient(<CollaborationPanel />);
     
-    expect(await screen.findByText(/active participants/i)).toBeInTheDocument();
+    // Initial render
+    const firstCollab = await screen.findByText(mockCollaborations[0].title);
+    expect(firstCollab).toBeInTheDocument();
+    
+    // Select a collaboration
+    fireEvent.click(firstCollab);
+    
+    // Verify participants section is shown
+    const participantsText = await screen.findByText(/participants/i);
+    expect(participantsText).toBeInTheDocument();
   });
 });

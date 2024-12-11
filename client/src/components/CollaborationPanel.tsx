@@ -71,37 +71,34 @@ export function CollaborationPanel() {
   const queryClient = useQueryClient();
 
   const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: collaborationsData, isLoading, error: queryError } = useQuery({
+    queryKey: ['collaborations'],
+    queryFn: () => Promise.resolve(mockCollaborations),
+  });
+
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState(mockMessages);
-  const [collaborations, setCollaborations] = useState(mockCollaborations);
-  const [agentStatus, setAgentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>({});
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
+  // Track online status of agents
+  const [agentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>(() => {
+    const initialStatus: Record<number, { isOnline: boolean; lastSeen: Date }> = {};
+    mockParticipants.forEach(participant => {
+      initialStatus[participant.agentId] = {
+        isOnline: true,
+        lastSeen: new Date()
+      };
+    });
+    return initialStatus;
+  });
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        // Initialize agent status
-        const initialAgentStatus: Record<number, { isOnline: boolean; lastSeen: Date }> = {};
-        mockParticipants.forEach(participant => {
-          initialAgentStatus[participant.agentId] = {
-            isOnline: true,
-            lastSeen: new Date()
-          };
-        });
-        setAgentStatus(initialAgentStatus);
-        setLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        setLoading(false);
-      }
-    };
+    if (selectedCollaboration) {
+      const selectedParticipants = mockParticipants.filter(p => p.collaborationId === selectedCollaboration);
+      setParticipants(selectedParticipants);
+    }
+  }, [selectedCollaboration]);
 
-    loadData();
-    
+  useEffect(() => {
     // Simulate real-time events
     return simulateRealTimeEvents((event) => {
       switch (event.type) {
@@ -116,17 +113,19 @@ export function CollaborationPanel() {
           setMessages(prev => [...prev, event.data.message]);
           break;
         case 'status_update':
-          setCollaborations(prev => 
-            prev.map(collab => 
+          // Handle status updates through React Query mutation
+          queryClient.setQueryData(['collaborations'], (oldData: any) => {
+            if (!oldData) return oldData;
+            return oldData.map((collab: any) =>
               collab.id === event.data.collaborationId
                 ? { ...collab, status: event.data.status }
                 : collab
-            )
-          );
+            );
+          });
           break;
       }
     });
-  }, []);
+  }, [queryClient, toast]);
 
   useEffect(() => {
     if (selectedCollaboration) {
@@ -220,20 +219,20 @@ export function CollaborationPanel() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {error ? (
+        {queryError ? (
           <div className="flex items-center justify-center h-full">
             <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
-              {error}
+              {queryError instanceof Error ? queryError.message : 'An error occurred'}
             </div>
           </div>
-        ) : loading ? (
+        ) : isLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-8 w-8 animate-spin" />
             <span className="ml-2 text-sm text-muted-foreground">Loading collaborations...</span>
           </div>
         ) : (
           <div className="space-y-4">
-            {collaborations.map((collab) => (
+            {(collaborationsData || []).map((collab) => (
               <Card
                 key={collab.id}
                 className="p-4 hover:bg-muted/50 transition-colors"
