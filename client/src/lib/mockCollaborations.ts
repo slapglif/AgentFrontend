@@ -2,7 +2,7 @@ import type {
   Collaboration,
   CollaborationParticipant,
   CollaborationMessage 
-} from "@db/schema";
+} from "@/types/schema";
 
 export const mockCollaborations: Collaboration[] = [
   {

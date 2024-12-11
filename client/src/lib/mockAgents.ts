@@ -1,19 +1,26 @@
-import { Agent } from "@/lib/agents";
+import { Agent } from "@/types/agent";
 
 export interface LearningMetrics {
-  skillsProficiency: {
+  skills: { name: string; proficiency: number }[];
+  level: {
+    current: number;
+    xp: number;
+    nextLevelXp: number;
+  };
+  achievements: any[];
+  skillsProficiency?: {
     [key: string]: number;  // 0-100 proficiency level
   };
-  knowledgeAreas: {
+  knowledgeAreas?: {
     name: string;
     progress: number;  // 0-100 progress level
     lastUpdated: string;
   }[];
-  learningRate: number;  // 0-100 learning efficiency
-  completedLessons: number;
-  totalLessons: number;
-  adaptabilityScore: number;  // 0-100 score
-  retentionRate: number;  // 0-100 percentage
+  learningRate?: number;  // 0-100 learning efficiency
+  completedLessons?: number;
+  totalLessons?: number;
+  adaptabilityScore?: number;  // 0-100 score
+  retentionRate?: number;  // 0-100 percentage
 }
 
 export const mockAgents: Agent[] = [
@@ -28,6 +35,18 @@ export const mockAgents: Agent[] = [
     confidence: 95,
     capabilities: ["task_delegation", "coordination", "performance_monitoring"],
     learningMetrics: {
+      skills: [
+        { name: "Research", proficiency: 92 },
+        { name: "Coordination", proficiency: 88 },
+        { name: "Analysis", proficiency: 85 },
+        { name: "Communication", proficiency: 90 }
+      ],
+      level: {
+        current: 5,
+        xp: 7500,
+        nextLevelXp: 10000
+      },
+      achievements: [],
       skillsProficiency: {
         "research": 92,
         "coordination": 88,
@@ -95,6 +114,34 @@ export const mockAgents: Agent[] = [
     experience: 72,
     confidence: 92,
     capabilities: ["pattern_recognition", "data_processing", "statistical_analysis"],
+    learningMetrics: {
+      skills: [
+        { name: "Data Processing", proficiency: 95 },
+        { name: "Statistical Analysis", proficiency: 88 },
+        { name: "Pattern Recognition", proficiency: 92 }
+      ],
+      level: {
+        current: 4,
+        xp: 5500,
+        nextLevelXp: 8000
+      },
+      achievements: [],
+      skillsProficiency: {
+        "data_processing": 95,
+        "statistical_analysis": 88,
+        "pattern_recognition": 92
+      },
+      knowledgeAreas: [
+        {
+          name: "Data Science",
+          progress: 90,
+          lastUpdated: "2024-12-08T10:30:00Z"
+        }
+      ],
+      learningRate: 88,
+      completedLessons: 42,
+      totalLessons: 55
+    },
     configuration: {
       decision_threshold: 0.92,
       response_time_limit: 3000,
@@ -133,6 +180,34 @@ export const mockAgents: Agent[] = [
     experience: 68,
     confidence: 88,
     capabilities: ["system_integration", "protocol_management", "compatibility_analysis"],
+    learningMetrics: {
+      skills: [
+        { name: "System Integration", proficiency: 90 },
+        { name: "Protocol Management", proficiency: 85 },
+        { name: "Compatibility Analysis", proficiency: 88 }
+      ],
+      level: {
+        current: 4,
+        xp: 4800,
+        nextLevelXp: 8000
+      },
+      achievements: [],
+      skillsProficiency: {
+        "system_integration": 90,
+        "protocol_management": 85,
+        "compatibility_analysis": 88
+      },
+      knowledgeAreas: [
+        {
+          name: "System Architecture",
+          progress: 85,
+          lastUpdated: "2024-12-08T11:30:00Z"
+        }
+      ],
+      learningRate: 86,
+      completedLessons: 38,
+      totalLessons: 50
+    },
     configuration: {
       decision_threshold: 0.88,
       response_time_limit: 4000,

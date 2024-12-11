@@ -1,5 +1,3 @@
-import { Agent } from "./agents";
-
 export interface CommunicationLog {
   id: number;
   fromAgentId: number;
@@ -90,7 +88,7 @@ export function simulateRealtimeCommunication(callback: (log: CommunicationLog) 
       type: ["request", "response", "broadcast"][Math.floor(Math.random() * 3)] as CommunicationLog["type"],
       content: `Simulated communication message ${Date.now()}`,
       timestamp: new Date(),
-      status: "sent",
+      status: "sent" as const,
       metadata: {
         latency: Math.floor(Math.random() * 200) + 50,
         priority: Math.random() > 0.5 ? "high" : "medium"
