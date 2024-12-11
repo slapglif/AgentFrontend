@@ -44,7 +44,11 @@ export default function History() {
         </Badge>
       </div>
 
-      <div className="h-[calc(100vh-200px)] overflow-y-auto">
+      <div 
+        className="h-[calc(100vh-200px)] overflow-y-auto"
+        role="region"
+        aria-label="Activity History"
+      >
         <div className="space-y-4">
           {mockHistory.map((entry) => (
             <Card key={entry.id} className="p-4 transition-all hover:shadow-md">
