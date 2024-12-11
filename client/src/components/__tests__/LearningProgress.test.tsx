@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, within } from '@testing-library/react';
 import { LearningProgress } from '../LearningProgress';
 
 const mockDate = new Date('2024-12-10T12:00:00Z');
@@ -97,22 +97,43 @@ describe('LearningProgress', () => {
     });
     
     await waitFor(() => {
-      const updatedTimestamp = screen.getByText(/Updated:/);
-      expect(updatedTimestamp).toBeInTheDocument();
+      // Find knowledge area by its name first
+      const knowledgeArea = mockLearningMetrics.knowledgeAreas[0];
+      const areaSection = screen.getByText(knowledgeArea.name).closest('div');
+      expect(areaSection).not.toBeNull();
+
+      // Then look for the date within that section
+      const lastUpdated = knowledgeArea.lastUpdated;
+      const formattedDate = new Date(lastUpdated).toLocaleDateString();
+      const dateText = within(areaSection as HTMLElement).getByText(formattedDate, { exact: false });
+      expect(dateText).toBeInTheDocument();
     }, { timeout: 10000 });
   });
 
   it('cleans up interval on unmount', async () => {
+    // Mock setInterval to return a specific interval ID
+    const mockIntervalId = 123;
+    const setIntervalSpy = jest.spyOn(window, 'setInterval').mockReturnValue(mockIntervalId);
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    
+    // Render component
     const { unmount } = render(<LearningProgress metrics={mockLearningMetrics} />);
     
+    // Wait for initial render
     await waitFor(() => {
       expect(screen.getByText('Learning Progress')).toBeInTheDocument();
     });
     
-    unmount();
+    // Verify setInterval was called with expected parameters
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Number));
     
-    expect(clearIntervalSpy).toHaveBeenCalled();
+    // Unmount and verify clearInterval was called
+    unmount();
+    expect(clearIntervalSpy).toHaveBeenCalledWith(mockIntervalId);
+    
+    // Clean up mocks
+    setIntervalSpy.mockRestore();
     clearIntervalSpy.mockRestore();
   });
 

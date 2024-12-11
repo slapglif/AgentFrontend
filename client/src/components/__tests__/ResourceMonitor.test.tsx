@@ -54,8 +54,12 @@ describe('ResourceMonitor', () => {
   it('displays error state when there is an error', () => {
     const invalidAgent = {
       ...mockAgent,
-      memory_allocation: undefined,
-      current_tasks: undefined
+      memory_allocation: {
+        total: 0,
+        used: 0,
+        reserved: 0
+      },
+      current_tasks: []
     };
     render(<ResourceMonitor agent={invalidAgent} />);
     const errorMessage = screen.getByText(/Failed to initialize resource monitoring: Missing memory allocation/i);
