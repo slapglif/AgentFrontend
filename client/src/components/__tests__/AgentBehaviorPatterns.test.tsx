@@ -1,7 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AgentBehaviorPatterns } from '../AgentBehaviorPatterns';
 import { mockAnalytics } from '@/lib/mockAnalytics';
+import '@testing-library/jest-dom';
 
 // Mock the mockAnalytics data
 jest.mock('@/lib/mockAnalytics', () => ({

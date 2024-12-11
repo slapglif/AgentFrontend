@@ -1,6 +1,6 @@
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
 import '@testing-library/jest-dom';
-import '@testing-library/jest-dom/extend-expect';
-import 'jest-environment-jsdom';
+import React from 'react';
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {

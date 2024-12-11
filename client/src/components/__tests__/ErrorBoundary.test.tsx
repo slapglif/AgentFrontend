@@ -1,7 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 
 const ThrowError = () => {
   throw new Error('Test error');

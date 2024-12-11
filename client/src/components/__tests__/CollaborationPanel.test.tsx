@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import '@testing-library/jest-dom';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
 

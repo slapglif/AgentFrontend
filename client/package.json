@@ -18,7 +18,17 @@
       "\\.(css|less|scss|sass)$": "identity-obj-proxy"
     },
     "transform": {
-      "^.+\\.(t|j)sx?$": "@swc/jest"
+      "^.+\\.(t|j)sx?$": ["babel-jest", {
+        "configFile": "./babel.config.cjs"
+      }]
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@tanstack|lucide-react|react-day-picker))"
+    ],
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "testMatch": ["**/__tests__/**/*.test.(ts|tsx|js|jsx)"],
+    "testEnvironmentOptions": {
+      "customExportConditions": [""]
     }
   }
 }
