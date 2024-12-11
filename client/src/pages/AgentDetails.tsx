@@ -265,7 +265,7 @@ export default function AgentDetails() {
                   <div className="flex items-center justify-center h-32">
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
-                ) : memories?.length > 0 ? (
+                ) : memories && memories.length > 0 ? (
                   memories.map((memory) => (
                     <MemoryCard 
                       key={memory.id}
@@ -289,7 +289,21 @@ export default function AgentDetails() {
             <TabsContent value="learning">
               <div className="grid grid-cols-1 gap-4 pb-6">
                 <ErrorBoundary>
-                  <LearningProgress metrics={mockLearningMetrics} />
+                  <LearningProgress 
+                    metrics={{
+                      skillsProficiency: agent.learningMetrics?.skills?.map(s => s.proficiency) ?? [],
+                      knowledgeAreas: agent.learningMetrics?.skills?.map(s => s.name) ?? [],
+                      learningRate: agent.learningMetrics?.level ? 
+                        agent.learningMetrics.level.xp / agent.learningMetrics.level.nextLevelXp : 0,
+                      completedLessons: agent.learningMetrics?.achievements?.length ?? 0,
+                      currentLevel: agent.learningMetrics?.level?.current ?? 1,
+                      experiencePoints: agent.learningMetrics?.level?.xp ?? 0,
+                      nextLevelAt: agent.learningMetrics?.level?.nextLevelXp ?? 100,
+                      totalSkills: agent.learningMetrics?.skills?.length ?? 0,
+                      skillsProgress: agent.learningMetrics?.skills?.length ? 
+                        agent.learningMetrics.skills.reduce((acc, skill) => acc + skill.proficiency, 0) / agent.learningMetrics.skills.length : 0
+                    }} 
+                  />
                 </ErrorBoundary>
               </div>
             </TabsContent>

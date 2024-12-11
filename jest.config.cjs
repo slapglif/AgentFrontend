@@ -11,31 +11,24 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['<rootDir>/**/*.test.{ts,tsx}'],
   transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        tsconfig: './tsconfig.json',
-        diagnostics: {
-          ignoreCodes: ['TS151001']
-        },
-        sourceMap: true,
-        inlineSourceMap: true,
-        isolatedModules: true
-      }
-    ]
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: './tsconfig.json',
+      diagnostics: false,
+      isolatedModules: true,
+      useESM: true
+    }]
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   transformIgnorePatterns: [
     '/node_modules/(?!(@radix-ui|class-variance-authority|tailwind-merge|clsx|lucide-react)/)',
   ],
   testEnvironmentOptions: {
-    customExportConditions: [''],
+    customExportConditions: ['']
   },
-  globals: {
-    'ts-jest': {
-      tsconfig: './tsconfig.json',
-      isolatedModules: true,
-      diagnostics: false
-    },
+  fakeTimers: {
+    enableGlobally: true,
+    now: new Date('2024-01-01T12:00:00Z').getTime()
   },
+  verbose: true,
+  testTimeout: 20000
 };

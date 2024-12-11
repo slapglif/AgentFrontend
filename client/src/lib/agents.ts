@@ -40,6 +40,18 @@ export interface Agent {
     status: string;
     priority: string;
   }[];
+  learningMetrics?: {
+    skills: Array<{
+      name: string;
+      proficiency: number;
+    }>;
+    level: {
+      current: number;
+      xp: number;
+      nextLevelXp: number;
+    };
+    achievements: any[];
+  };
 }
 
 export const DEFAULT_AGENTS: Agent[] = [
@@ -74,6 +86,19 @@ export const DEFAULT_AGENTS: Agent[] = [
         icon: "zap"
       }
     ],
+    learningMetrics: {
+      skills: [
+        { name: "Ayurvedic Analysis", proficiency: 95 },
+        { name: "Herbal Knowledge", proficiency: 88 },
+        { name: "Traditional Practices", proficiency: 92 }
+      ],
+      level: {
+        current: 5,
+        xp: 850,
+        nextLevelXp: 1000
+      },
+      achievements: []
+    },
     configuration: {
       decision_threshold: 0.92,
       response_time_limit: 2000,

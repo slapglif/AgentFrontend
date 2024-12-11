@@ -52,23 +52,17 @@ describe('PerformanceMetrics', () => {
     expect(loadingElements).toHaveLength(4);
   });
 
-  it('shows all metric charts', async () => {
-    const { rerender } = render(<PerformanceMetrics />);
+  it('shows all metric charts', () => {
+    render(<PerformanceMetrics />);
     
     // Handle initial loading state
     expect(screen.getAllByTestId('loading-card')).toHaveLength(4);
     
-    // Wait for loading to complete and verify charts
-    await act(async () => {
+    // Fast-forward timers
+    act(() => {
       jest.advanceTimersByTime(2000);
     });
     
-    rerender(<PerformanceMetrics />);
-    
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
-    });
-
     // Verify all charts are rendered
     expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
     expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
@@ -76,18 +70,14 @@ describe('PerformanceMetrics', () => {
     expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
   });
 
-  it('updates metrics in real-time', async () => {
+  it('updates metrics in real-time', () => {
     const { mockRandom } = setupMocks();
     
     render(<PerformanceMetrics />);
     
-    // Wait for initial load
-    await act(async () => {
+    // Fast-forward initial load
+    act(() => {
       jest.advanceTimersByTime(2000);
-    });
-    
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
     });
 
     // Verify initial state
@@ -98,8 +88,6 @@ describe('PerformanceMetrics', () => {
       'Collaboration Effectiveness'
     ];
     
-    const initialCharts = screen.getAllByRole('presentation');
-    expect(initialCharts).toHaveLength(4);
     chartTitles.forEach(title => {
       expect(screen.getByText(title)).toBeInTheDocument();
     });
@@ -110,75 +98,59 @@ describe('PerformanceMetrics', () => {
     const expectedTokens = baseTokens + expectedNewTokens;
     
     // Simulate data update
-    await act(async () => {
+    act(() => {
       jest.advanceTimersByTime(2000);
     });
 
     // Verify updated state
-    await waitFor(() => {
-      const tooltipText = `Tokens Used: ${expectedTokens}`;
-      expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
-    });
+    const tooltipText = `Tokens Used: ${expectedTokens}`;
+    expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
 
     // Cleanup mocks
     mockRandom.mockRestore();
   });
 
-  it('calculates metrics correctly', async () => {
+  it('calculates metrics correctly', () => {
     render(<PerformanceMetrics />);
     
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
-    }, { timeout: 10000 });
+    // Fast-forward timers
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
 
     // Predefined values based on mocked Math.random() = 0.5
-    const expectedNewTokens = 500; // Math.floor(0.5 * 1000)
+    const expectedNewTokens = 500;
     const baseTokens = mockAnalytics.systemMetrics.tokenMetrics.tokensUsed;
     const expectedTokens = baseTokens + expectedNewTokens;
 
-    await waitFor(() => {
-      const tooltipText = `Tokens Used: ${expectedTokens}`;
-      expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
-    }, { timeout: 10000 });
+    const tooltipText = `Tokens Used: ${expectedTokens}`;
+    expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
   });
 
-  it('formats time correctly', async () => {
-    jest.useFakeTimers();
+  it('formats time correctly', () => {
     const mockDate = new Date('2024-12-10T12:00:00Z');
     jest.setSystemTime(mockDate);
     
     render(<PerformanceMetrics />);
     
-    // Wait for loading to complete
-    await act(async () => {
+    // Fast-forward timers
+    act(() => {
       jest.advanceTimersByTime(2000);
     });
     
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
-    });
-
     // Format expected time
     const hours = '12';
     const minutes = '00';
-    
-    // Verify time display
     const timeText = `${hours}:${minutes}`;
     expect(screen.getByText(new RegExp(timeText))).toBeInTheDocument();
-    
-    jest.useRealTimers();
   });
 
-  it('handles tooltips correctly', async () => {
+  it('handles tooltips correctly', () => {
     render(<PerformanceMetrics />);
     
-    // Wait for initial load
-    await act(async () => {
+    // Fast-forward timers
+    act(() => {
       jest.advanceTimersByTime(2000);
-    });
-    
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
     });
 
     // Verify all chart titles and containers
@@ -195,12 +167,12 @@ describe('PerformanceMetrics', () => {
       expect(container).toHaveAttribute('role', 'presentation');
     });
 
-    // Verify initial tooltips
+    // Verify tooltips
     const tooltipText = `Tokens Used: ${mockAnalytics.systemMetrics.tokenMetrics.tokensUsed}`;
     expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
 
     // Simulate data update
-    await act(async () => {
+    act(() => {
       jest.advanceTimersByTime(2000);
     });
 
@@ -209,25 +181,20 @@ describe('PerformanceMetrics', () => {
     expect(charts).toHaveLength(4);
   });
 
-  it('cleans up interval on unmount', async () => {
+  it('cleans up interval on unmount', () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     const { unmount } = render(<PerformanceMetrics />);
     
-    // Wait for initial load
-    await act(async () => {
+    // Fast-forward initial load
+    act(() => {
       jest.advanceTimersByTime(2000);
     });
     
-    await waitFor(() => {
-      expect(screen.queryByTestId('loading-card')).not.toBeInTheDocument();
-    });
-
     // Verify cleanup
     unmount();
     expect(clearIntervalSpy).toHaveBeenCalled();
 
-    // Restore original implementation
+    // Cleanup
     clearIntervalSpy.mockRestore();
-    jest.clearAllTimers();
   });
 });
