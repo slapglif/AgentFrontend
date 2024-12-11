@@ -23,8 +23,14 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
 
   useEffect(() => {
     // Validate required agent data
-    if (!agent?.memory_allocation || !agent?.current_tasks) {
-      setError('Failed to initialize resource monitoring');
+    if (!agent?.memory_allocation) {
+      setError('Failed to initialize resource monitoring: Missing memory allocation');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!agent?.current_tasks) {
+      setError('Failed to initialize resource monitoring: Missing tasks');
       setIsLoading(false);
       return;
     }
@@ -139,7 +145,7 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
                   </div>
                 </div>
               </div>
-              <Progress value={resourceMetrics.memory} className="h-2" />
+              <Progress value={resourceMetrics.memory} className="h-2" data-testid="memory-progress" />
             </div>
 
             {/* Storage Usage */}

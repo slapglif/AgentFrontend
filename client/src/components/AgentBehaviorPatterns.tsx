@@ -41,28 +41,28 @@ export function AgentBehaviorPatterns() {
                           <span>Research Depth</span>
                           <span>{scores.researchDepth}%</span>
                         </div>
-                        <Progress value={scores.researchDepth} className="h-1" />
+                        <Progress value={scores.researchDepth} max={100} className="h-1" data-testid="research-depth-progress" />
                       </div>
                       <div>
                         <div className="flex justify-between text-sm">
                           <span>Learning Efficiency</span>
                           <span>{scores.learningEfficiency}%</span>
                         </div>
-                        <Progress value={scores.learningEfficiency} className="h-1" />
+                        <Progress value={scores.learningEfficiency} max={100} className="h-1" data-testid="learning-efficiency-progress" />
                       </div>
                       <div>
                         <div className="flex justify-between text-sm">
                           <span>Collaboration Impact</span>
                           <span>{scores.collaborationImpact}%</span>
                         </div>
-                        <Progress value={scores.collaborationImpact} className="h-1" />
+                        <Progress value={scores.collaborationImpact} max={100} className="h-1" data-testid="collaboration-impact-progress" />
                       </div>
                       <div>
                         <div className="flex justify-between text-sm">
                           <span>Knowledge Synthesis</span>
                           <span>{scores.knowledgeSynthesis}%</span>
                         </div>
-                        <Progress value={scores.knowledgeSynthesis} className="h-1" />
+                        <Progress value={scores.knowledgeSynthesis} max={100} className="h-1" data-testid="knowledge-synthesis-progress" />
                       </div>
                     </div>
                   </div>

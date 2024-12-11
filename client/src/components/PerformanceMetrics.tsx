@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { DotPattern } from "@/components/DotPattern";
 import {
   LineChart,
   Line,
@@ -120,8 +121,14 @@ export function PerformanceMetrics() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className="p-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+      <DotPattern 
+        width={24}
+        height={24}
+        className="opacity-40"
+        svgClassName="transform -rotate-12"
+      />
+      <Card className="p-4 relative">
         <h3 className="font-medium mb-4">Token Usage Trend</h3>
         <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>

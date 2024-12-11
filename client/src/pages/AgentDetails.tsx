@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
+import { DotPattern } from "@/components/DotPattern";
 // Removed unused import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -153,8 +154,14 @@ export default function AgentDetails() {
         </div>
       </header>
 
-      <div className="flex-1 p-6">
-        <Tabs defaultValue="overview" className="w-full">
+      <div className="flex-1 p-6 relative">
+        <DotPattern 
+          width={32}
+          height={32}
+          className="opacity-50"
+          svgClassName="transform rotate-45"
+        />
+        <Tabs defaultValue="overview" className="w-full relative">
           <TabsList>
             <TabsTrigger value="overview" className="gap-2">
               <Activity className="h-4 w-4" />
