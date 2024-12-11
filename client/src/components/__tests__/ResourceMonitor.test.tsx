@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, within } from '@testing-library/react';
 import { ResourceMonitor } from '../ResourceMonitor';
 import { DEFAULT_AGENTS } from '@/lib/agents';
 
@@ -46,9 +46,12 @@ describe('ResourceMonitor', () => {
     expect(screen.getByText('Resource Monitor')).toBeInTheDocument();
   });
 
-  it('shows loading state initially', () => {
+  it('shows loading state initially', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    
+    const loadingElement = await screen.findByTestId('resource-monitor-loading');
+    expect(loadingElement).toBeInTheDocument();
+    expect(within(loadingElement).getByText('Loading...')).toBeInTheDocument();
   });
 
   it('displays error state when there is an error', () => {
@@ -110,10 +113,13 @@ describe('ResourceMonitor', () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Tasks/)).toBeInTheDocument();
+    const taskSection = screen.getByTestId('task-section');
+    expect(taskSection).toBeInTheDocument();
+    expect(within(taskSection).getByText('Tasks')).toBeInTheDocument();
+    expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
   });
 
   it('displays resource metrics correctly', async () => {
@@ -165,37 +171,33 @@ describe('ResourceMonitor', () => {
   });
 
   it('updates metrics periodically', async () => {
-    const mockMath = Object.create(global.Math);
-    mockMath.random = () => 0.5;
-    global.Math = mockMath;
+    const mockRandom = jest.spyOn(Math, 'random');
+    mockRandom.mockImplementation(() => 0.5);
 
     render(<ResourceMonitor agent={mockAgent} />);
     
-    // Wait for initial render and get initial values
-    await act(async () => {
-      jest.advanceTimersByTime(100);
+    // Wait for loading to finish
+    await waitFor(() => {
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
     });
 
-    const initialProgressBars = screen.getAllByRole('progressbar');
-    const initialValues = initialProgressBars.map(bar => 
-      parseFloat(bar.getAttribute('aria-valuenow') || '0')
-    );
+    // Get initial CPU value
+    const initialCpuBadge = await screen.findByTestId('cpu-usage-badge');
+    const initialCpuValue = parseFloat(initialCpuBadge.textContent!);
 
     // Advance time to trigger update
     await act(async () => {
       jest.advanceTimersByTime(2000);
     });
 
-    const updatedProgressBars = screen.getAllByRole('progressbar');
-    const updatedValues = updatedProgressBars.map(bar => 
-      parseFloat(bar.getAttribute('aria-valuenow') || '0')
-    );
+    // Wait for and verify the update
+    await waitFor(() => {
+      const updatedCpuBadge = screen.getByTestId('cpu-usage-badge');
+      const updatedCpuValue = parseFloat(updatedCpuBadge.textContent!);
+      expect(updatedCpuValue).toBeGreaterThan(initialCpuValue);
+    }, { timeout: 3000 });
 
-    // Verify that at least one value has changed by comparing arrays
-    expect(updatedValues).not.toEqual(initialValues);
-
-    // Restore original Math
-    global.Math = Object.create(global.Math);
+    mockRandom.mockRestore();
   });
 
   it('displays agent performance metrics', () => {

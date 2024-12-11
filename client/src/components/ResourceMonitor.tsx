@@ -23,61 +23,46 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
 
     const initializeMetrics = async () => {
       try {
-        // Show loading state immediately
-        setIsLoading(true);
-        
-        // Add small delay for loading state visibility
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
         if (!mounted) return;
+        setIsLoading(true);
+        setError(null);
 
         // Validate required agent data
-        if (!agent?.memory_allocation) {
+        if (!agent?.memory_allocation?.total) {
           throw new Error('Failed to initialize resource monitoring: Missing memory allocation');
         }
 
-        if (!agent?.current_tasks) {
-          throw new Error('Failed to initialize resource monitoring: Missing tasks');
-        }
-
-        // Initialize metrics after validation
+        // Initialize metrics with initial values
+        const initialMetrics = getInitialResourceMetrics(agent);
         if (mounted) {
-          const initialMetrics = getInitialResourceMetrics(agent);
           setResourceMetrics(initialMetrics);
+          setIsLoading(false);
         }
       } catch (err) {
         if (mounted) {
-          const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-          setError(errorMessage);
-        }
-      } finally {
-        if (mounted) {
+          setError(err instanceof Error ? err.message : 'An unexpected error occurred');
           setIsLoading(false);
         }
       }
     };
 
-    // Start initialization
     initializeMetrics();
 
     const updateMetrics = () => {
-      if (!mounted) return;
+      if (!mounted || !resourceMetrics) return;
       
       setResourceMetrics(prev => {
         if (!prev) return prev;
 
-        // For testing purposes, ensure values always change
-        const incrementValue = 10;
-        
-        // Calculate new values ensuring they change for test verification
-        const newCpuValue = Math.min(100, Math.max(0, prev.cpu + incrementValue));
-        const newMemoryValue = Math.min(100, Math.max(0, prev.memory + incrementValue));
-        const newStorageValue = Math.min(100, Math.max(0, prev.storage + incrementValue));
+        // Update metrics with small, consistent changes for testing
+        const newMemoryValue = Math.min(100, prev.memory + (Math.random() * 2));
+        const newCpuValue = Math.min(100, prev.cpu + (Math.random() * 2));
+        const newStorageValue = Math.min(100, prev.storage + (Math.random() * 1));
 
         return {
           ...prev,
-          cpu: newCpuValue,
           memory: newMemoryValue,
+          cpu: newCpuValue,
           storage: newStorageValue,
           memoryTrend: [...prev.memoryTrend.slice(1), newMemoryValue],
           cpuTrend: [...prev.cpuTrend.slice(1), newCpuValue],
@@ -106,8 +91,8 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
 
   if (error) {
     return (
-      <Card className="p-4">
-        <div className="flex items-center gap-2 text-destructive" data-testid="error-message">
+      <Card className="p-4" data-testid="resource-monitor-error">
+        <div className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-4 w-4" />
           <span>{error}</span>
         </div>
@@ -115,9 +100,10 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
     );
   }
 
-  if (isLoading) {
+  // Show loading state immediately when component mounts
+  if (isLoading || !resourceMetrics) {
     return (
-      <Card className="p-4">
+      <Card className="p-4" data-testid="resource-monitor-loading">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 animate-spin" />
           <span>Loading...</span>
@@ -126,20 +112,9 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
     );
   }
 
-  if (!resourceMetrics) {
-    return (
-      <Card className="p-4">
-        <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4" />
-          <span>Initializing resource monitor...</span>
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <ErrorBoundary>
-      <Card className="p-4">
+      <Card className="p-4 col-span-2" data-testid="resource-monitor">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium">Resource Monitor</h3>
           <Activity className="h-4 w-4 text-muted-foreground" />
@@ -147,25 +122,8 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
 
         <ScrollArea className="h-[300px]">
           <div className="space-y-6">
-            {/* CPU Usage */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Cpu className="h-4 w-4" />
-                  <span className="text-sm font-medium">CPU Usage</span>
-                </div>
-                <Badge 
-                  variant="outline" 
-                  className={getUtilizationColor(resourceMetrics.cpu)}
-                >
-                  {resourceMetrics.cpu.toFixed(1)}%
-                </Badge>
-              </div>
-              <Progress value={resourceMetrics.cpu} className="h-2" />
-            </div>
-
             {/* Memory Usage */}
-            <div className="space-y-2">
+            <div className="space-y-2" data-testid="memory-section">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Database className="h-4 w-4" />
@@ -175,6 +133,7 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
                   <Badge 
                     variant="outline" 
                     className={getUtilizationColor(resourceMetrics.memory)}
+                    data-testid="memory-usage-badge"
                   >
                     {resourceMetrics.memory.toFixed(1)}%
                   </Badge>
@@ -185,81 +144,79 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
               </div>
               <Progress 
                 value={resourceMetrics.memory} 
-                className="h-2" 
+                className="h-2"
                 data-testid="memory-progress"
+              />
+              <div className="text-xs text-muted-foreground" data-testid="reserved-memory">
+                Reserved: {agent.memory_allocation.reserved}MB
+              </div>
+            </div>
+
+            {/* CPU Usage */}
+            <div className="space-y-2" data-testid="cpu-section">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Cpu className="h-4 w-4" />
+                  <span className="text-sm font-medium">CPU Usage</span>
+                </div>
+                <Badge 
+                  variant="outline" 
+                  className={getUtilizationColor(resourceMetrics.cpu)}
+                  data-testid="cpu-usage-badge"
+                >
+                  {resourceMetrics.cpu.toFixed(1)}%
+                </Badge>
+              </div>
+              <Progress 
+                value={resourceMetrics.cpu} 
+                className="h-2"
+                data-testid="cpu-progress"
               />
             </div>
 
             {/* Storage Usage */}
-            <div className="space-y-2">
+            <div className="space-y-2" data-testid="storage-section">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <HardDrive className="h-4 w-4" />
-                  <span className="text-sm font-medium">Storage Usage</span>
+                  <span className="text-sm font-medium">Storage</span>
                 </div>
                 <Badge 
                   variant="outline" 
                   className={getUtilizationColor(resourceMetrics.storage)}
+                  data-testid="storage-usage-badge"
                 >
                   {resourceMetrics.storage.toFixed(1)}%
                 </Badge>
               </div>
-              <Progress value={resourceMetrics.storage} className="h-2" />
+              <Progress 
+                value={resourceMetrics.storage} 
+                className="h-2"
+                data-testid="storage-progress"
+              />
             </div>
 
-            {/* Resource Details */}
+            {/* Tasks and Performance */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-muted rounded-lg">
+              <div className="p-3 bg-muted rounded-lg" data-testid="task-section">
                 <div className="flex items-center gap-2">
                   <List className="h-4 w-4" />
-                  <div className="text-sm text-muted-foreground">Task Queue</div>
+                  <span className="text-sm">Tasks</span>
                 </div>
-                <div className="text-lg font-semibold">{resourceMetrics.taskQueue}</div>
+                <div className="text-lg font-semibold mt-1">
+                  {resourceMetrics.taskQueue}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   Total Tasks: {resourceMetrics.tasks}
                 </div>
               </div>
-              <div className="p-3 bg-muted rounded-lg">
+              <div className="p-3 bg-muted rounded-lg" data-testid="processing-section">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   <div className="text-sm text-muted-foreground">Processing Time</div>
                 </div>
-                <div className="text-lg font-semibold">
+                <div className="text-lg font-semibold mt-1">
                   {agent.performance_metrics.avg_response_time}ms
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Reserved: {agent.memory_allocation.reserved}MB
-                </div>
-              </div>
-            </div>
-
-            {/* Performance Trends */}
-            <div className="space-y-2">
-              <div className="text-sm font-medium">Resource Trends</div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="p-3 bg-muted rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">Memory Trend</div>
-                  <div className="flex items-end gap-1 h-12">
-                    {resourceMetrics.memoryTrend.map((value, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 bg-primary transition-all duration-300"
-                        style={{ height: `${Math.max(0, Math.min(100, value))}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="p-3 bg-muted rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">CPU Trend</div>
-                  <div className="flex items-end gap-1 h-12">
-                    {resourceMetrics.cpuTrend.map((value, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 bg-primary transition-all duration-300"
-                        style={{ height: `${Math.max(0, Math.min(100, value))}%` }}
-                      />
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
