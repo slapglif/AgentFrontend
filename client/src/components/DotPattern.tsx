@@ -23,27 +23,41 @@ export const DotPattern = ({
   className,
   svgClassName,
 }: DotPatternProps) => {
+  const patternId = `dotPattern-${Math.random().toString(36).substr(2, 9)}`;
+  
   return (
-    <div className={cn("absolute inset-0 -z-10 overflow-hidden", className)}>
+    <div className={cn("absolute inset-0 -z-10 pointer-events-none select-none", className)}>
       <svg
-        className={cn("[mask-image:radial-gradient(ellipse_at_center,black,transparent)] absolute inset-0 opacity-25", svgClassName)}
-        width="100%"
-        height="100%"
-        style={{ minHeight: '100vh' }}
+        className={cn("absolute inset-0 w-full h-full opacity-50", svgClassName)}
+        style={{ 
+          minHeight: '100vh',
+          maskImage: 'radial-gradient(ellipse at center, black, transparent)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent)'
+        }}
       >
         <defs>
           <pattern
-            id="dotPattern"
+            id={patternId}
             x={x}
             y={y}
             width={width}
             height={height}
             patternUnits="userSpaceOnUse"
           >
-            <circle cx={cx} cy={cy} r={cr} className="fill-muted-foreground/20" />
+            <circle 
+              cx={cx} 
+              cy={cy} 
+              r={cr} 
+              className="fill-primary/30" 
+            />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#dotPattern)" />
+        <rect 
+          width="100%" 
+          height="100%" 
+          fill={`url(#${patternId})`}
+          className="[mask-image:radial-gradient(ellipse_at_center,black,transparent)]"
+        />
       </svg>
     </div>
   );

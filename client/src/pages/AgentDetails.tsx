@@ -154,12 +154,17 @@ export default function AgentDetails() {
         </div>
       </header>
 
-      <div className="flex-1 p-6 relative overflow-hidden min-h-screen">
+      <div className="flex-1 p-6 relative overflow-hidden min-h-screen bg-background/80">
         <DotPattern 
-          width={20}
-          height={20}
+          width={16}
+          height={16}
+          x={0}
+          y={0}
+          cx={1}
+          cy={1}
+          cr={1}
           className="absolute inset-0 opacity-70"
-          svgClassName="transform rotate-45 scale-[2.5]"
+          svgClassName="transform rotate-45 scale-[3]"
         />
         <Tabs defaultValue="overview" className="w-full relative">
           <TabsList>

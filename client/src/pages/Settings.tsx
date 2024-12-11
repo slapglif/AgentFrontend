@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { DotPattern } from "@/components/DotPattern";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -59,12 +60,17 @@ export default function Settings() {
   return (
     <ErrorBoundary>
       <TooltipProvider>
-        <div className="container py-6 space-y-6 relative overflow-hidden min-h-screen">
+        <div className="container py-6 space-y-6 relative overflow-hidden min-h-screen bg-background/80">
           <DotPattern 
-            width={32} 
-            height={32}
-            className="opacity-50"
-            svgClassName="transform scale-150"
+            width={24} 
+            height={24}
+            x={0}
+            y={0}
+            cx={2}
+            cy={2}
+            cr={1}
+            className="opacity-70 fixed inset-0"
+            svgClassName="transform scale-[2] rotate-12"
           />
           <div className="flex items-center justify-between mb-8">
             <div>
