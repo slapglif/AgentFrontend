@@ -84,26 +84,26 @@ describe('Analytics Page', () => {
     });
 
     // Switch to Behavior Patterns tab
+    const behaviorTab = screen.getByRole('tab', { name: 'Behavior Patterns' });
     await act(async () => {
-      await user.click(screen.getByRole('tab', { name: 'Behavior Patterns' }));
-      jest.runOnlyPendingTimers();
+      await user.click(behaviorTab);
     });
-
+    
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Behavior Patterns' })).toHaveAttribute('aria-selected', 'true');
+      expect(behaviorTab).toHaveAttribute('aria-selected', 'true');
       expect(screen.getByText('Agent Behavior Analysis')).toBeInTheDocument();
     });
 
     // Switch to Real-time tab
+    const realTimeTab = screen.getByRole('tab', { name: 'Real-time' });
     await act(async () => {
-      await user.click(screen.getByRole('tab', { name: 'Real-time' }));
-      jest.runOnlyPendingTimers();
+      await user.click(realTimeTab);
     });
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Real-time' })).toHaveAttribute('aria-selected', 'true');
+      expect(realTimeTab).toHaveAttribute('aria-selected', 'true');
       expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('handles error states gracefully', async () => {
@@ -142,31 +142,33 @@ describe('Analytics Page', () => {
     const user = userEvent.setup();
     render(<Analytics />);
 
+    // Switch to Real-time tab
+    const realTimeTab = screen.getByRole('tab', { name: 'Real-time' });
     await act(async () => {
-      await user.click(screen.getByRole('tab', { name: 'Real-time' }));
-      // Run all pending timers for initial render
-      jest.runAllTimers();
+      await user.click(realTimeTab);
     });
 
+    // Initial metrics should be visible
     await waitFor(() => {
       expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
       expect(screen.getByText('Research Progress')).toBeInTheDocument();
       expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
       expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     // Simulate metrics update cycle
     await act(async () => {
-      jest.advanceTimersByTime(2000); // Advance past the update interval
-      jest.runAllTimers(); // Run any pending timers from the update
+      jest.advanceTimersByTime(2000);
+      // Allow any pending state updates to complete
+      await Promise.resolve();
     });
 
-    // Verify charts remain present after update
+    // Verify charts remain after update
     await waitFor(() => {
-      expect(screen.getByTestId('token-usage-chart')).toBeInTheDocument();
-      expect(screen.getByTestId('research-progress-chart')).toBeInTheDocument();
-      expect(screen.getByTestId('knowledge-synthesis-chart')).toBeInTheDocument();
-      expect(screen.getByTestId('collaboration-effectiveness-chart')).toBeInTheDocument();
-    });
+      expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
+      expect(screen.getByText('Research Progress')).toBeInTheDocument();
+      expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
+      expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 });

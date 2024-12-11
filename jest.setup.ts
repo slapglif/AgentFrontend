@@ -1,24 +1,22 @@
+import '@testing-library/jest-dom';
 
-};
-// Define global clipboard mock as writable property
-const mockClipboard = {
-  writeText: jest.fn(() => Promise.resolve()),
-  readText: jest.fn(() => Promise.resolve('')),
-};
-
+// Define clipboard mock only if it doesn't exist
 if (!navigator.clipboard) {
   Object.defineProperty(window.navigator, 'clipboard', {
-    writable: true,
-    enumerable: true,
-    value: mockClipboard,
+    configurable: true,
+    value: {
+      writeText: jest.fn().mockImplementation(() => Promise.resolve()),
+      readText: jest.fn().mockImplementation(() => Promise.resolve('')),
+    },
   });
 }
 
-beforeEach(() => {
-  // Reset mock functions
-  mockClipboard.writeText.mockClear();
-  mockClipboard.readText.mockClear();
-});
+// Mock window.ResizeObserver
+window.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 
 // Mock getComputedStyle
 window.getComputedStyle = jest.fn().mockImplementation((element) => ({
@@ -35,7 +33,6 @@ global.requestAnimationFrame = function(callback) {
   return 0;
 };
 
-
 // Add missing TextEncoder/TextDecoder
 if (typeof TextEncoder === 'undefined') {
   global.TextEncoder = require('util').TextEncoder;
@@ -43,3 +40,8 @@ if (typeof TextEncoder === 'undefined') {
 if (typeof TextDecoder === 'undefined') {
   global.TextDecoder = require('util').TextDecoder;
 }
+
+// Reset all mocks before each test
+beforeEach(() => {
+  jest.clearAllMocks();
+});
