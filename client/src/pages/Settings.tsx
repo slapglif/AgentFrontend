@@ -59,7 +59,13 @@ export default function Settings() {
   return (
     <ErrorBoundary>
       <TooltipProvider>
-        <div className="container py-6 space-y-6">
+        <div className="container py-6 space-y-6 relative overflow-hidden min-h-screen">
+          <DotPattern 
+            width={32} 
+            height={32}
+            className="opacity-50"
+            svgClassName="transform scale-150"
+          />
           <div className="flex items-center justify-between mb-8">
             <div>
               {isLoading ? (

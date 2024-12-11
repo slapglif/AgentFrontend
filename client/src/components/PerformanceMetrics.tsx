@@ -121,12 +121,12 @@ export function PerformanceMetrics() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative overflow-hidden">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative overflow-hidden min-h-[600px]">
       <DotPattern 
-        width={24}
-        height={24}
-        className="opacity-60"
-        svgClassName="transform -rotate-12 scale-125"
+        width={16}
+        height={16}
+        className="absolute inset-0 opacity-70"
+        svgClassName="transform rotate-12 scale-[2]"
       />
       <Card className="p-4 relative">
         <h3 className="font-medium mb-4">Token Usage Trend</h3>
