@@ -30,21 +30,19 @@ describe('Tasks', () => {
     });
   });
 
-  it('renders scroll areas with correct height', () => {
+  it('renders scroll areas with correct height and layout', () => {
     render(<Tasks />);
     const scrollAreas = screen.getAllByRole('region');
     expect(scrollAreas).toHaveLength(3); // One for each column
+    
     scrollAreas.forEach(area => {
       expect(area).toHaveClass('h-[calc(100vh-250px)]');
-    });
-  });
-
-  it('renders scroll area for task columns', () => {
-    render(<Tasks />);
-    const scrollAreas = screen.getAllByRole('region');
-    expect(scrollAreas).toHaveLength(3); // One for each column
-    scrollAreas.forEach(area => {
-      expect(area).toHaveClass('h-[calc(100vh-250px)]');
+      expect(area).toHaveAttribute('data-radix-scroll-area-viewport');
+      expect(area.parentElement).toHaveStyle({
+        position: 'relative',
+        '--radix-scroll-area-corner-width': '0px',
+        '--radix-scroll-area-corner-height': '0px'
+      });
     });
   });
 

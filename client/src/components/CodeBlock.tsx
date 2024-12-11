@@ -30,6 +30,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
   return (
     <div className="relative group">
       <div
+        role="code-container"
         className={`rounded-lg bg-gradient-to-br from-muted to-muted/90 transition-all duration-500 ease-in-out ${
           isCollapsed ? "max-h-16" : "max-h-[2000px]"
         } overflow-hidden`}

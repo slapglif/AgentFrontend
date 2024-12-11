@@ -14,9 +14,10 @@ describe('CodeBlock', () => {
 
   it('renders code with syntax highlighting', () => {
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const codeElement = screen.getByText(mockCode);
+    const codeElement = screen.getByRole('code-container')
+      .querySelector('code.language-javascript');
     expect(codeElement).toBeInTheDocument();
-    expect(codeElement.closest('code')).toHaveClass('language-javascript');
+    expect(codeElement?.textContent).toBe(mockCode);
   });
 
   it('handles code copy functionality', async () => {
@@ -30,13 +31,20 @@ describe('CodeBlock', () => {
   it('toggles collapse state', () => {
     render(<CodeBlock code={mockCode} language="javascript" />);
     const collapseButton = screen.getByRole('button', { name: /collapse code/i });
+    const codeContainer = screen.getByRole('code-container');
     
-    fireEvent.click(collapseButton);
-    expect(screen.getByText(mockCode).closest('div')).toHaveClass('max-h-16');
-    expect(screen.getByRole('button', { name: /expand code/i })).toBeInTheDocument();
+    // Initial state should be expanded
+    expect(codeContainer).toHaveClass('max-h-[2000px]');
     
+    // Click to collapse
     fireEvent.click(collapseButton);
-    expect(screen.getByText(mockCode).closest('div')).toHaveClass('max-h-[2000px]');
+    expect(codeContainer).toHaveClass('max-h-16');
+    const expandButton = screen.getByRole('button', { name: /expand code/i });
+    expect(expandButton).toBeInTheDocument();
+    
+    // Click to expand
+    fireEvent.click(expandButton);
+    expect(codeContainer).toHaveClass('max-h-[2000px]');
     expect(screen.getByRole('button', { name: /collapse code/i })).toBeInTheDocument();
   });
 
