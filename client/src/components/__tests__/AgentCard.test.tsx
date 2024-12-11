@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AgentCard } from '../AgentCard';
 
@@ -10,10 +11,12 @@ describe('AgentCard', () => {
   const mockAgent = {
     id: 1,
     name: 'Test Agent',
-    type: 'research',
+    type: 'Research Assistant',
     status: 'active' as const,
-    level: 1,
-    experience: 75,
+    skillLevel: 5,
+    successRate: 0.85,
+    currentTasks: 3,
+    specializations: ['data_analysis', 'machine_learning'],
     achievements: [
       { 
         id: 1,
@@ -27,9 +30,7 @@ describe('AgentCard', () => {
       summary: 'Test task',
       progress: 50,
       status: 'in_progress' as const,
-      priority: 'medium' as const,
-      started_at: new Date().toISOString(),
-      estimated_completion: new Date(Date.now() + 3600000).toISOString()
+      priority: 'medium' as const
     }
   };
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +7,16 @@ import { Brain, Target, Zap } from "lucide-react";
 
 export function AgentBehaviorPatterns() {
   const getBehaviorScore = (agent: any) => {
-    const safeNumber = (value: number) => (isNaN(value) ? 0 : Math.min(100, Math.max(0, value)));
+    const safeNumber = (value: number) => {
+      if (isNaN(value) || value === null || value === undefined) return 0;
+      return Math.min(100, Math.max(0, Math.round(value)));
+    };
+    
     const scores = {
-      researchDepth: safeNumber(Math.round((agent?.researchContributions ?? 0) * (agent?.taskComplexity ?? 0) / 200)),
-      learningEfficiency: safeNumber(Math.round((agent?.xp ?? 0) / Math.max(1, agent?.researchContributions ?? 1) * 10)),
-      collaborationImpact: safeNumber(Math.round(agent?.collaborationScore ?? 0)),
-      problemSolvingScore: safeNumber(Math.round(((agent?.taskComplexity ?? 0) + (agent?.researchContributions ?? 0)) / 2)),
+      researchDepth: safeNumber((agent?.researchContributions ?? 0) * (agent?.taskComplexity ?? 0) / 200),
+      learningEfficiency: safeNumber((agent?.xp ?? 0) / Math.max(1, agent?.researchContributions ?? 1) * 10),
+      collaborationImpact: safeNumber(agent?.collaborationScore ?? 0),
+      problemSolvingScore: safeNumber(((agent?.taskComplexity ?? 0) + (agent?.researchContributions ?? 0)) / 2),
       knowledgeSynthesis: safeNumber(agent?.collaborationScore ?? 0),
     };
     return scores;
@@ -20,7 +25,6 @@ export function AgentBehaviorPatterns() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Individual Agent Behavior Analysis */}
         <Card className="p-4">
           <h3 className="font-medium mb-4">Agent Behavior Analysis</h3>
           <div className="space-y-6">
@@ -44,7 +48,7 @@ export function AgentBehaviorPatterns() {
                       <Progress 
                         value={scores.researchDepth} 
                         max={100} 
-                        className="h-1" 
+                        className="h-1"
                         data-testid="research-depth-progress"
                         aria-label="Research Depth Progress"
                       />
@@ -57,7 +61,7 @@ export function AgentBehaviorPatterns() {
                       <Progress 
                         value={scores.learningEfficiency} 
                         max={100} 
-                        className="h-1" 
+                        className="h-1"
                         data-testid="learning-efficiency-progress"
                         aria-label="Learning Efficiency Progress"
                       />
@@ -70,7 +74,7 @@ export function AgentBehaviorPatterns() {
                       <Progress 
                         value={scores.collaborationImpact} 
                         max={100} 
-                        className="h-1" 
+                        className="h-1"
                         data-testid="collaboration-impact-progress"
                         aria-label="Collaboration Impact Progress"
                       />
@@ -83,7 +87,7 @@ export function AgentBehaviorPatterns() {
                       <Progress 
                         value={scores.knowledgeSynthesis} 
                         max={100} 
-                        className="h-1" 
+                        className="h-1"
                         data-testid="knowledge-synthesis-progress"
                         aria-label="Knowledge Synthesis Progress"
                       />
@@ -95,11 +99,9 @@ export function AgentBehaviorPatterns() {
           </div>
         </Card>
 
-        {/* Research Pattern Analysis */}
         <Card className="p-4">
           <h3 className="font-medium mb-4">Research Pattern Analysis</h3>
           <div className="space-y-6">
-            {/* Knowledge Graph Growth */}
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Brain className="h-4 w-4" />
@@ -125,7 +127,6 @@ export function AgentBehaviorPatterns() {
               </div>
             </div>
 
-            {/* Research Milestone Completion */}
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Target className="h-4 w-4" />
@@ -146,8 +147,8 @@ export function AgentBehaviorPatterns() {
                         value={stat.researchProgress} 
                         max={100} 
                         className="w-24 h-2"
-                        aria-label={`Research Progress for ${stat.date}`}
                         data-testid="research-progress"
+                        aria-label={`Research Progress for ${stat.date}`}
                       />
                       <span className="text-sm font-medium">{stat.researchProgress}%</span>
                     </div>
@@ -156,7 +157,6 @@ export function AgentBehaviorPatterns() {
               </div>
             </div>
 
-            {/* Agent Specialization Development */}
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="h-4 w-4" />
