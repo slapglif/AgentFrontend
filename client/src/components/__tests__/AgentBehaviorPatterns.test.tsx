@@ -87,7 +87,8 @@ describe('AgentBehaviorPatterns', () => {
       expect(screen.getByText((content) => content.includes(stat.date))).toBeInTheDocument();
       expect(screen.getByText((content) => content.includes(`${stat.researchProgress}%`))).toBeInTheDocument();
       // Use a more flexible approach for numbers that might be part of larger text
-      expect(screen.getByText((content) => content.includes(stat.activeResearchTasks.toString()))).toBeInTheDocument();
+      const activeTasks = screen.getAllByTestId('active-tasks');
+      expect(activeTasks.some(el => el.textContent?.includes(stat.activeResearchTasks.toString()))).toBeTruthy();
     });
   });
 

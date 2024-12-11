@@ -2,17 +2,17 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { mockAnalytics } from "@/lib/mockAnalytics";
-
 import { Brain, Target, Zap } from "lucide-react";
 
 export function AgentBehaviorPatterns() {
   const getBehaviorScore = (agent: any) => {
+    const safeNumber = (value: number) => (isNaN(value) ? 0 : Math.min(100, Math.max(0, value)));
     const scores = {
-      researchDepth: Math.round((agent.researchContributions * agent.taskComplexity) / 200),
-      learningEfficiency: Math.round((agent.xp / agent.researchContributions) * 10),
-      collaborationImpact: Math.round((agent.collaborationScore * agent.knowledgeGenerationRate) / 100),
-      problemSolvingScore: Math.round((agent.taskComplexity + agent.researchContributions) / 2),
-      knowledgeSynthesis: agent.collaborationScore,
+      researchDepth: safeNumber(Math.round((agent?.researchContributions ?? 0) * (agent?.taskComplexity ?? 0) / 200)),
+      learningEfficiency: safeNumber(Math.round((agent?.xp ?? 0) / Math.max(1, agent?.researchContributions ?? 1) * 10)),
+      collaborationImpact: safeNumber(Math.round(agent?.collaborationScore ?? 0)),
+      problemSolvingScore: safeNumber(Math.round(((agent?.taskComplexity ?? 0) + (agent?.researchContributions ?? 0)) / 2)),
+      knowledgeSynthesis: safeNumber(agent?.collaborationScore ?? 0),
     };
     return scores;
   };
@@ -24,51 +24,75 @@ export function AgentBehaviorPatterns() {
         <Card className="p-4">
           <h3 className="font-medium mb-4">Agent Behavior Analysis</h3>
           <div className="space-y-6">
-              {mockAnalytics.agentPerformance.map((agent) => {
-                const scores = getBehaviorScore(agent);
-                return (
-                  <div key={agent.agent} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">{agent.agent}</h4>
-                        <p className="text-sm text-muted-foreground">Level {agent.level}</p>
-                      </div>
-                      <Badge variant="outline">XP: {agent.xp}</Badge>
+            {mockAnalytics.agentPerformance.map((agent) => {
+              const scores = getBehaviorScore(agent);
+              return (
+                <div key={agent.agent} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">{agent.agent}</h4>
+                      <p className="text-sm text-muted-foreground">Level {agent.level}</p>
                     </div>
-                    <div className="space-y-2">
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Research Depth</span>
-                          <span>{scores.researchDepth}%</span>
-                        </div>
-                        <Progress value={scores.researchDepth} max={100} className="h-1" data-testid="research-depth-progress" />
+                    <Badge variant="outline">XP: {agent.xp}</Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span>Research Depth</span>
+                        <span>{scores.researchDepth}%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Learning Efficiency</span>
-                          <span>{scores.learningEfficiency}%</span>
-                        </div>
-                        <Progress value={scores.learningEfficiency} max={100} className="h-1" data-testid="learning-efficiency-progress" />
+                      <Progress 
+                        value={scores.researchDepth} 
+                        max={100} 
+                        className="h-1" 
+                        data-testid="research-depth-progress"
+                        aria-label="Research Depth Progress"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span>Learning Efficiency</span>
+                        <span>{scores.learningEfficiency}%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Collaboration Impact</span>
-                          <span>{scores.collaborationImpact}%</span>
-                        </div>
-                        <Progress value={scores.collaborationImpact} max={100} className="h-1" data-testid="collaboration-impact-progress" />
+                      <Progress 
+                        value={scores.learningEfficiency} 
+                        max={100} 
+                        className="h-1" 
+                        data-testid="learning-efficiency-progress"
+                        aria-label="Learning Efficiency Progress"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span>Collaboration Impact</span>
+                        <span>{scores.collaborationImpact}%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Knowledge Synthesis</span>
-                          <span>{scores.knowledgeSynthesis}%</span>
-                        </div>
-                        <Progress value={scores.knowledgeSynthesis} max={100} className="h-1" data-testid="knowledge-synthesis-progress" />
+                      <Progress 
+                        value={scores.collaborationImpact} 
+                        max={100} 
+                        className="h-1" 
+                        data-testid="collaboration-impact-progress"
+                        aria-label="Collaboration Impact Progress"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span>Knowledge Synthesis</span>
+                        <span>{scores.knowledgeSynthesis}%</span>
                       </div>
+                      <Progress 
+                        value={scores.knowledgeSynthesis} 
+                        max={100} 
+                        className="h-1" 
+                        data-testid="knowledge-synthesis-progress"
+                        aria-label="Knowledge Synthesis Progress"
+                      />
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
+          </div>
         </Card>
 
         {/* Research Pattern Analysis */}
@@ -110,10 +134,21 @@ export function AgentBehaviorPatterns() {
               <div className="space-y-2">
                 {mockAnalytics.collaborationStats.map((stat, index) => (
                   <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                    <span className="text-sm">{stat.date}</span>
+                    <div>
+                      <span className="text-sm">{stat.date}</span>
+                      <div className="text-xs text-muted-foreground mt-1" data-testid="active-tasks">
+                        Active Tasks: {stat.activeResearchTasks}
+                      </div>
+                    </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm">Progress:</span>
-                      <Progress value={stat.researchProgress} className="w-24 h-2" />
+                      <Progress 
+                        value={stat.researchProgress} 
+                        max={100} 
+                        className="w-24 h-2"
+                        aria-label={`Research Progress for ${stat.date}`}
+                        data-testid="research-progress"
+                      />
                       <span className="text-sm font-medium">{stat.researchProgress}%</span>
                     </div>
                   </div>
