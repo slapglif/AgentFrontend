@@ -134,10 +134,7 @@ export function CollaborationPanel() {
     }
   }, [selectedCollaboration]);
 
-  // Using mock data directly instead of fetching from API
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  // Removed redundant loading state as we're using isLoading from useQuery
 
   const createCollaboration = useMutation({
     mutationFn: async (data: typeof newCollaboration) => {
