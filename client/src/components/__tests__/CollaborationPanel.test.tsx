@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CollaborationPanel } from '../CollaborationPanel';
@@ -38,7 +39,7 @@ describe('CollaborationPanel', () => {
         expect(screen.getByText(collab.title)).toBeInTheDocument();
         expect(screen.getByText(collab.description)).toBeInTheDocument();
       });
-    }, { timeout: 10000 });
+    });
   });
 
   it('shows loading state initially', () => {
@@ -53,7 +54,7 @@ describe('CollaborationPanel', () => {
       const participantsButton = screen.getAllByText('Participants')[0];
       fireEvent.click(participantsButton);
       expect(screen.getByText('Collaboration Timeline')).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
   });
 
   it('displays new collaboration dialog', async () => {
@@ -65,7 +66,7 @@ describe('CollaborationPanel', () => {
       expect(screen.getByText('Create New Collaboration')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Title')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Description')).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
   });
 
   it('shows real-time updates', async () => {
@@ -73,6 +74,6 @@ describe('CollaborationPanel', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Active participants will appear here in real-time')).toBeInTheDocument();
-    }, { timeout: 10000 });
+    });
   });
 });

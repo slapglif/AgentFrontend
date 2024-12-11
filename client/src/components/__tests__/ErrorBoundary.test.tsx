@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import userEvent from '@testing-library/user-event';
@@ -49,11 +50,11 @@ describe('ErrorBoundary', () => {
   });
 
   it('resets error boundary when try again is clicked', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
     const onReset = jest.fn();
 
     const { rerender } = render(
-      <ErrorBoundary>
+      <ErrorBoundary onReset={onReset}>
         <div>
           <button onClick={onReset}>Reset</button>
           <ThrowError />
@@ -64,19 +65,17 @@ describe('ErrorBoundary', () => {
     const tryAgainButton = screen.getByRole('button', { name: 'Try again' });
     await user.click(tryAgainButton);
     
-    // Re-render to simulate reset
+    expect(onReset).toHaveBeenCalled();
+
+    // Re-render with working content to verify reset
     rerender(
-      <ErrorBoundary>
-        <div>
-          <button onClick={onReset}>Reset</button>
-          <ThrowError />
-        </div>
+      <ErrorBoundary onReset={onReset}>
+        <div>Working Content</div>
       </ErrorBoundary>
     );
 
-    // Verify error is shown again after reset and re-throw
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-  }, 10000);
+    expect(screen.getByText('Working Content')).toBeInTheDocument();
+  });
 
   it('logs error details to console', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error');

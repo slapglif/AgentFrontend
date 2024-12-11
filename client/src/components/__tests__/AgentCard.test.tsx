@@ -4,7 +4,9 @@ import { AgentCard } from '../AgentCard';
 
 // Mock wouter's Link component
 jest.mock('wouter', () => ({
-  Link: ({ children }: { children: React.ReactNode }) => children,
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href} data-testid="mock-link">{children}</a>
+  ),
 }));
 
 describe('AgentCard', () => {
@@ -59,11 +61,9 @@ describe('AgentCard', () => {
 
   it('displays experience progress', () => {
     render(<AgentCard agent={mockAgent} />);
-    expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
-    
-    // Check for experience level and progress
-    expect(screen.getByText(`Level ${mockAgent.level}`)).toBeInTheDocument();
-    const progressBar = screen.getAllByRole('progressbar')[1]; // Second progress bar is for experience
+    expect(screen.getByText(`Level ${mockAgent.skillLevel}`)).toBeInTheDocument();
+    expect(screen.getByText(`${(mockAgent.successRate * 100).toFixed(1)}% Success Rate`)).toBeInTheDocument();
+    const progressBar = screen.getByRole('progressbar');
     expect(progressBar).toBeInTheDocument();
   });
 
