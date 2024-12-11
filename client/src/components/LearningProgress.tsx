@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
     error: null
   }));
 
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -112,12 +112,14 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
     updateMetrics();
 
     // Set up interval for subsequent updates
-    const interval = setInterval(updateMetrics, 5000);
-    setIntervalId(interval);
+    intervalRef.current = setInterval(updateMetrics, 5000);
 
     return () => {
       mounted = false;
-      if (intervalId) clearInterval(intervalId);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
   }, []);
   const getProgressColor = (value: number) => {
@@ -155,7 +157,10 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
           {metricsState.isLoading && (
             <Loader2 className="h-4 w-4 animate-spin" />
           )}
-          <span className="text-xs text-muted-foreground">
+          <span 
+            className="text-xs text-muted-foreground"
+            data-testid="metrics-last-updated"
+          >
             Updated: {new Date(metricsState.lastUpdated).toLocaleTimeString()}
           </span>
         </div>
@@ -191,7 +196,10 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
                 <Brain className="h-4 w-4" />
                 <span className="text-sm">Learning Rate</span>
               </div>
-              <div className={`text-lg font-semibold ${getProgressColor(metricsState.learningRate)}`}>
+              <div
+                className={`text-lg font-semibold ${getProgressColor(metricsState.learningRate)}`}
+                data-testid="learning-rate-value"
+              >
                 {metricsState.learningRate.toFixed(1)}%
               </div>
             </div>
@@ -238,7 +246,10 @@ export function LearningProgress({ metrics, className }: LearningProgressProps) 
                     </Badge>
                   </div>
                   <Progress value={area.progress} className="h-1 mb-2" />
-                  <span className="text-xs text-muted-foreground">
+                  <span 
+                    className="text-xs text-muted-foreground"
+                    data-testid={`knowledge-area-${area.name}-updated`}
+                  >
                     Updated: {new Date(area.lastUpdated).toLocaleString()}
                   </span>
                 </div>

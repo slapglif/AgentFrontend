@@ -26,17 +26,13 @@ const mockLearningMetrics = {
   completedLessons: 42,
   totalLessons: 100,
   adaptabilityScore: 94,
-  retentionRate: 88,
-  error: null,
-  isLoading: false,
-  lastUpdated: mockDate.toISOString()
+  retentionRate: 88
 };
 
 describe('LearningProgress', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(mockDate);
-    jest.spyOn(Math, 'random').mockReturnValue(0.5);
   });
 
   afterEach(() => {
@@ -83,56 +79,58 @@ describe('LearningProgress', () => {
   });
 
   it('updates metrics in real-time', async () => {
+    let mockRandomValue = 0.5;
+    jest.spyOn(Math, 'random').mockImplementation(() => {
+      mockRandomValue += 0.1;
+      return mockRandomValue;
+    });
+
     render(<LearningProgress metrics={mockLearningMetrics} />);
     
     await waitFor(() => {
-      expect(screen.getByText('Learning Progress')).toBeInTheDocument();
-    }, { timeout: 10000 });
+      expect(screen.getByTestId('metrics-last-updated')).toBeInTheDocument();
+    });
 
-    const initialLearningRate = screen.getByText(`${mockLearningMetrics.learningRate.toFixed(1)}%`);
-    expect(initialLearningRate).toBeInTheDocument();
+    // Get initial learning rate value
+    const initialValue = parseFloat(screen.getByTestId('learning-rate-value').textContent!);
     
+    // Advance time to trigger update
     await act(async () => {
       jest.advanceTimersByTime(5000);
     });
-    
-    await waitFor(() => {
-      // Find knowledge area by its name first
-      const knowledgeArea = mockLearningMetrics.knowledgeAreas[0];
-      const areaSection = screen.getByText(knowledgeArea.name).closest('div');
-      expect(areaSection).not.toBeNull();
 
-      // Then look for the date within that section
-      const lastUpdated = knowledgeArea.lastUpdated;
-      const formattedDate = new Date(lastUpdated).toLocaleDateString();
-      const dateText = within(areaSection as HTMLElement).getByText(formattedDate, { exact: false });
-      expect(dateText).toBeInTheDocument();
-    }, { timeout: 10000 });
+    // Verify updates using data-testid
+    await waitFor(() => {
+      const knowledgeArea = mockLearningMetrics.knowledgeAreas[0];
+      const updatedElement = screen.getByTestId(`knowledge-area-${knowledgeArea.name}-updated`);
+      expect(updatedElement).toBeInTheDocument();
+      expect(updatedElement.textContent).toMatch(/Updated:/);
+    });
+
+    // Get updated learning rate value
+    const updatedValue = parseFloat(screen.getByTestId('learning-rate-value').textContent!);
+    expect(updatedValue).not.toBe(initialValue);
   });
 
   it('cleans up interval on unmount', async () => {
-    // Mock setInterval to return a specific interval ID
-    const mockIntervalId = 123;
-    const setIntervalSpy = jest.spyOn(window, 'setInterval').mockReturnValue(mockIntervalId);
+    const setIntervalSpy = jest.spyOn(window, 'setInterval');
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     
-    // Render component
     const { unmount } = render(<LearningProgress metrics={mockLearningMetrics} />);
     
-    // Wait for initial render
-    await waitFor(() => {
-      expect(screen.getByText('Learning Progress')).toBeInTheDocument();
+    // Wait for the component to mount and set up interval
+    await act(async () => {
+      jest.advanceTimersByTime(0);
     });
     
-    // Verify setInterval was called with expected parameters
     expect(setIntervalSpy).toHaveBeenCalledTimes(1);
-    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Number));
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 5000);
     
-    // Unmount and verify clearInterval was called
+    // Unmount and verify cleanup
     unmount();
-    expect(clearIntervalSpy).toHaveBeenCalledWith(mockIntervalId);
+    expect(clearIntervalSpy).toHaveBeenCalled();
     
-    // Clean up mocks
+    // Clean up spies
     setIntervalSpy.mockRestore();
     clearIntervalSpy.mockRestore();
   });
