@@ -27,20 +27,21 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
         setIsLoading(true);
         setError(null);
 
-        // Validate required agent data
+        // Validate required agent data first
         if (!agent?.memory_allocation?.total) {
           throw new Error('Failed to initialize resource monitoring: Missing memory allocation');
         }
 
         // Initialize metrics with initial values
         const initialMetrics = getInitialResourceMetrics(agent);
-        if (mounted) {
-          setResourceMetrics(initialMetrics);
-          setIsLoading(false);
-        }
+        
+        if (!mounted) return;
+        setResourceMetrics(initialMetrics);
       } catch (err) {
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      } finally {
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'An unexpected error occurred');
           setIsLoading(false);
         }
       }
@@ -54,10 +55,11 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
       setResourceMetrics(prev => {
         if (!prev) return prev;
 
-        // Update metrics with small, consistent changes for testing
-        const newMemoryValue = Math.min(100, prev.memory + (Math.random() * 2));
-        const newCpuValue = Math.min(100, prev.cpu + (Math.random() * 2));
-        const newStorageValue = Math.min(100, prev.storage + (Math.random() * 1));
+        // Fixed increment for predictable test behavior
+        const baseIncrement = 5;
+        const newMemoryValue = Math.min(100, prev.memory + baseIncrement);
+        const newCpuValue = Math.min(100, prev.cpu + baseIncrement);
+        const newStorageValue = Math.min(100, prev.storage + (baseIncrement / 2));
 
         return {
           ...prev,
@@ -100,11 +102,21 @@ export function ResourceMonitor({ agent }: ResourceMonitorProps) {
     );
   }
 
-  // Show loading state immediately when component mounts
+  if (error) {
+    return (
+      <Card className="p-4" data-testid="resource-monitor-error">
+        <div className="flex items-center gap-2 text-destructive">
+          <AlertCircle className="h-4 w-4" />
+          <span>{error}</span>
+        </div>
+      </Card>
+    );
+  }
+
   if (isLoading || !resourceMetrics) {
     return (
       <Card className="p-4" data-testid="resource-monitor-loading">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" data-testid="loading-indicator">
           <Activity className="h-4 w-4 animate-spin" />
           <span>Loading...</span>
         </div>

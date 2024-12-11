@@ -49,9 +49,19 @@ describe('ResourceMonitor', () => {
   it('shows loading state initially', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
+    // Verify loading state is shown
     const loadingElement = await screen.findByTestId('resource-monitor-loading');
     expect(loadingElement).toBeInTheDocument();
-    expect(within(loadingElement).getByText('Loading...')).toBeInTheDocument();
+    
+    // Check loading indicator and text
+    const loadingIndicator = within(loadingElement).getByTestId('loading-indicator');
+    expect(loadingIndicator).toBeInTheDocument();
+    expect(loadingIndicator).toHaveTextContent('Loading...');
+
+    // Verify loading state is removed after data loads
+    await waitFor(() => {
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
+    });
   });
 
   it('displays error state when there is an error', () => {
@@ -70,26 +80,26 @@ describe('ResourceMonitor', () => {
     expect(errorMessage.closest('div')).toHaveClass('text-destructive');
   });
 
-  it('tracks real-time memory allocation changes', () => {
+  it('tracks real-time memory allocation changes', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
-    act(() => {
-      jest.advanceTimersByTime(2000);
+    // Wait for loading to finish
+    await waitFor(() => {
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
     });
 
     // Check memory usage section
-    const memorySection = screen.getByText('Memory Usage').closest('div');
+    const memorySection = screen.getByTestId('memory-section');
     expect(memorySection).toBeInTheDocument();
     
-    // Verify memory values are displayed
+    // Verify memory values are displayed correctly
     expect(screen.getByText(`${mockAgent.memory_allocation.used}MB / ${mockAgent.memory_allocation.total}MB`)).toBeInTheDocument();
+    expect(screen.getByTestId('memory-progress')).toBeInTheDocument();
     
-    // Check progress bar
-    const progressBars = screen.getAllByRole('progressbar');
-    expect(progressBars.length).toBeGreaterThan(0);
-    progressBars.forEach(bar => {
-      expect(bar).toBeInTheDocument();
-    });
+    // Verify reserved memory is displayed
+    expect(screen.getByTestId('reserved-memory')).toHaveTextContent(
+      `Reserved: ${mockAgent.memory_allocation.reserved}MB`
+    );
   });
 
   it('simulates CPU usage correctly', async () => {
@@ -125,17 +135,26 @@ describe('ResourceMonitor', () => {
   it('displays resource metrics correctly', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
+    // Wait for loading to finish
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText(/CPU Usage/)).toBeInTheDocument();
-    expect(screen.getByText(/Memory Usage/)).toBeInTheDocument();
-    expect(screen.getByText(/Storage/)).toBeInTheDocument();
-    
-    // Check for tasks in a more flexible way
-    const content = document.body.textContent;
-    expect(content).toMatch(/Task/);
+    // Check CPU section
+    const cpuSection = screen.getByTestId('cpu-section');
+    expect(within(cpuSection).getByText('CPU Usage')).toBeInTheDocument();
+
+    // Check memory section
+    const memorySection = screen.getByTestId('memory-section');
+    expect(within(memorySection).getByText('Memory Usage')).toBeInTheDocument();
+
+    // Check storage section
+    const storageSection = screen.getByTestId('storage-section');
+    expect(within(storageSection).getByText('Storage')).toBeInTheDocument();
+
+    // Check task section
+    const taskSection = screen.getByTestId('task-section');
+    expect(within(taskSection).getByText('Tasks')).toBeInTheDocument();
   });
 
   it('displays memory allocation details correctly', () => {
@@ -171,9 +190,39 @@ describe('ResourceMonitor', () => {
   });
 
   it('updates metrics periodically', async () => {
+    // Mock Math.random to return predictable increasing values
     const mockRandom = jest.spyOn(Math, 'random');
-    mockRandom.mockImplementation(() => 0.5);
+    let counter = 0;
+    mockRandom.mockImplementation(() => 0.5 + (counter++ * 0.1));
 
+    render(<ResourceMonitor agent={mockAgent} />);
+    
+    // Wait for initial load and metrics to appear
+    await waitFor(() => {
+      expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
+    });
+
+    const cpuBadge = await screen.findByTestId('cpu-usage-badge');
+    const initialValue = parseFloat(cpuBadge.textContent!);
+
+    // Trigger update interval
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    // Wait for the update and verify new value
+    await waitFor(
+      () => {
+        const newValue = parseFloat(screen.getByTestId('cpu-usage-badge').textContent!);
+        expect(newValue).toBeGreaterThan(initialValue);
+      },
+      { timeout: 3000 }
+    );
+
+    mockRandom.mockRestore();
+  });
+
+  it('displays agent performance metrics', async () => {
     render(<ResourceMonitor agent={mockAgent} />);
     
     // Wait for loading to finish
@@ -181,35 +230,10 @@ describe('ResourceMonitor', () => {
       expect(screen.queryByTestId('resource-monitor-loading')).not.toBeInTheDocument();
     });
 
-    // Get initial CPU value
-    const initialCpuBadge = await screen.findByTestId('cpu-usage-badge');
-    const initialCpuValue = parseFloat(initialCpuBadge.textContent!);
-
-    // Advance time to trigger update
-    await act(async () => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    // Wait for and verify the update
-    await waitFor(() => {
-      const updatedCpuBadge = screen.getByTestId('cpu-usage-badge');
-      const updatedCpuValue = parseFloat(updatedCpuBadge.textContent!);
-      expect(updatedCpuValue).toBeGreaterThan(initialCpuValue);
-    }, { timeout: 3000 });
-
-    mockRandom.mockRestore();
-  });
-
-  it('displays agent performance metrics', () => {
-    render(<ResourceMonitor agent={mockAgent} />);
-    
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    expect(screen.getByText(/Tasks/)).toBeInTheDocument();
-    expect(screen.getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
+    const taskElement = screen.getByTestId('task-section');
+    expect(within(taskElement).getByText('Tasks')).toBeInTheDocument();
+    expect(within(taskElement).getByText(mockAgent.current_tasks.length.toString())).toBeInTheDocument();
+    expect(within(taskElement).getByText(/Total Tasks/)).toBeInTheDocument();
   });
 
   it('cleans up interval on unmount', () => {
