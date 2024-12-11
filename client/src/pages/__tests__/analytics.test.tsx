@@ -5,10 +5,7 @@ import { mockAnalytics } from '@/lib/mockAnalytics';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 describe('Analytics Page', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    const mockDate = new Date('2024-12-10T12:00:00Z');
-    jest.setSystemTime(mockDate);
+  beforeAll(() => {
     // Mock window.ResizeObserver
     window.ResizeObserver = jest.fn().mockImplementation(() => ({
       observe: jest.fn(),
@@ -17,10 +14,19 @@ describe('Analytics Page', () => {
     }));
   });
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+    const mockDate = new Date('2024-12-10T12:00:00Z');
+    jest.setSystemTime(mockDate);
+  });
+
   afterEach(() => {
-    jest.useRealTimers();
+    jest.clearAllTimers();
     jest.clearAllMocks();
-    jest.restoreAllMocks();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   it('renders analytics dashboard title and initial state', async () => {
@@ -69,33 +75,34 @@ describe('Analytics Page', () => {
   });
 
   it('handles tab switching with correct content rendering', async () => {
+    const user = userEvent.setup();
     render(<Analytics />);
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     // Initial state
-    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true');
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true');
+    });
 
-    // Switch to Behavior Patterns
+    // Switch to Behavior Patterns tab
     await act(async () => {
       await user.click(screen.getByRole('tab', { name: 'Behavior Patterns' }));
-      jest.advanceTimersByTime(1000);
+      jest.runOnlyPendingTimers();
     });
-    
-    expect(screen.getByRole('tab', { name: 'Behavior Patterns' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('Agent Behavior Analysis')).toBeInTheDocument();
 
-    // Switch to Real-time
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: 'Behavior Patterns' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Agent Behavior Analysis')).toBeInTheDocument();
+    });
+
+    // Switch to Real-time tab
     await act(async () => {
       await user.click(screen.getByRole('tab', { name: 'Real-time' }));
-      jest.advanceTimersByTime(2000);
-    });
-    
-    await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Real-time' })).toHaveAttribute('aria-selected', 'true');
+      jest.runOnlyPendingTimers();
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Performance Metrics')).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'Real-time' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
     });
   });
 
@@ -132,26 +139,34 @@ describe('Analytics Page', () => {
   });
 
   it('updates real-time metrics periodically', async () => {
+    const user = userEvent.setup();
     render(<Analytics />);
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     await act(async () => {
       await user.click(screen.getByRole('tab', { name: 'Real-time' }));
-      jest.advanceTimersByTime(1000);
+      // Run all pending timers for initial render
+      jest.runAllTimers();
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Performance Metrics')).toBeInTheDocument();
-    }, { timeout: 10000 });
-
-    await act(async () => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    await waitFor(() => {
+      expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
       expect(screen.getByText('Research Progress')).toBeInTheDocument();
-      expect(screen.getByText('Knowledge Generation')).toBeInTheDocument();
-      expect(screen.getByText('Collaboration Impact')).toBeInTheDocument();
-    }, { timeout: 10000 });
+      expect(screen.getByText('Knowledge Synthesis Rate')).toBeInTheDocument();
+      expect(screen.getByText('Collaboration Effectiveness')).toBeInTheDocument();
+    });
+
+    // Simulate metrics update cycle
+    await act(async () => {
+      jest.advanceTimersByTime(2000); // Advance past the update interval
+      jest.runAllTimers(); // Run any pending timers from the update
+    });
+
+    // Verify charts remain present after update
+    await waitFor(() => {
+      expect(screen.getByTestId('token-usage-chart')).toBeInTheDocument();
+      expect(screen.getByTestId('research-progress-chart')).toBeInTheDocument();
+      expect(screen.getByTestId('knowledge-synthesis-chart')).toBeInTheDocument();
+      expect(screen.getByTestId('collaboration-effectiveness-chart')).toBeInTheDocument();
+    });
   });
 });

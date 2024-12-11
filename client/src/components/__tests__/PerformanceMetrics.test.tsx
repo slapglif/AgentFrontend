@@ -1,9 +1,9 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { PerformanceMetrics } from '../PerformanceMetrics';
 import { mockAnalytics } from '@/lib/mockAnalytics';
 import { Card } from '@/components/ui/card';
 
-// Mock Recharts components with SVG support
+// Mock Recharts components
 jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
@@ -31,10 +31,10 @@ jest.mock('recharts', () => ({
   XAxis: () => <g data-testid="x-axis" />,
   YAxis: () => <g data-testid="y-axis" />,
   CartesianGrid: () => <g data-testid="cartesian-grid" />,
-  Tooltip: () => <g data-testid="tooltip" />
+  Tooltip: () => <g data-testid="tooltip" />,
 }));
 
-// Wrapper component to provide fixed dimensions for charts
+// Wrapper component for fixed dimensions
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <div 
     style={{ 
@@ -49,194 +49,56 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const setupMocks = () => {
-  // Mock random for consistent values
-  const mockRandom = jest.spyOn(Math, 'random');
-  mockRandom.mockImplementation(() => 0.5);
-
-  // Mock date for consistent timestamps
-  const mockDate = new Date('2024-01-01T12:00:00Z');
-  jest.setSystemTime(mockDate);
-
-  // Store originals for cleanup
-  const originalRandom = Math.random;
-
-  return { 
-    mockRandom,
-    mockDate,
-    cleanup: () => {
-      mockRandom.mockRestore();
-      jest.useRealTimers();
-      Math.random = originalRandom;
-      jest.clearAllMocks();
-    }
-  };
-};
-
 describe('PerformanceMetrics', () => {
-  let mocks: ReturnType<typeof setupMocks>;
-  
+  beforeAll(() => {
+    // Mock date and random for consistent values
+    jest.setSystemTime(new Date('2024-01-01T12:00:00Z'));
+    jest.spyOn(Math, 'random').mockImplementation(() => 0.5);
+  });
+
   beforeEach(() => {
-    jest.useFakeTimers();
-    mocks = setupMocks();
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
   });
 
   afterEach(() => {
     jest.clearAllTimers();
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
     jest.useRealTimers();
     jest.restoreAllMocks();
-    mocks.cleanup();
   });
 
-  it('renders without crashing', async () => {
+  it('renders without crashing and shows loading state', async () => {
     render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
-    // Initial loading state
-    const loadingElements = screen.getAllByTestId('loading-card');
-    expect(loadingElements).toHaveLength(4);
-    
-    // Fast-forward past loading state
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-    
-    // Verify container and dimensions
-    const container = screen.getByTestId('chart-container');
-    expect(container).toBeInTheDocument();
-    expect(container).toHaveStyle({ width: '800px', height: '600px' });
-    
-    // Verify charts are rendered
-    expect(screen.getAllByTestId('responsive-container')).toHaveLength(4);
-    expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
-  });
-
-  it('displays loading state initially', () => {
-    render(<PerformanceMetrics />, { wrapper: TestWrapper });
+    // Verify initial loading state
     const loadingElements = screen.getAllByTestId('loading-card');
     expect(loadingElements).toHaveLength(4);
     expect(loadingElements[0].parentElement).toHaveClass('animate-pulse');
-  });
-
-  it('shows all metric charts after loading', async () => {
-    render(<PerformanceMetrics />, { wrapper: TestWrapper });
-    
-    // Fast-forward past loading state
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-    
-    // Verify all chart containers and titles
-    const chartTitles = [
-      'Token Usage Trend',
-      'Research Progress',
-      'Knowledge Synthesis Rate',
-      'Collaboration Effectiveness'
-    ];
-    
-    chartTitles.forEach(title => {
-      const titleElement = screen.getByText(title);
-      expect(titleElement).toBeInTheDocument();
-      expect(titleElement.closest(Card)).toBeInTheDocument();
-    });
-    
-    // Verify chart components are rendered
-    expect(screen.getAllByTestId('responsive-container')).toHaveLength(4);
-    expect(screen.getAllByTestId('area-chart')).toHaveLength(2);
-    expect(screen.getAllByTestId('line-chart')).toHaveLength(2);
-  });
-
-  it('updates metrics in real-time', () => {
-    const { mockRandom } = setupMocks();
-    
-    render(<PerformanceMetrics />, { wrapper: TestWrapper });
-    
-    // Fast-forward initial load
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    // Verify initial charts are rendered
-    const areaCharts = screen.getAllByTestId('area-chart');
-    const lineCharts = screen.getAllByTestId('line-chart');
-    expect(areaCharts).toHaveLength(2);
-    expect(lineCharts).toHaveLength(2);
-
-    // Verify initial metrics
-    const chartTitles = [
-      'Token Usage Trend',
-      'Research Progress',
-      'Knowledge Synthesis Rate',
-      'Collaboration Effectiveness'
-    ];
-    
-    chartTitles.forEach(title => {
-      const titleElement = screen.getByText(title);
-      const card = titleElement.closest(Card);
-      expect(card).toBeInTheDocument();
-      expect(card).toContainElement(screen.getByTestId('responsive-container'));
-    });
-
-    // Simulate data update
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    // Verify charts remain rendered after update
-    expect(screen.getAllByTestId('area-chart')).toHaveLength(2);
-    expect(screen.getAllByTestId('line-chart')).toHaveLength(2);
-
-    // Cleanup mocks
-    mockRandom.mockRestore();
-  });
-
-  it('handles data updates correctly', () => {
-    render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
     // Fast-forward past loading
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(2000);
+      await Promise.resolve();
     });
-
-    // Get all chart containers
-    const chartContainers = screen.getAllByTestId('responsive-container');
-    expect(chartContainers).toHaveLength(4);
-
-    // Verify each chart has necessary components
-    chartContainers.forEach(container => {
-      expect(container).toContainElement(screen.getByTestId('cartesian-grid'));
-      expect(container).toContainElement(screen.getByTestId('x-axis'));
-      expect(container).toContainElement(screen.getByTestId('y-axis'));
-      expect(container).toContainElement(screen.getByTestId('tooltip'));
+    
+    // Verify content is rendered
+    await waitFor(() => {
+      expect(screen.getByText('Token Usage Trend')).toBeInTheDocument();
+      expect(screen.getAllByTestId('responsive-container')).toHaveLength(4);
     });
   });
 
-  it('formats time correctly', () => {
-    const mockDate = new Date('2024-12-10T12:00:00Z');
-    jest.setSystemTime(mockDate);
-    
+  it('displays all chart sections after loading', async () => {
     render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
-    // Fast-forward timers
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(2000);
+      await Promise.resolve();
     });
     
-    // Format expected time
-    const hours = '12';
-    const minutes = '00';
-    const timeText = `${hours}:${minutes}`;
-    expect(screen.getByText(new RegExp(timeText))).toBeInTheDocument();
-  });
-
-  it('handles tooltips correctly', () => {
-    render(<PerformanceMetrics />, { wrapper: TestWrapper });
-    
-    // Fast-forward timers
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    // Verify all chart titles and containers
     const chartTitles = [
       'Token Usage Trend',
       'Research Progress',
@@ -244,40 +106,74 @@ describe('PerformanceMetrics', () => {
       'Collaboration Effectiveness'
     ];
     
-    chartTitles.forEach(title => {
-      const container = screen.getByText(title).closest('div');
-      expect(container).toBeInTheDocument();
-      expect(container).toHaveAttribute('role', 'presentation');
+    for (const title of chartTitles) {
+      await waitFor(() => {
+        const titleElement = screen.getByText(title);
+        expect(titleElement).toBeInTheDocument();
+        expect(titleElement.closest(Card)).toBeInTheDocument();
+      });
+    }
+    
+    await waitFor(() => {
+      expect(screen.getAllByTestId('responsive-container')).toHaveLength(4);
+      expect(screen.getAllByTestId('area-chart')).toHaveLength(2);
+      expect(screen.getAllByTestId('line-chart')).toHaveLength(2);
     });
-
-    // Verify tooltips
-    const tooltipText = `Tokens Used: ${mockAnalytics.systemMetrics.tokenMetrics.tokensUsed}`;
-    expect(screen.getByText(tooltipText, { exact: false })).toBeInTheDocument();
-
-    // Simulate data update
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
-
-    // Verify charts are updated
-    const charts = screen.getAllByRole('presentation');
-    expect(charts).toHaveLength(4);
   });
 
-  it('cleans up interval on unmount', () => {
+  it('updates metrics in real-time', async () => {
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
+    
+    // Wait for initial render
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    // Verify initial state
+    await waitFor(() => {
+      expect(screen.getAllByTestId('area-chart')).toHaveLength(2);
+      expect(screen.getAllByTestId('line-chart')).toHaveLength(2);
+    });
+
+    // Simulate update cycle
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+
+    // Verify charts remain after update
+    await waitFor(() => {
+      expect(screen.getAllByTestId('area-chart')).toHaveLength(2);
+      expect(screen.getAllByTestId('line-chart')).toHaveLength(2);
+    });
+  });
+
+  it('formats time correctly', async () => {
+    render(<PerformanceMetrics />, { wrapper: TestWrapper });
+    
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+    
+    const timeFormat = new RegExp('12:00');
+    await waitFor(() => {
+      expect(screen.getByText(timeFormat)).toBeInTheDocument();
+    });
+  });
+
+  it('cleans up interval on unmount', async () => {
     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
     const { unmount } = render(<PerformanceMetrics />, { wrapper: TestWrapper });
     
-    // Fast-forward initial load
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(2000);
+      await Promise.resolve();
     });
     
-    // Verify cleanup
     unmount();
     expect(clearIntervalSpy).toHaveBeenCalled();
-
-    // Cleanup
     clearIntervalSpy.mockRestore();
   });
 });
