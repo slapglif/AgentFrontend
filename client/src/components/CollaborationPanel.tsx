@@ -14,52 +14,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { mockCollaborations, mockParticipants, mockMessages, simulateRealTimeEvents } from "@/lib/mockCollaborations";
-
-interface ParticipantMetadata {
-  expertise?: string[];
-  [key: string]: any;
-}
-
-interface CollaborationParticipant {
-  id: number;
-  collaborationId: number;
-  agentId: number;
-  role: string;
-  joinedAt: Date;
-  metadata: ParticipantMetadata | null;
-}
+import type { CollaborationMessage, CollaborationParticipant, Collaboration } from "@/types/schema";
 
 interface MessageReply {
   id: number;
   fromAgentId: number;
   content: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
-interface CollaborationMessage {
-  id: number;
-  fromAgentId: number;
-  content: string;
-  timestamp: Date;
-  type: string;
-  metadata: {
+// Extend the CollaborationMessage type to include isTyping
+interface ExtendedCollaborationMessage extends Omit<CollaborationMessage, 'metadata'> {
+  metadata?: {
     replies?: MessageReply[];
     context?: Record<string, unknown>;
   };
   isTyping?: boolean;
-}
-
-interface Collaboration {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  metadata: {
-    priority?: string;
-    tags?: string[];
-  } | null;
+  fromAgentId?: number;
+  content: string;
+  timestamp: string;
+  type?: string;
 }
 
 export function CollaborationPanel() {
@@ -69,23 +43,28 @@ export function CollaborationPanel() {
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
   const [selectedCollaboration, setSelectedCollaboration] = useState<number | null>(null);
+  
   const { data: collaborationsData, isLoading, error: queryError } = useQuery({
     queryKey: ['collaborations'],
     queryFn: () => Promise.resolve(mockCollaborations),
   });
 
   const [participants, setParticipants] = useState(mockParticipants);
-  const [messages, setMessages] = useState(mockMessages);
+  const [messages, setMessages] = useState<ExtendedCollaborationMessage[]>(
+    mockMessages.map(msg => ({
+      ...msg,
+      timestamp: msg.timestamp?.toISOString() || new Date().toISOString(),
+    })) as ExtendedCollaborationMessage[]
+  );
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
-  // Track online status of agents
-  const [agentStatus] = useState<Record<number, { isOnline: boolean; lastSeen: Date }>>(() => {
-    const initialStatus: Record<number, { isOnline: boolean; lastSeen: Date }> = {};
+  
+  const [onlineAgents, setOnlineAgents] = useState<Record<number, { isOnline: boolean; lastSeen: string }>>(() => {
+    const initialStatus: Record<number, { isOnline: boolean; lastSeen: string }> = {};
     mockParticipants.forEach(participant => {
       initialStatus[participant.agentId] = {
         isOnline: true,
-        lastSeen: new Date()
+        lastSeen: new Date().toISOString()
       };
     });
     return initialStatus;
@@ -99,7 +78,6 @@ export function CollaborationPanel() {
   }, [selectedCollaboration]);
 
   useEffect(() => {
-    // Simulate real-time events
     return simulateRealTimeEvents((event) => {
       switch (event.type) {
         case 'participant_joined':
@@ -110,13 +88,15 @@ export function CollaborationPanel() {
           });
           break;
         case 'new_message':
-          setMessages(prev => [...prev, event.data.message]);
+          setMessages(prev => [...prev, {
+            ...event.data.message,
+            timestamp: new Date(event.data.message.timestamp).toISOString()
+          }]);
           break;
         case 'status_update':
-          // Handle status updates through React Query mutation
-          queryClient.setQueryData(['collaborations'], (oldData: any) => {
+          queryClient.setQueryData(['collaborations'], (oldData: typeof collaborationsData) => {
             if (!oldData) return oldData;
-            return oldData.map((collab: any) =>
+            return oldData.map((collab) =>
               collab.id === event.data.collaborationId
                 ? { ...collab, status: event.data.status }
                 : collab
@@ -126,15 +106,6 @@ export function CollaborationPanel() {
       }
     });
   }, [queryClient, toast]);
-
-  useEffect(() => {
-    if (selectedCollaboration) {
-      const selectedParticipants = mockParticipants.filter(p => p.collaborationId === selectedCollaboration);
-      setParticipants(selectedParticipants);
-    }
-  }, [selectedCollaboration]);
-
-  // Removed redundant loading state as we're using isLoading from useQuery
 
   const createCollaboration = useMutation({
     mutationFn: async (data: typeof newCollaboration) => {
@@ -162,6 +133,27 @@ export function CollaborationPanel() {
       });
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-sm text-muted-foreground">Loading collaborations...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (queryError) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <div className="p-4 bg-destructive/10 text-destructive rounded-lg max-w-md text-center">
+          {queryError instanceof Error ? queryError.message : 'An error occurred'}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -208,7 +200,14 @@ export function CollaborationPanel() {
                 onClick={() => createCollaboration.mutate(newCollaboration)}
                 disabled={createCollaboration.isPending}
               >
-                Create
+                {createCollaboration.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create"
+                )}
               </Button>
             </div>
           </DialogContent>
@@ -216,146 +215,137 @@ export function CollaborationPanel() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {queryError ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="p-4 bg-destructive/10 text-destructive rounded-lg">
-              {queryError instanceof Error ? queryError.message : 'An error occurred'}
-            </div>
-          </div>
-        ) : isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading collaborations...</span>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {(collaborationsData || []).map((collab) => (
-              <Card
-                key={collab.id}
-                className="p-4 hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold">{collab.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {collab.description}
-                    </p>
-                  </div>
-                  <Badge>{collab.status}</Badge>
+        <div className="space-y-4 animate-staggered-fade-in">
+          {(collaborationsData || []).map((collab) => (
+            <Card
+              key={collab.id}
+              className="p-4 hover:bg-muted/50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold">{collab.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {collab.description}
+                  </p>
                 </div>
-                <div className="mt-4">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Button 
-                      variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => setSelectedCollaboration(collab.id)}
-                    >
-                      <Users className="h-4 w-4" />
-                      Participants
-                    </Button>
-                    <Button 
-                      variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => setSelectedCollaboration(collab.id)}
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      Messages
-                    </Button>
-                  </div>
-                  {selectedCollaboration === collab.id && (
-                    <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium">Collaboration Timeline</h4>
-                        <Badge variant="outline">
-                          {new Date(collab.updatedAt).toLocaleDateString()}
-                        </Badge>
+                <Badge>{collab.status}</Badge>
+              </div>
+              <div className="mt-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <Button 
+                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setSelectedCollaboration(collab.id)}
+                  >
+                    <Users className="h-4 w-4" />
+                    Participants
+                  </Button>
+                  <Button 
+                    variant={selectedCollaboration === collab.id ? "secondary" : "outline"} 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setSelectedCollaboration(collab.id)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Messages
+                  </Button>
+                </div>
+                {selectedCollaboration === collab.id && (
+                  <div className="border rounded-lg p-4 space-y-4 bg-muted/30 animate-staggered-fade-in">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Collaboration Timeline</h4>
+                      <Badge variant="outline">
+                        {new Date(collab.updatedAt).toLocaleDateString()}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        Active participants will appear here in real-time
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {participants.map((participant) => (
+                          <div 
+                            key={participant.id}
+                            onClick={() => {
+                              toast({
+                                title: `Agent ${participant.agentId}`,
+                                description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") ?? "None"}`,
+                              });
+                            }}
+                            className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
+                          >
+                            👤
+                          </div>
+                        ))}
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">
-                          Active participants will appear here in real-time
-                        </p>
-                        <div className="flex items-center gap-2">
-                          {participants.map((participant) => (
-                            <div 
-                              key={participant.id}
-                              onClick={() => {
-                                toast({
-                                  title: `Agent ${participant.agentId}`,
-                                  description: `Role: ${participant.role}\nExpertise: ${participant.metadata?.expertise?.join(", ") ?? "None"}`,
-                                });
-                              }}
-                              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
-                            >
-                              👤
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-4 space-y-2">
-                          {messages.map((message) => (
-                            <div
-                              key={message.id}
-                              className="p-2 rounded-lg bg-background hover:bg-muted transition-colors cursor-pointer"
-                              onClick={() => {
-                                if (message.metadata?.replies?.length) {
-                                  setExpandedMessage(
-                                    expandedMessage === message.id ? null : message.id
-                                  );
-                                }
-                              }}
-                            >
-                              <div className="flex items-start justify-between">
-                                <div>
+                      <div className="mt-4 space-y-2">
+                        {messages.map((message) => (
+                          <div
+                            key={message.id}
+                            className="p-3 rounded-lg bg-background hover:bg-muted/80 transition-all duration-300 cursor-pointer hover:shadow-sm"
+                            onClick={() => {
+                              if (message.metadata?.replies?.length) {
+                                setExpandedMessage(
+                                  expandedMessage === message.id ? null : message.id
+                                );
+                              }
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
                                   <span className="text-sm font-medium">
                                     Agent {message.fromAgentId}
                                   </span>
-                                  <p className="text-sm">{message.content}</p>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(message.timestamp).toLocaleTimeString()}
+                                  </span>
                                 </div>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(message.timestamp).toLocaleTimeString()}
-                                </span>
+                                <p className="text-sm text-foreground/90 break-words">{message.content}</p>
                               </div>
-                              {message.isTyping && (
-                                <div className="flex items-center gap-1 mt-1">
-                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce" />
-                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.2s]" />
-                                  <div className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
-                                </div>
-                              )}
-                              {expandedMessage === message.id && message.metadata?.replies && (
-                                <div className="mt-2 pl-4 space-y-2 border-l">
-                                  {message.metadata.replies.map((reply) => (
-                                    <div
-                                      key={reply.id}
-                                      className="p-2 rounded-lg bg-muted"
-                                    >
-                                      <div className="flex items-start justify-between">
-                                        <div>
-                                          <span className="text-sm font-medium">
+                            </div>
+                            {message.isTyping && (
+                              <div className="flex items-center gap-1 mt-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-pulse" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-pulse [animation-delay:0.2s]" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-pulse [animation-delay:0.4s]" />
+                              </div>
+                            )}
+                            {expandedMessage === message.id && message.metadata?.replies && (
+                              <div className="mt-3 pl-4 space-y-3 border-l-2 border-primary/20 animate-staggered-fade-in">
+                                {message.metadata.replies.map((reply) => (
+                                  <div
+                                    key={reply.id}
+                                    className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200"
+                                  >
+                                    <div className="flex items-start justify-between gap-4">
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-sm font-medium text-primary/90">
                                             Agent {reply.fromAgentId}
                                           </span>
-                                          <p className="text-sm">{reply.content}</p>
+                                          <span className="text-xs text-muted-foreground">
+                                            {new Date(reply.timestamp).toLocaleTimeString()}
+                                          </span>
                                         </div>
-                                        <span className="text-xs text-muted-foreground">
-                                          {new Date(reply.timestamp).toLocaleTimeString()}
-                                        </span>
+                                        <p className="text-sm text-foreground/80 break-words">{reply.content}</p>
                                       </div>
                                     </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                  </div>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
