@@ -47,24 +47,26 @@ export function Layout({ children }: LayoutProps) {
         <aside 
           className={cn(
             "fixed top-0 h-screen shrink-0 border-r bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-            "transition-all duration-500 ease-in-out z-30",
-            "shadow-lg hover:shadow-xl",
+            "transition-[width,transform] duration-300 ease-in-out z-30",
+            "shadow-lg will-change-transform",
             isCollapsed ? 
-              "w-16 hover:w-64 group md:hover:w-64 hover:translate-x-0" : 
+              "w-16 md:hover:w-64 group md:transition-[width]" : 
               "w-64",
-            "max-sm:w-[280px] max-sm:transform max-sm:translate-x-full max-sm:transition-transform",
-            !isCollapsed && "max-sm:translate-x-0"
+            "max-sm:w-[280px]",
+            isCollapsed ? "-translate-x-full md:translate-x-0" : "translate-x-0",
+            "max-sm:z-50"
           )}
+          aria-label="Sidebar"
         >
           <div className="flex h-full flex-col">
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className={cn(
                   "space-y-1.5",
-                  "transition-all duration-500 ease-in-out transform",
+                  "transition-all duration-300 ease-in-out transform overflow-hidden",
                   isCollapsed ? 
-                    "opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 hidden group-hover:block" : 
-                    "opacity-100 translate-x-0"
+                    "w-0 opacity-0 md:group-hover:w-auto md:group-hover:opacity-100" : 
+                    "w-auto opacity-100"
                 )}>
                   <h2 className="text-lg font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
                     Research System
@@ -101,12 +103,13 @@ export function Layout({ children }: LayoutProps) {
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
                         "w-full justify-start gap-2",
-                        "transition-all duration-300 ease-in-out",
-                        "hover:translate-x-1 hover:shadow-sm",
-                        isCollapsed && "px-2",
+                        "transition-[transform,background-color,color] duration-200 ease-out",
+                        "hover:translate-x-1",
+                        isCollapsed ? "px-2 md:px-3" : "px-3",
+                        "relative overflow-hidden",
                         isActive ? 
-                          "bg-secondary hover:bg-secondary/80 font-medium" : 
-                          "hover:bg-accent/80 hover:text-accent-foreground"
+                          "bg-secondary hover:bg-secondary/90 font-medium shadow-sm after:absolute after:inset-y-0 after:left-0 after:w-[2px] after:bg-primary" : 
+                          "hover:bg-accent/80 hover:text-accent-foreground active:scale-[0.98]"
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -125,20 +128,34 @@ export function Layout({ children }: LayoutProps) {
         </aside>
         <main className={cn(
           "flex-1 min-h-screen",
-          "transition-all duration-500 ease-in-out",
+          "transition-all duration-300 ease-in-out",
           "bg-background/50 backdrop-blur-sm",
           isCollapsed ? "md:ml-16" : "md:ml-64",
-          "max-sm:ml-0 relative"
+          "max-sm:ml-0 relative z-10"
         )}>
           <div className="sticky top-0 z-20 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-            <div className="container mx-auto flex h-16 items-center px-4">
+            <div className="container mx-auto flex h-16 items-center justify-between px-4">
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
+                className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary md:hidden"
               >
-                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle sidebar</span>
+                <Menu className="h-6 w-6" aria-hidden="true" />
               </button>
+              
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+              </div>
             </div>
+            
+            {/* Mobile overlay */}
+            {!isCollapsed && (
+              <div 
+                className="fixed inset-0 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-opacity z-40 md:hidden"
+                onClick={() => setIsCollapsed(true)}
+                aria-hidden="true"
+              />
+            )}
           </div>
           <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 h-[calc(100vh-4rem)] animate-staggered-fade-in">
             {children}
