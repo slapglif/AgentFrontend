@@ -46,9 +46,13 @@ export function Layout({ children }: LayoutProps) {
       <div className="flex min-h-screen bg-background">
         <aside 
           className={cn(
-            "fixed top-0 h-screen shrink-0 border-r bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 z-30 shadow-sm",
-            isCollapsed ? "w-16 hover:w-64 group md:hover:w-64" : "w-64",
-            "max-sm:w-full max-sm:transform max-sm:translate-x-full max-sm:transition-transform",
+            "fixed top-0 h-screen shrink-0 border-r bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+            "transition-all duration-500 ease-in-out z-30",
+            "shadow-lg hover:shadow-xl",
+            isCollapsed ? 
+              "w-16 hover:w-64 group md:hover:w-64 hover:translate-x-0" : 
+              "w-64",
+            "max-sm:w-[280px] max-sm:transform max-sm:translate-x-full max-sm:transition-transform",
             !isCollapsed && "max-sm:translate-x-0"
           )}
         >
@@ -56,11 +60,18 @@ export function Layout({ children }: LayoutProps) {
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <div className={cn(
-                  "space-y-1 transition-opacity duration-300",
-                  isCollapsed ? "opacity-0 group-hover:opacity-100 hidden group-hover:block" : "opacity-100"
+                  "space-y-1.5",
+                  "transition-all duration-500 ease-in-out transform",
+                  isCollapsed ? 
+                    "opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 hidden group-hover:block" : 
+                    "opacity-100 translate-x-0"
                 )}>
-                  <h2 className="text-lg font-semibold tracking-tight">Research System</h2>
-                  <p className="text-sm text-muted-foreground">Multi-agent platform</p>
+                  <h2 className="text-lg font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+                    Research System
+                  </h2>
+                  <p className="text-sm font-medium text-muted-foreground/90">
+                    Multi-agent platform
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 ml-auto">
                   <div className={cn(
@@ -89,9 +100,13 @@ export function Layout({ children }: LayoutProps) {
                     <Button
                       variant={isActive ? "secondary" : "ghost"}
                       className={cn(
-                        "w-full justify-start gap-2 transition-colors",
+                        "w-full justify-start gap-2",
+                        "transition-all duration-300 ease-in-out",
+                        "hover:translate-x-1 hover:shadow-sm",
                         isCollapsed && "px-2",
-                        isActive ? "bg-secondary hover:bg-secondary/80" : "hover:bg-accent"
+                        isActive ? 
+                          "bg-secondary hover:bg-secondary/80 font-medium" : 
+                          "hover:bg-accent/80 hover:text-accent-foreground"
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -109,7 +124,9 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </aside>
         <main className={cn(
-          "flex-1 min-h-screen transition-all duration-300 ease-in-out",
+          "flex-1 min-h-screen",
+          "transition-all duration-500 ease-in-out",
+          "bg-background/50 backdrop-blur-sm",
           isCollapsed ? "md:ml-16" : "md:ml-64",
           "max-sm:ml-0 relative"
         )}>
@@ -123,7 +140,7 @@ export function Layout({ children }: LayoutProps) {
               </button>
             </div>
           </div>
-          <div className="container mx-auto px-4 py-6 h-[calc(100vh-4rem)]">
+          <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 h-[calc(100vh-4rem)] animate-staggered-fade-in">
             {children}
           </div>
         </main>

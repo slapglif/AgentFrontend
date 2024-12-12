@@ -24,16 +24,20 @@ interface MessageReply {
 }
 
 // Extend the CollaborationMessage type to include isTyping
-interface ExtendedCollaborationMessage extends Omit<CollaborationMessage, 'metadata'> {
-  metadata?: {
-    replies?: MessageReply[];
-    context?: Record<string, unknown>;
-  };
-  isTyping?: boolean;
-  fromAgentId?: number;
+// Extend the base message type with additional fields
+interface ExtendedCollaborationMessage {
+  id: number;
+  collaborationId?: number;
   content: string;
   timestamp: string;
   type?: string;
+  fromAgentId?: number;
+  isTyping?: boolean;
+  metadata: {
+    replies?: MessageReply[];
+    context?: Record<string, unknown>;
+    [key: string]: any;
+  };
 }
 
 export function CollaborationPanel() {
@@ -53,22 +57,32 @@ export function CollaborationPanel() {
   const [participants, setParticipants] = useState(mockParticipants);
   const [messages, setMessages] = useState<ExtendedCollaborationMessage[]>(
     mockMessages.map(msg => ({
-      ...msg,
-      timestamp: msg.timestamp?.toISOString() || new Date().toISOString(),
-    })) as ExtendedCollaborationMessage[]
+      id: msg.id!,
+      collaborationId: msg.collaborationId || 0,
+      content: msg.content,
+      timestamp: new Date().toISOString(),
+      type: msg.type || 'message',
+      fromAgentId: msg.fromAgentId,
+      metadata: msg.metadata || {},
+      isTyping: msg.isTyping || false
+    }))
   );
   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
   
-  const [onlineAgents, setOnlineAgents] = useState<Record<number, { isOnline: boolean; lastSeen: string }>>(() => {
+  // Track online status of participants
+  const [participantStatus, setParticipantStatus] = useState<Record<number, { isOnline: boolean; lastSeen: string }>>({});
+
+  // Initialize participant status
+  useEffect(() => {
     const initialStatus: Record<number, { isOnline: boolean; lastSeen: string }> = {};
-    mockParticipants.forEach(participant => {
+    participants.forEach(participant => {
       initialStatus[participant.agentId] = {
         isOnline: true,
         lastSeen: new Date().toISOString()
       };
     });
-    return initialStatus;
-  });
+    setParticipantStatus(initialStatus);
+  }, [participants]);
 
   useEffect(() => {
     if (selectedCollaboration) {
