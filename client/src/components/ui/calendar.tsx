@@ -1,2 +1,1 @@
-// Removing calendar component as it's not needed
-export {}
+// This component has been removed as it's not needed for the application

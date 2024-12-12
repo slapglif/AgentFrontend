@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { mockMemoryData } from "@/lib/mockData";
 import { MemoryCard } from "./MemoryCard";
-import { memorySchema, type MemoryEntry } from "../types/memory";
+import type { MemoryEntry } from "@/types/memory";
 
 export function AgentTimeline() {
   const { data: memories } = useQuery<MemoryEntry[]>({

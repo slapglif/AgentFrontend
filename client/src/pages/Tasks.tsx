@@ -26,7 +26,11 @@ export default function Tasks() {
               </Badge>
             </h3>
           </div>
-          <ScrollArea className="h-[calc(100vh-250px)]">
+          <ScrollArea 
+            className="h-[calc(100vh-250px)]"
+            role="region"
+            aria-label="Todo tasks list"
+          >
             <div className="space-y-3">
               {mockTasks.todo.map((task, index) => (
                 <Card 
@@ -68,7 +72,11 @@ export default function Tasks() {
               </Badge>
             </h3>
           </div>
-          <ScrollArea className="h-[calc(100vh-250px)]">
+          <ScrollArea 
+            className="h-[calc(100vh-250px)]"
+            role="region"
+            aria-label="In progress tasks list"
+          >
             <div className="space-y-3">
               {mockTasks.inProgress.map((task, index) => (
                 <Card 
@@ -110,7 +118,11 @@ export default function Tasks() {
               </Badge>
             </h3>
           </div>
-          <ScrollArea className="h-[calc(100vh-250px)]">
+          <ScrollArea 
+            className="h-[calc(100vh-250px)]"
+            role="region"
+            aria-label="Completed tasks list"
+          >
             <div className="space-y-3">
               {mockTasks.completed.map((task, index) => (
                 <Card 

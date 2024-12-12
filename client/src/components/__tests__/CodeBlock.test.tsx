@@ -22,6 +22,14 @@ jest.mock('prismjs/components/prism-python', () => ({}), { virtual: true });
 describe('CodeBlock', () => {
   const mockCode = 'console.log("test")';
   
+  beforeAll(() => {
+    // Mock clipboard API once before all tests
+    const mockClipboard = {
+      writeText: jest.fn(() => Promise.resolve())
+    };
+    global.navigator.clipboard = mockClipboard;
+  });
+
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
@@ -33,32 +41,30 @@ describe('CodeBlock', () => {
 
   it('renders code with syntax highlighting', () => {
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const codeContainer = screen.getByRole('code-container');
+    const codeContainer = screen.getByTestId('code-container');
     expect(codeContainer).toBeInTheDocument();
     expect(codeContainer.querySelector('code.language-javascript')).toBeInTheDocument();
     expect(codeContainer.textContent).toContain(mockCode);
   });
 
   it('handles code copy functionality', async () => {
-    const user = userEvent.setup();
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const copyButton = screen.getByRole('button', { name: /copy code/i });
-    await user.click(copyButton);
+    const copyButton = screen.getByRole('button', { name: /copy/i });
+    await userEvent.click(copyButton);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(mockCode);
   });
 
   it('toggles collapse state', async () => {
-    const user = userEvent.setup();
     render(<CodeBlock code={mockCode} language="javascript" />);
-    const collapseButton = screen.getByRole('button', { name: /collapse code/i });
-    const codeContainer = screen.getByRole('code-container');
+    const codeContainer = screen.getByTestId('code-container');
+    const collapseButton = screen.getByRole('button', { name: /collapse/i });
     
     expect(codeContainer).toHaveClass('max-h-[2000px]');
-    await user.click(collapseButton);
+    await userEvent.click(collapseButton);
     expect(codeContainer).toHaveClass('max-h-16');
     
-    const expandButton = screen.getByRole('button', { name: /expand code/i });
-    await user.click(expandButton);
+    const expandButton = screen.getByRole('button', { name: /expand/i });
+    await userEvent.click(expandButton);
     expect(codeContainer).toHaveClass('max-h-[2000px]');
   });
 

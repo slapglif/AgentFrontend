@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const memoryContentSchema = z.object({
   text: z.string(),
-  code: z.string().nullable().optional(),
+  code: z.string().nullable(),
   language: z.string().optional()
 });
 

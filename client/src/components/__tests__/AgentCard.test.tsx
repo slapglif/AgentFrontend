@@ -45,9 +45,10 @@ describe('AgentCard', () => {
 
   it('displays correct status badge', () => {
     render(<AgentCard agent={mockAgent} />);
-    const statusBadge = screen.getByText(mockAgent.status, { exact: false });
+    const statusBadge = screen.getByText(mockAgent.status);
     expect(statusBadge).toBeInTheDocument();
-    expect(statusBadge.className).toContain('bg-green-500');
+    const badgeContainer = statusBadge.closest('[class*="bg-"]');
+    expect(badgeContainer).toHaveClass('bg-green-500');
   });
 
   it('shows specializations', () => {
@@ -68,7 +69,7 @@ describe('AgentCard', () => {
     render(<AgentCard agent={mockAgent} />);
     expect(screen.getByText(`Level ${mockAgent.skillLevel}`)).toBeInTheDocument();
     expect(screen.getByText(`${(mockAgent.successRate * 100).toFixed(1)}% Success Rate`)).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByTestId('success-rate-progress')).toBeInTheDocument();
   });
 
   it('shows current task information', () => {

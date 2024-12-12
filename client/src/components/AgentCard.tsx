@@ -1,10 +1,8 @@
-import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Database, Atom, Brain, Leaf, Zap } from "lucide-react";
-import type { Agent } from "@/lib/agents";
+import { Trophy, Database, Atom, Brain, Leaf, Zap, type LucideIcon } from "lucide-react";
 
 interface AgentCardProps {
   agent: {
@@ -126,6 +124,7 @@ export function AgentCard({ agent }: AgentCardProps) {
           <Progress 
             value={agent.successRate ? agent.successRate * 100 : 0} 
             className="animate-progress relative overflow-hidden"
+            data-testid="success-rate-progress"
             style={{
               background: 'linear-gradient(90deg, var(--primary-50), var(--primary))',
               backgroundSize: '200% 100%',
