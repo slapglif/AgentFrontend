@@ -43,18 +43,18 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
-      <div className="flex min-h-screen bg-background">
+      <div className="relative flex min-h-screen bg-background/50 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
         <aside 
           className={cn(
             "fixed top-0 h-screen shrink-0 border-r bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-            "transition-[width,transform] duration-300 ease-in-out z-30",
-            "shadow-lg will-change-transform",
+            "transition-[width,transform] duration-300 ease-in-out will-change-transform",
+            "shadow-lg z-50",
             isCollapsed ? 
-              "w-16 md:hover:w-64 group md:transition-[width]" : 
+              "w-16 md:hover:w-64 group hover:shadow-xl" : 
               "w-64",
             "max-sm:w-[280px]",
             isCollapsed ? "-translate-x-full md:translate-x-0" : "translate-x-0",
-            "max-sm:z-50"
+            "max-sm:z-[100] md:z-30"
           )}
           aria-label="Sidebar"
         >

@@ -32,8 +32,26 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = window.document.documentElement;
+    
+    // Set initial theme without transition
+    if (!root.classList.contains('light') && !root.classList.contains('dark')) {
+      root.classList.add(theme);
+      return;
+    }
+    
+    // Add transition class before theme change
+    root.classList.add('theme-transition');
+    
+    // Remove old theme and add new theme
     root.classList.remove("light", "dark");
     root.classList.add(theme);
+    
+    // Remove transition class after animation completes
+    const transitionTimeout = setTimeout(() => {
+      root.classList.remove('theme-transition');
+    }, 150);
+    
+    return () => clearTimeout(transitionTimeout);
   }, [theme]);
 
   const value = {

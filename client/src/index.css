@@ -71,9 +71,16 @@
   }
 
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased min-h-screen;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+
+  /* Prevent white flash during theme transitions */
+  html {
+    background-color: hsl(var(--background));
+    transition: background-color 0.3s ease-in-out;
   }
 }
 @keyframes spring {
@@ -325,6 +332,44 @@
   filter: brightness(1.1);
 }
 
+/* Theme transition handling */
+:root {
+  color-scheme: light dark;
+  background-color: hsl(var(--background));
+}
+
+.dark {
+  color-scheme: dark;
+  background-color: hsl(var(--background));
+}
+
+/* Critical styles - no transition */
+html, 
+body {
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+}
+
+/* Theme transition */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.15s ease-out,
+              border-color 0.15s ease-out,
+              color 0.15s ease-out,
+              fill 0.15s ease-out,
+              stroke 0.15s ease-out,
+              opacity 0.15s ease-out !important;
+  transition-delay: 0ms !important;
+}
+
+/* Backdrop improvements */
+.backdrop-blur {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background-color: transparent;
+}
 .click-feedback {
   transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }

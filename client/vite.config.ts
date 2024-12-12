@@ -20,13 +20,30 @@ export default defineConfig({
     port: 5173,
     hmr: {
       clientPort: 443,
+      host: '0.0.0.0',
+      protocol: 'wss',
+      path: '/@hmr',
+      timeout: 10000,
+      overlay: false,
     },
+    watch: {
+      usePolling: true,
+      interval: 500,
+    },
+    cors: true,
+    strictPort: true,
   },
   optimizeDeps: {
     include: ['@radix-ui/react-icons', 'lucide-react'],
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   build: {
     sourcemap: true,
+    cssCodeSplit: true,
+    reportCompressedSize: false,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -34,5 +51,8 @@ export default defineConfig({
         },
       },
     },
+  },
+  esbuild: {
+    target: 'esnext',
   },
 });

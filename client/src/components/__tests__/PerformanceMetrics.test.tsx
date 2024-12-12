@@ -110,7 +110,7 @@ describe('PerformanceMetrics', () => {
       await waitFor(() => {
         const titleElement = screen.getByText(title);
         expect(titleElement).toBeInTheDocument();
-        expect(titleElement.closest(Card)).toBeInTheDocument();
+        expect(titleElement.closest('[role="region"]')).toBeInTheDocument();
       });
     }
     

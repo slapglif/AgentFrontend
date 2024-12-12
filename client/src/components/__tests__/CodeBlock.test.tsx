@@ -24,10 +24,12 @@ describe('CodeBlock', () => {
   
   beforeAll(() => {
     // Mock clipboard API once before all tests
-    const mockClipboard = {
-      writeText: jest.fn(() => Promise.resolve())
-    };
-    global.navigator.clipboard = mockClipboard;
+    Object.defineProperty(global.navigator, 'clipboard', {
+      value: {
+        writeText: jest.fn(() => Promise.resolve())
+      },
+      configurable: true
+    });
   });
 
   beforeEach(() => {

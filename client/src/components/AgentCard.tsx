@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Database, Atom, Brain, Leaf, Zap, type LucideIcon } from "lucide-react";
+import { Trophy, Database, Atom, Brain, Leaf, Zap } from "lucide-react";
 
 interface AgentCardProps {
   agent: {
