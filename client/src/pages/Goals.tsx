@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatDrawer } from "@/components/ChatDrawer";
@@ -176,20 +176,7 @@ export default function Goals() {
     setGoals(updatedGoals);
   };
 
-  const mapGoalsToKanbanView = (goals: Goal[]) => {
-    return goals.map(({ id, title, description, status, tasks }) => ({
-      id,
-      title,
-      description,
-      status,
-      tasks: tasks.map(({ id, title, description, completed }) => ({
-        id,
-        title,
-        description,
-        completed
-      }))
-    }));
-  };
+  
 
   const [isAddingNewGoal, setIsAddingNewGoal] = useState(false);
   

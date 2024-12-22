@@ -1,0 +1,704 @@
+atch --clear-screen=false server/index.ts
+
+06:34:49 PM [express] 🚀 Server running at http://0.0.0.0:5000
+06:34:49 PM [express] 🔥 Environment: development
+
+ ERROR(TypeScript)  Cannot find module '@db/schema' or its corresponding type declarations.
+ FILE  /home/runner/DeepDarkUI/client/src/components/ChatInterface.tsx:7:30
+
+     5 | import { useToast } from "@/hooks/use-toast";
+     6 | import { formatDistance } from "date-fns";
+  >  7 | import type { Message } from "@db/schema";
+       |                              ^^^^^^^^^^^^
+     8 | import { useEffect } from "react";
+     9 |
+    10 | interface OrchestratorMessage extends Omit<Message, 'metadata'> {
+
+ ERROR(TypeScript)  'refetch' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/ChatInterface.tsx:33:27
+
+    31 |   const [isConnected, setIsConnected] = useState(false);
+    32 |   
+  > 33 |   const { data: messages, refetch } = useQuery<OrchestratorMessage[]>({
+       |                           ^^^^^^^
+    34 |     queryKey: ["messages"],
+    35 |     queryFn: async () => {
+    36 |       const res = await fetch("/api/messages");
+
+ ERROR(TypeScript)  All imports in import declaration are unused.
+ FILE  /home/runner/DeepDarkUI/client/src/components/CollaborationPanel.tsx:17:1
+
+    15 | } from "@/components/ui/dialog";
+    16 | import { mockCollaborations, mockParticipants, mockMessages, simulateRealTimeEvents } from "@/lib/mockCollaborations";
+  > 17 | import type { CollaborationMessage, CollaborationParticipant, Collaboration } from "@/types/schema";
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    18 |
+    19 | interface MessageReply {
+    20 |   id: number;
+
+ ERROR(TypeScript)  Argument of type '{ id: number; collaborationId: number; content: string | undefined; timestamp: string; type: string; fromAgentId: number | undefined; metadata: Record<string, any>; isTyping: boolean; }[]' is not assignable to parameter of type 'ExtendedCollaborationMessage[] | (() => ExtendedCollaborationMessage[])'.
+  Type '{ id: number; collaborationId: number; content: string | undefined; timestamp: string; type: string; fromAgentId: number | undefined; metadata: Record<string, any>; isTyping: boolean; }[]' is not assignable to type 'ExtendedCollaborationMessage[]'.
+    Type '{ id: number; collaborationId: number; content: string | undefined; timestamp: string; type: string; fromAgentId: number | undefined; metadata: Record<string, any>; isTyping: boolean; }' is not assignable to type 'ExtendedCollaborationMessage'.
+      Types of property 'content' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/CollaborationPanel.tsx:59:5
+
+    57 |   const [participants, setParticipants] = useState(mockParticipants);
+    58 |   const [messages, setMessages] = useState<ExtendedCollaborationMessage[]>(
+  > 59 |     mockMessages.map(msg => ({
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  > 60 |       id: msg.id!,
+       | ^^^^^^^^^^^^^^^^^^
+  > 61 |       collaborationId: msg.collaborationId || 0,
+       | ^^^^^^^^^^^^^^^^^^
+  > 62 |       content: msg.content,
+       | ^^^^^^^^^^^^^^^^^^
+  > 63 |       timestamp: new Date().toISOString(),
+       | ^^^^^^^^^^^^^^^^^^
+  > 64 |       type: msg.type || 'message',
+       | ^^^^^^^^^^^^^^^^^^
+  > 65 |       fromAgentId: msg.fromAgentId,
+       | ^^^^^^^^^^^^^^^^^^
+  > 66 |       metadata: msg.metadata || {},
+       | ^^^^^^^^^^^^^^^^^^
+  > 67 |       isTyping: msg.isTyping || false
+       | ^^^^^^^^^^^^^^^^^^
+  > 68 |     }))
+       | ^^^^^^^^
+    69 |   );
+    70 |   const [expandedMessage, setExpandedMessage] = useState<number | null>(null);
+    71 |   
+
+ ERROR(TypeScript)  'participantStatus' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/CollaborationPanel.tsx:73:10
+
+    71 |   
+    72 |   // Track online status of participants
+  > 73 |   const [participantStatus, setParticipantStatus] = useState<Record<number, { isOnline: boolean; lastSeen: string }>>({});
+       |          ^^^^^^^^^^^^^^^^^
+    74 |
+    75 |   // Initialize participant status
+    76 |   useEffect(() => {
+
+ ERROR(TypeScript)  'React' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/GoalKanbanBoard.tsx:1:1
+
+  > 1 | import React from "react";
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 | import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+    3 | import { Card } from "@/components/ui/card";
+    4 | import { ScrollArea } from "@/components/ui/scroll-area";
+
+ ERROR(TypeScript)  'currentValues.skillsProficiency' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:73:36
+
+    71 |           if (currentValues.skillsProficiency) {
+    72 |             Object.keys(currentValues.skillsProficiency).forEach(key => {
+  > 73 |               const currentValue = currentValues.skillsProficiency[key];
+       |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    74 |               const maxChange = 1; // Limit the change to 1% per update
+    75 |               const change = (Math.random() - 0.5) * maxChange;
+    76 |               currentValues.skillsProficiency[key] = Math.min(100, Math.max(0, currentValue + change));
+
+ ERROR(TypeScript)  'currentValues.skillsProficiency' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:76:15
+
+    74 |               const maxChange = 1; // Limit the change to 1% per update
+    75 |               const change = (Math.random() - 0.5) * maxChange;
+  > 76 |               currentValues.skillsProficiency[key] = Math.min(100, Math.max(0, currentValue + change));
+       |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    77 |             });
+    78 |           }
+    79 |
+
+ ERROR(TypeScript)  'currentValues.learningRate' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:83:53
+
+    81 |           return {
+    82 |             ...currentValues,
+  > 83 |             learningRate: Math.min(100, Math.max(0, currentValues.learningRate + (Math.random() - 0.5))),
+       |                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    84 |             adaptabilityScore: Math.min(100, Math.max(0, currentValues.adaptabilityScore + (Math.random() - 0.5))),
+    85 |             isLoading: false,
+    86 |             lastUpdated: new Date().toISOString(),
+
+ ERROR(TypeScript)  'currentValues.adaptabilityScore' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:84:58
+
+    82 |             ...currentValues,
+    83 |             learningRate: Math.min(100, Math.max(0, currentValues.learningRate + (Math.random() - 0.5))),
+  > 84 |             adaptabilityScore: Math.min(100, Math.max(0, currentValues.adaptabilityScore + (Math.random() - 0.5))),
+       |                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    85 |             isLoading: false,
+    86 |             lastUpdated: new Date().toISOString(),
+    87 |             error: null
+
+ ERROR(TypeScript)  'metricsState.completedLessons' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:183:25
+
+    181 |             <div className="relative group">
+    182 |               <Progress 
+  > 183 |                 value={(metricsState.completedLessons / metricsState.totalLessons) * 100} 
+        |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    184 |                 className="h-2 transition-all duration-300 ease-in-out" 
+    185 |               />
+    186 |               <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-popover p-2 rounded-md shadow-md text-xs">
+
+ ERROR(TypeScript)  'metricsState.totalLessons' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:183:57
+
+    181 |             <div className="relative group">
+    182 |               <Progress 
+  > 183 |                 value={(metricsState.completedLessons / metricsState.totalLessons) * 100} 
+        |                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    184 |                 className="h-2 transition-all duration-300 ease-in-out" 
+    185 |               />
+    186 |               <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-popover p-2 rounded-md shadow-md text-xs">
+
+ ERROR(TypeScript)  'metricsState.completedLessons' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:187:20
+
+    185 |               />
+    186 |               <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-popover p-2 rounded-md shadow-md text-xs">
+  > 187 |                 {((metricsState.completedLessons / metricsState.totalLessons) * 100).toFixed(1)}% Complete
+        |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    188 |               </div>
+    189 |             </div>
+    190 |           </div>
+
+ ERROR(TypeScript)  'metricsState.totalLessons' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:187:52
+
+    185 |               />
+    186 |               <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-popover p-2 rounded-md shadow-md text-xs">
+  > 187 |                 {((metricsState.completedLessons / metricsState.totalLessons) * 100).toFixed(1)}% Complete
+        |                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+    188 |               </div>
+    189 |             </div>
+    190 |           </div>
+
+ ERROR(TypeScript)  Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:200:70
+
+    198 |               </div>
+    199 |               <div
+  > 200 |                 className={`text-lg font-semibold ${getProgressColor(metricsState.learningRate)}`}
+        |                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+    201 |                 data-testid="learning-rate-value"
+    202 |               >
+    203 |                 {metricsState.learningRate.toFixed(1)}%
+
+ ERROR(TypeScript)  'metricsState.learningRate' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:203:18
+
+    201 |                 data-testid="learning-rate-value"
+    202 |               >
+  > 203 |                 {metricsState.learningRate.toFixed(1)}%
+        |                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+    204 |               </div>
+    205 |             </div>
+    206 |             <div className="p-3 bg-muted rounded-lg">
+
+ ERROR(TypeScript)  Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:211:73
+
+    209 |                 <span className="text-sm">Adaptability</span>
+    210 |               </div>
+  > 211 |               <div className={`text-lg font-semibold ${getProgressColor(metricsState.adaptabilityScore)}`}>
+        |                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    212 |                 {metricsState.adaptabilityScore.toFixed(1)}%
+    213 |               </div>
+    214 |             </div>
+
+ ERROR(TypeScript)  'metricsState.adaptabilityScore' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:212:18
+
+    210 |               </div>
+    211 |               <div className={`text-lg font-semibold ${getProgressColor(metricsState.adaptabilityScore)}`}>
+  > 212 |                 {metricsState.adaptabilityScore.toFixed(1)}%
+        |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    213 |               </div>
+    214 |             </div>
+    215 |           </div>
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 2, '(o: { [s: string]: number; } | ArrayLike<number>): [string, number][]', gave the following error.
+    Argument of type '{ [key: string]: number; } | undefined' is not assignable to parameter of type '{ [s: string]: number; } | ArrayLike<number>'.
+      Type 'undefined' is not assignable to type '{ [s: string]: number; } | ArrayLike<number>'.
+  Overload 2 of 2, '(o: {}): [string, any][]', gave the following error.
+    Argument of type '{ [key: string]: number; } | undefined' is not assignable to parameter of type '{}'.
+      Type 'undefined' is not assignable to type '{}'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:224:31
+
+    222 |             </div>
+    223 |             <div className="space-y-3">
+  > 224 |               {Object.entries(metricsState.skillsProficiency).map(([skill, level]) => (
+        |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    225 |                 <div key={skill} className="space-y-1">
+    226 |                   <div className="flex justify-between text-sm">
+    227 |                     <span className="capitalize">{skill}</span>
+
+ ERROR(TypeScript)  'metricsState.knowledgeAreas' is possibly 'undefined'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/LearningProgress.tsx:240:16
+
+    238 |             <h4 className="text-sm font-medium mb-3">Knowledge Areas</h4>
+    239 |             <div className="space-y-3">
+  > 240 |               {metricsState.knowledgeAreas.map((area) => (
+        |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    241 |                 <div key={area.name} className="p-3 bg-muted rounded-lg">
+    242 |                   <div className="flex justify-between items-start mb-2">
+    243 |                     <span className="text-sm font-medium">{area.name}</span>
+
+ ERROR(TypeScript)  Parameter 'code' implicitly has an 'any' type.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CodeBlock.test.tsx:41:45
+
+    39 |     // Mock Prism highlight function
+    40 |     const prismMock = require('prismjs');
+  > 41 |     prismMock.highlight.mockImplementation((code) => `<span>${code}</span>`);
+       |                                             ^^^^
+    42 |   });
+    43 |
+    44 |   it('renders code with syntax highlighting', () => {
+
+ ERROR(TypeScript)  'waitFor' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:2:26
+
+    1 | import * as React from 'react';
+  > 2 | import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+      |                          ^^^^^^^
+    3 | import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+    4 | import '@testing-library/jest-dom';
+    5 | import { CollaborationPanel } from '../CollaborationPanel';
+
+ ERROR(TypeScript)  'createTestQueryClient' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:9:7
+
+     7 |
+     8 | // Create a new QueryClient for each test
+  >  9 | const createTestQueryClient = () => new QueryClient({
+       |       ^^^^^^^^^^^^^^^^^^^^^
+    10 |   defaultOptions: {
+    11 |     queries: {
+    12 |       retry: false,
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'cacheTime' does not exist in type 'OmitKeyof<QueryObserverOptions<unknown, Error, unknown, unknown, QueryKey, never>, "suspense" | "queryKey", "strictly">'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:13:7
+
+    11 |     queries: {
+    12 |       retry: false,
+  > 13 |       cacheTime: 0,
+       |       ^^^^^^^^^
+    14 |       staleTime: 0,
+    15 |     },
+    16 |   },
+
+ ERROR(TypeScript)  'defaultQueryClient' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:33:7
+
+    31 |
+    32 | // Mock tanstack query hooks and client
+  > 33 | const defaultQueryClient = new QueryClient({
+       |       ^^^^^^^^^^^^^^^^^^
+    34 |   defaultOptions: {
+    35 |     queries: {
+    36 |       retry: false,
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'cacheTime' does not exist in type 'OmitKeyof<QueryObserverOptions<unknown, Error, unknown, unknown, QueryKey, never>, "suspense" | "queryKey", "strictly">'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:38:7
+
+    36 |       retry: false,
+    37 |       staleTime: Infinity,
+  > 38 |       cacheTime: Infinity,
+       |       ^^^^^^^^^
+    39 |     },
+    40 |   },
+    41 | });
+
+ ERROR(TypeScript)  'callback' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:73:28
+
+    71 | jest.mock('@/lib/mockCollaborations', () => ({
+    72 |   ...jest.requireActual('@/lib/mockCollaborations'),
+  > 73 |   simulateRealTimeEvents: (callback) => {
+       |                            ^^^^^^^^
+    74 |     // Return cleanup function
+    75 |     return () => {};
+    76 |   },
+
+ ERROR(TypeScript)  Parameter 'callback' implicitly has an 'any' type.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:73:28
+
+    71 | jest.mock('@/lib/mockCollaborations', () => ({
+    72 |   ...jest.requireActual('@/lib/mockCollaborations'),
+  > 73 |   simulateRealTimeEvents: (callback) => {
+       |                            ^^^^^^^^
+    74 |     // Return cleanup function
+    75 |     return () => {};
+    76 |   },
+
+ ERROR(TypeScript)  Cannot find name 'mockQueryClient'. Did you mean 'QueryClient'?
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/CollaborationPanel.test.tsx:82:34
+
+    80 | const renderWithQueryClient = (component: React.ReactNode) => {
+    81 |   return render(
+  > 82 |     <QueryClientProvider client={mockQueryClient}>
+       |                                  ^^^^^^^^^^^^^^^
+    83 |       {component}
+    84 |     </QueryClientProvider>
+    85 |   );
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 2, '(props: Props): ErrorBoundary', gave the following error.
+    Type '{ children: Element; onReset: Mock<any, any, any>; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+      Property 'onReset' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+  Overload 2 of 2, '(props: Props, context: any): ErrorBoundary', gave the following error.
+    Type '{ children: Element; onReset: Mock<any, any, any>; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+      Property 'onReset' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/ErrorBoundary.test.tsx:57:22
+
+    55 |
+    56 |     const { rerender } = render(
+  > 57 |       <ErrorBoundary onReset={onReset}>
+       |                      ^^^^^^^
+    58 |         <div>
+    59 |           <button onClick={onReset}>Reset</button>
+    60 |           <ThrowError />
+
+ ERROR(TypeScript)  No overload matches this call.
+  Overload 1 of 2, '(props: Props): ErrorBoundary', gave the following error.
+    Type '{ children: Element; onReset: Mock<any, any, any>; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+      Property 'onReset' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+  Overload 2 of 2, '(props: Props, context: any): ErrorBoundary', gave the following error.
+    Type '{ children: Element; onReset: Mock<any, any, any>; }' is not assignable to type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+      Property 'onReset' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<ErrorBoundary> & Readonly<Props>'.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/ErrorBoundary.test.tsx:72:22
+
+    70 |     // Re-render with working content to verify reset
+    71 |     rerender(
+  > 72 |       <ErrorBoundary onReset={onReset}>
+       |                      ^^^^^^^
+    73 |         <div>Working Content</div>
+    74 |       </ErrorBoundary>
+    75 |     );
+
+ ERROR(TypeScript)  'within' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:1:40
+
+  > 1 | import { render, screen, act, waitFor, within } from '@testing-library/react';
+      |                                        ^^^^^^
+    2 | import { LearningProgress } from '../LearningProgress';
+    3 |
+    4 | const mockDate = new Date('2024-12-10T12:00:00Z');
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:46:30
+
+    44 |
+    45 |   it('renders without crashing', () => {
+  > 46 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    47 |     expect(screen.getByText('Learning Progress')).toBeInTheDocument();
+    48 |   });
+    49 |
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:51:30
+
+    49 |
+    50 |   it('displays course progress correctly', () => {
+  > 51 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    52 |     expect(screen.getByText(`${mockLearningMetrics.completedLessons} / ${mockLearningMetrics.totalLessons} Lessons`)).toBeInTheDocument();
+    53 |   });
+    54 |
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:56:30
+
+    54 |
+    55 |   it('shows all skills proficiency levels', () => {
+  > 56 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    57 |     Object.entries(mockLearningMetrics.skillsProficiency).forEach(([skill, level]) => {
+    58 |       expect(screen.getByText(skill)).toBeInTheDocument();
+    59 |       expect(screen.getByText(`${level}%`)).toBeInTheDocument();
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:64:30
+
+    62 |
+    63 |   it('displays learning rate and adaptability scores', () => {
+  > 64 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    65 |     expect(screen.getByText(`${mockLearningMetrics.learningRate.toFixed(1)}%`)).toBeInTheDocument();
+    66 |     expect(screen.getByText(`${mockLearningMetrics.adaptabilityScore.toFixed(1)}%`)).toBeInTheDocument();
+    67 |   });
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:70:30
+
+    68 |
+    69 |   it('shows loading state during updates', async () => {
+  > 70 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    71 |     
+    72 |     act(() => {
+    73 |       jest.advanceTimersByTime(100);
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:88:30
+
+    86 |     });
+    87 |
+  > 88 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+       |                              ^^^^^^^
+    89 |     
+    90 |     await waitFor(() => {
+    91 |       expect(screen.getByTestId('metrics-last-updated')).toBeInTheDocument();
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:119:50
+
+    117 |     const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    118 |     
+  > 119 |     const { unmount } = render(<LearningProgress metrics={mockLearningMetrics} />);
+        |                                                  ^^^^^^^
+    120 |     
+    121 |     // Wait for the component to mount and set up interval
+    122 |     await act(async () => {
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: { Research: number; Analysis: number; Synthesis: number; Collaboration: number; }; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; adaptabilityScore: number; retentionRate: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/LearningProgress.test.tsx:139:30
+
+    137 |
+    138 |   it('shows all knowledge areas with progress', () => {
+  > 139 |     render(<LearningProgress metrics={mockLearningMetrics} />);
+        |                              ^^^^^^^
+    140 |     mockLearningMetrics.knowledgeAreas.forEach((area) => {
+    141 |       expect(screen.getByText(area.name)).toBeInTheDocument();
+    142 |       expect(screen.getByText(`${area.progress}%`)).toBeInTheDocument();
+
+ ERROR(TypeScript)  'mockAnalytics' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/PerformanceMetrics.test.tsx:3:1
+
+    1 | import { render, screen, waitFor, act } from '@testing-library/react';
+    2 | import { PerformanceMetrics } from '../PerformanceMetrics';
+  > 3 | import { mockAnalytics } from '@/lib/mockAnalytics';
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    4 | import { Card } from '@/components/ui/card';
+    5 |
+    6 | // Mock Recharts components
+
+ ERROR(TypeScript)  'Card' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/components/__tests__/PerformanceMetrics.test.tsx:4:1
+
+    2 | import { PerformanceMetrics } from '../PerformanceMetrics';
+    3 | import { mockAnalytics } from '@/lib/mockAnalytics';
+  > 4 | import { Card } from '@/components/ui/card';
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    5 |
+    6 | // Mock Recharts components
+    7 | jest.mock('recharts', () => ({
+
+ ERROR(TypeScript)  All imports in import declaration are unused.
+ FILE  /home/runner/DeepDarkUI/client/src/lib/mockHistory.ts:1:1
+
+  > 1 | import { Activity, Code, MessageSquare, Database, FileText } from 'lucide-react';
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 |
+    3 | export interface HistoryEntry {
+    4 |   id: string;
+
+ ERROR(TypeScript)  Cannot find module '@db/schema' or its corresponding type declarations.
+ FILE  /home/runner/DeepDarkUI/client/src/lib/mockMemories.ts:1:29
+
+  > 1 | import type { Memory } from "@db/schema";
+      |                             ^^^^^^^^^^^^
+    2 |
+    3 | // Define required interfaces
+    4 | interface Resource {
+
+ ERROR(TypeScript)  'AllocationPlan' is declared but never used.
+ FILE  /home/runner/DeepDarkUI/client/src/lib/mockMemories.ts:11:11
+
+     9 | }
+    10 |
+  > 11 | interface AllocationPlan {
+       |           ^^^^^^^^^^^^^^
+    12 |   tasks: Map<string, Resource[]>;
+    13 |   getCurrentUtilization(): number;
+    14 |   allocate(task: ResourceAllocation, resources: Resource[]): void;
+
+ ERROR(TypeScript)  Type '{ skillsProficiency: {}; knowledgeAreas: { name: string; progress: number; lastUpdated: string; }[]; learningRate: number; completedLessons: number; totalLessons: number; retentionRate: number; adaptabilityScore: number; }' is missing the following properties from type 'LearningMetrics': skills, level, achievements
+ FILE  /home/runner/DeepDarkUI/client/src/pages/AgentDetails.tsx:304:21
+
+    302 |                 <ErrorBoundary>
+    303 |                   <LearningProgress 
+  > 304 |                     metrics={{
+        |                     ^^^^^^^
+    305 |                       skillsProficiency: agent.learningMetrics?.skills?.reduce((acc, s) => ({
+    306 |                         ...acc,
+    307 |                         [s.name]: s.proficiency
+
+ ERROR(TypeScript)  'React' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:1:8
+
+  > 1 | import React, { useState, useEffect, useCallback } from "react";
+      |        ^^^^^
+    2 | import { useLocation } from "wouter";
+    3 | import { ErrorBoundary } from "@/components/ErrorBoundary";
+    4 | import { ScrollArea } from "@/components/ui/scroll-area";
+
+ ERROR(TypeScript)  'ScrollArea' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:4:1
+
+    2 | import { useLocation } from "wouter";
+    3 | import { ErrorBoundary } from "@/components/ErrorBoundary";
+  > 4 | import { ScrollArea } from "@/components/ui/scroll-area";
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    5 | import { Button } from "@/components/ui/button";
+    6 | import { Input } from "@/components/ui/input";
+    7 | import { Card } from "@/components/ui/card";
+
+ ERROR(TypeScript)  'Filter' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:11:18
+
+     9 | import { Progress } from "@/components/ui/progress";
+    10 | import { Alert, AlertDescription } from "@/components/ui/alert";
+  > 11 | import { Search, Filter, AlertCircle, Loader2 } from "lucide-react";
+       |                  ^^^^^^
+    12 | import { useToast } from "@/hooks/use-toast";
+    13 | import { DEFAULT_AGENTS } from "@/lib/agents";
+    14 | import { mockAnalytics } from "@/lib/mockAnalytics";
+
+ ERROR(TypeScript)  'mockAnalytics' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:14:1
+
+    12 | import { useToast } from "@/hooks/use-toast";
+    13 | import { DEFAULT_AGENTS } from "@/lib/agents";
+  > 14 | import { mockAnalytics } from "@/lib/mockAnalytics";
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    15 | import { cn } from "@/lib/utils";
+    16 | import type { AgentWithStatus, OrchestratorState } from "@/types/agent";
+    17 |
+
+ ERROR(TypeScript)  'location' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:19:10
+
+    17 |
+    18 | export default function Agents() {
+  > 19 |   const [location, setLocation] = useLocation();
+       |          ^^^^^^^^
+    20 |   const { toast } = useToast();
+    21 |   
+    22 |   // State declarations
+
+ ERROR(TypeScript)  Object literal may only specify known properties, and 'version' does not exist in type 'SetStateAction<OrchestratorState>'.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:38:7
+
+    36 |       lastConnected: new Date(),
+    37 |       retryCount: 0,
+  > 38 |       version: "1.0.0",
+       |       ^^^^^^^
+    39 |       capabilities: ["task_delegation", "monitoring", "coordination"]
+    40 |     });
+    41 |
+
+ ERROR(TypeScript)  Argument of type '{ realTimeStatus: { isOnline: boolean; lastSeen: Date; currentLoad: number; errorCount: number; memoryUsage: { used: number; total: number; }; }; id: number; name: string; type: string; description: string; ... 11 more ...; learningMetrics?: { ...; } | undefined; }[]' is not assignable to parameter of type 'SetStateAction<AgentWithStatus[]>'.
+  Type '{ realTimeStatus: { isOnline: boolean; lastSeen: Date; currentLoad: number; errorCount: number; memoryUsage: { used: number; total: number; }; }; id: number; name: string; type: string; description: string; ... 11 more ...; learningMetrics?: { ...; } | undefined; }[]' is not assignable to type 'AgentWithStatus[]'.
+    Type '{ realTimeStatus: { isOnline: boolean; lastSeen: Date; currentLoad: number; errorCount: number; memoryUsage: { used: number; total: number; }; }; id: number; name: string; type: string; description: string; ... 11 more ...; learningMetrics?: { skills: Array<{ name: string; proficiency: number; }>; level: { current: ...' is not assignable to type 'AgentWithStatus'.
+      Types of property 'learningMetrics' are incompatible.
+        Type '{ skills: { name: string; proficiency: number; }[]; level: { current: number; xp: number; nextLevelXp: number; }; achievements: any[]; } | undefined' is not assignable to type '{ skills: { name: string; proficiency: number; }[]; level: { current: number; xp: number; nextLevelXp: number; }; achievements: any[]; skillsProficiency?: Record<string, number> | undefined; ... 5 more ...; retentionRate?: number | undefined; }'.
+          Type 'undefined' is not assignable to type '{ skills: { name: string; proficiency: number; }[]; level: { current: number; xp: number; nextLevelXp: number; }; achievements: any[]; skillsProficiency?: Record<string, number> | undefined; ... 5 more ...; retentionRate?: number | undefined; }'.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Agents.tsx:56:15
+
+    54 |       }
+    55 |     }));
+  > 56 |     setAgents(initialAgents);
+       |               ^^^^^^^^^^^^^
+    57 |     setIsLoading(false);
+    58 |
+    59 |     toast({
+
+ ERROR(TypeScript)  'React' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Goals.tsx:1:8
+
+  > 1 | import React, { useState, Suspense } from "react";
+      |        ^^^^^
+    2 | import { Button } from "@/components/ui/button";
+    3 | import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+    4 | import { ChatDrawer } from "@/components/ChatDrawer";
+
+ ERROR(TypeScript)  'mapGoalsToKanbanView' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/pages/Goals.tsx:179:9
+
+    177 |   };
+    178 |
+  > 179 |   const mapGoalsToKanbanView = (goals: Goal[]) => {
+        |         ^^^^^^^^^^^^^^^^^^^^
+    180 |     return goals.map(({ id, title, description, status, tasks }) => ({
+    181 |       id,
+    182 |       title,
+
+ ERROR(TypeScript)  'callback' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/setupTests.ts:40:15
+
+    38 | // Mock IntersectionObserver
+    39 | class MockIntersectionObserver {
+  > 40 |   constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
+       |               ^^^^^^^^
+    41 |   observe = jest.fn();
+    42 |   unobserve = jest.fn();
+    43 |   disconnect = jest.fn();
+
+ ERROR(TypeScript)  'options' is declared but its value is never read.
+ FILE  /home/runner/DeepDarkUI/client/src/setupTests.ts:40:55
+
+    38 | // Mock IntersectionObserver
+    39 | class MockIntersectionObserver {
+  > 40 |   constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
+       |                                                       ^^^^^^^
+    41 |   observe = jest.fn();
+    42 |   unobserve = jest.fn();
+    43 |   disconnect = jest.fn();
+
+ ERROR(TypeScript)  Type 'typeof MockIntersectionObserver' is not assignable to type '{ new (callback: IntersectionObserverCallback, options?: IntersectionObserverInit | undefined): IntersectionObserver; prototype: IntersectionObserver; }'.
+  Types of property 'prototype' are incompatible.
+    Type 'MockIntersectionObserver' is missing the following properties from type 'IntersectionObserver': root, rootMargin, thresholds
+ FILE  /home/runner/DeepDarkUI/client/src/setupTests.ts:47:1
+
+    45 | }
+    46 |
+  > 47 | global.IntersectionObserver = MockIntersectionObserver;
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    48 |
+    49 | // Mock Prismjs
+    50 | jest.mock('prismjs', () => ({
+
+ ERROR(TypeScript)  Type '(namespaceURI: string, qualifiedName: string) => Element' is not assignable to type '{ (namespaceURI: "http://www.w3.org/1999/xhtml", qualifiedName: string): HTMLElement; <K extends keyof SVGElementTagNameMap>(namespaceURI: "http://www.w3.org/2000/svg", qualifiedName: K): SVGElementTagNameMap[K]; (namespaceURI: "http://www.w3.org/2000/svg", qualifiedName: string): SVGElement; <K extends keyof MathML...'.
+  Type 'Element' is missing the following properties from type 'HTMLElement': accessKey, accessKeyLabel, autocapitalize, dir, and 126 more.
+ FILE  /home/runner/DeepDarkUI/client/src/setupTests.ts:66:1
+
+    64 | // Mock SVG elements
+    65 | const createElementNSOrig = global.document.createElementNS;
+  > 66 | global.document.createElementNS = function(namespaceURI: string, qualifiedName: string) {
+       | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    67 |   const element = createElementNSOrig.call(document, namespaceURI, qualifiedName);
+    68 |   if (namespaceURI === 'http://www.w3.org/2000/svg') {
+    69 |     element.createSVGRect = jest.fn();
+
+ ERROR(TypeScript)  Property 'createSVGRect' does not exist on type 'Element'.
+ FILE  /home/runner/DeepDarkUI/client/src/setupTests.ts:69:13
+
+    67 |   const element = createElementNSOrig.call(document, namespaceURI, qualifiedName);
+    68 |   if (namespaceURI === 'http://www.w3.org/2000/svg') {
+  > 69 |     element.createSVGRect = jest.fn();
+       |             ^^^^^^^^^^^^^
+    70 |   }
+    71 |   return element;
+    72 | };
+
+[TypeScript] Found 60 errors. Watching for file changes.

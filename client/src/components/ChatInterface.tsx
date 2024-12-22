@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistance } from "date-fns";
-import type { Message } from "@db/schema";
-import { useEffect } from "react";
+import type { CollaborationMessage as Message } from "@/types/schema";
 
 interface OrchestratorMessage extends Omit<Message, 'metadata'> {
   metadata: {
@@ -30,7 +29,7 @@ export function ChatInterface() {
   const [input, setInput] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   
-  const { data: messages, refetch } = useQuery<OrchestratorMessage[]>({
+  const { data: messages } = useQuery<OrchestratorMessage[]>({
     queryKey: ["messages"],
     queryFn: async () => {
       const res = await fetch("/api/messages");
