@@ -30,7 +30,7 @@ interface AgentCardProps {
   };
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, isLoading }: AgentCardProps & { isLoading?: boolean }) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -63,8 +63,31 @@ export function AgentCard({ agent }: AgentCardProps) {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="animate-fadeIn">
+        <Card className="p-4 bg-gradient-to-br from-background to-muted/30 backdrop-blur-sm border-primary/10 overflow-hidden">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <Skeleton variant="text" width={150} height={24} />
+                <Skeleton variant="text" width={100} height={20} />
+              </div>
+              <Skeleton variant="rectangular" width={80} height={28} className="rounded-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton variant="text" width="100%" height={16} />
+              <Skeleton variant="text" width="80%" height={16} />
+            </div>
+            <Skeleton variant="rectangular" width="100%" height={100} className="rounded-lg" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <Link href={`/agents/${agent.id}`} className="block">
+    <Link href={`/agents/${agent.id}`} className="block animate-fadeIn">
       <Card 
         className="p-4 hover-3d interactive-hover bg-gradient-to-br from-background to-muted/30 backdrop-blur-sm border-primary/10 overflow-hidden cursor-pointer transition-all duration-300 hover:translate-y-[-2px]"
       >
