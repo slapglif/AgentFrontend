@@ -302,6 +302,13 @@ export default function AgentDetails() {
                 <ErrorBoundary>
                   <LearningProgress 
                     metrics={{
+                      skills: agent.learningMetrics?.skills ?? [],
+                      level: {
+                        current: agent.learningMetrics?.level?.current ?? 1,
+                        xp: agent.learningMetrics?.level?.xp ?? 0,
+                        nextLevelXp: agent.learningMetrics?.level?.nextLevelXp ?? 100
+                      },
+                      achievements: agent.learningMetrics?.achievements ?? [],
                       skillsProficiency: agent.learningMetrics?.skills?.reduce((acc, s) => ({
                         ...acc,
                         [s.name]: s.proficiency

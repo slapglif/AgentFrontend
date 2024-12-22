@@ -2,7 +2,11 @@
 export interface Memory {
   id: number;
   agentId: number;
-  content: string;
+  content: string | {
+    text: string;
+    code?: string;
+    language?: string;
+  };
   type: string;
   timestamp: Date;
   metadata: Record<string, any>;

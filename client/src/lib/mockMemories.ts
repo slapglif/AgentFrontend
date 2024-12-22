@@ -1,25 +1,11 @@
-import type { Memory } from "@db/schema";
+import type { Memory } from "@/types/schema";
 
-// Define required interfaces
+// Resource management interfaces - used in memory content
 interface Resource {
   id: string;
   type: string;
   capacity: number;
   availability: boolean;
-}
-
-interface AllocationPlan {
-  tasks: Map<string, Resource[]>;
-  getCurrentUtilization(): number;
-  allocate(task: ResourceAllocation, resources: Resource[]): void;
-}
-
-interface ResourceAllocation {
-  taskId: string;
-  priority: number;
-  requiredResources: Resource[];
-  estimatedDuration: number;
-  dependencies: string[];
 }
 
 export const DEFAULT_MEMORIES: Partial<Memory>[] = [
@@ -60,7 +46,6 @@ def analyze_collaboration_patterns(interaction_data):
       language: "python"
     },
     timestamp: new Date(Date.now() - 7200000),
-    confidence: 94,
     metadata: {
       analysis_type: "ayurvedic_analysis",
       data_points: 1250,
@@ -71,6 +56,7 @@ def analyze_collaboration_patterns(interaction_data):
       ],
       methodology: "traditional_assessment",
       validation_score: 0.92,
+      confidence: 94,
       interactionHistory: [
         { 
           id: "int-1",
@@ -96,35 +82,34 @@ def analyze_collaboration_patterns(interaction_data):
     type: "decision_making",
     content: {
       text: "Decision analysis for resource allocation in collaborative research tasks",
-      code: `// Resource allocation types and decision engine implementation
-interface ResourceAllocation {
-  taskId: string;
-  priority: number;
-  requiredResources: Resource[];
-  estimatedDuration: number;
-  dependencies: string[];
+      code: `// Resource allocation implementation
+interface Resource {
+  id: string;
+  type: string;
+  capacity: number;
+  availability: boolean;
 }
 
 class DecisionEngine {
   private async calculateOptimalAllocation(
-    tasks: ResourceAllocation[],
+    tasks: Task[],
     availableResources: Resource[]
-  ): Promise<AllocationPlan> {
+  ): Promise<Map<string, Resource[]>> {
     const prioritizedTasks = tasks
       .sort((a, b) => b.priority - a.priority)
       .filter(task => this.hasRequiredResources(task, availableResources));
       
-    const allocationPlan = new AllocationPlan();
+    const allocationPlan = new Map<string, Resource[]>();
     
     for (const task of prioritizedTasks) {
       const resourceSet = await this.findOptimalResourceSet(
         task,
         availableResources,
-        allocationPlan.getCurrentUtilization()
+        this.getCurrentUtilization()
       );
       
       if (resourceSet) {
-        allocationPlan.allocate(task, resourceSet);
+        allocationPlan.set(task.id, resourceSet);
       }
     }
     
@@ -134,7 +119,6 @@ class DecisionEngine {
       language: "typescript"
     },
     timestamp: new Date(Date.now() - 3600000),
-    confidence: 89,
     metadata: {
       decision_type: "resource_allocation",
       factors_considered: [
@@ -143,6 +127,7 @@ class DecisionEngine {
         "dependencies",
         "estimated_duration"
       ],
+      confidence: 89,
       impact_assessment: {
         efficiency_gain: "35%",
         resource_utilization: "92%",
@@ -199,7 +184,6 @@ export class CollaborationProtocolComponent {
       language: "typescript"
     },
     timestamp: new Date(Date.now() - 1800000),
-    confidence: 96,
     metadata: {
       event_type: "protocol_documentation",
       participants: [
@@ -207,6 +191,7 @@ export class CollaborationProtocolComponent {
         { id: 8, role: "synthesizer" },
         { id: 9, role: "documentor" }
       ],
+      confidence: 96,
       documentation_metrics: {
         coverage: "98%",
         clarity_score: 9.2,
