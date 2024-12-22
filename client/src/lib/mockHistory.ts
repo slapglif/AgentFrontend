@@ -1,4 +1,4 @@
-import { Activity, Code, MessageSquare, Database, FileText } from 'lucide-react';
+// Removed unused imports to fix TypeScript warnings
 
 export interface HistoryEntry {
   id: string;

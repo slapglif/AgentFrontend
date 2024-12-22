@@ -4,6 +4,42 @@ import { LearningProgress } from '../LearningProgress';
 const mockDate = new Date('2024-12-10T12:00:00Z');
 
 const mockLearningMetrics = {
+  skills: [
+    { 
+      name: 'Research',
+      proficiency: 85,
+      lastUpdated: mockDate.toISOString()
+    },
+    {
+      name: 'Analysis',
+      proficiency: 78,
+      lastUpdated: mockDate.toISOString()
+    },
+    {
+      name: 'Synthesis',
+      proficiency: 92,
+      lastUpdated: mockDate.toISOString()
+    },
+    {
+      name: 'Collaboration',
+      proficiency: 88,
+      lastUpdated: mockDate.toISOString()
+    }
+  ],
+  level: {
+    current: 5,
+    xp: 2500,
+    nextLevelXp: 3000
+  },
+  achievements: [
+    {
+      id: 1,
+      name: 'First Milestone',
+      description: 'Completed initial training',
+      dateAchieved: mockDate.toISOString(),
+      icon: 'trophy'
+    }
+  ],
   skillsProficiency: {
     'Research': 85,
     'Analysis': 78,

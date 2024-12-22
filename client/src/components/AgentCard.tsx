@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Database, Atom, Brain, Leaf, Zap } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AgentCardProps {
   agent: {

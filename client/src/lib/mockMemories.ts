@@ -1,12 +1,11 @@
 import type { Memory } from "@/types/schema";
 
-// Resource management interfaces - used in memory content
-interface Resource {
-  id: string;
-  type: string;
-  capacity: number;
-  availability: boolean;
-}
+// Types for memory content structure
+type MemoryContent = {
+  text: string;
+  code?: string;
+  language?: string;
+};
 
 export const DEFAULT_MEMORIES: Partial<Memory>[] = [
   // Research Analysis Memory
