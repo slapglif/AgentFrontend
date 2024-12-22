@@ -386,8 +386,8 @@ export default function AgentDetails() {
                       skills={MOCK_AGENT_SKILLS}
                       onSkillSelect={(skillId) => {
                         console.log('Selected skill:', skillId);
-                        // TODO: Implement skill upgrade/details panel
                       }}
+                      selectedSkillId={undefined}
                     />
                   </Card>
                 </ErrorBoundary>

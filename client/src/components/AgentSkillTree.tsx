@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useSpring, animated } from "react-spring";
 import { Card } from "@/components/ui/card";
 import {
@@ -8,6 +8,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+
+interface Position {
+  x: number;
+  y: number;
+}
 
 interface Skill {
   id: string;
@@ -28,30 +33,33 @@ interface SkillNodeProps {
   isSelected: boolean;
 }
 
-const SkillNode: React.FC<SkillNodeProps> = ({
+function SkillNode({
   skill,
   position,
   onSelect,
   isSelected,
-}) => {
+}: SkillNodeProps) {
+  const progressPercentage = useMemo(() => 
+    (skill.level / skill.maxLevel) * 100
+  , [skill.level, skill.maxLevel]);
+
   const spring = useSpring({
     to: {
       transform: `translate(${position.x}px, ${position.y}px)`,
       scale: isSelected ? 1.1 : 1,
+      opacity: skill.isUnlocked ? 1 : 0.5,
     },
     from: {
       transform: `translate(${position.x}px, ${position.y}px)`,
       scale: 1,
+      opacity: 0,
     },
     config: { 
       tension: 300, 
       friction: 20,
       clamp: true
     },
-    immediate: false,
   });
-
-  const progressPercentage = (skill.level / skill.maxLevel) * 100;
 
   return (
     <animated.div
@@ -77,14 +85,14 @@ const SkillNode: React.FC<SkillNodeProps> = ({
               )}
               disabled={!skill.isUnlocked}
             >
-              <div className="text-2xl">{skill.icon}</div>
+              <div className="text-xl">{skill.icon}</div>
               <div
-                className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-primary/10 rounded-full px-2 py-0.5 text-xs font-medium"
+                className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-background/80 rounded-full px-2 py-0.5 text-xs font-medium border border-primary/20"
               >
                 {skill.level}/{skill.maxLevel}
               </div>
               <svg
-                className="absolute -top-1 -right-1 w-3 h-3"
+                className="absolute inset-0 w-full h-full -rotate-90"
                 viewBox="0 0 100 100"
               >
                 <circle
@@ -93,9 +101,18 @@ const SkillNode: React.FC<SkillNodeProps> = ({
                   r="45"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="10"
+                  strokeWidth="8"
+                  className="text-muted/20"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
                   strokeDasharray={`${progressPercentage} 100`}
-                  className="text-primary"
+                  className="text-primary transition-all duration-500 ease-in-out"
                   transform="rotate(-90 50 50)"
                 />
               </svg>
