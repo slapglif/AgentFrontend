@@ -9,8 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Trophy } from "lucide-react";
-import type { UserProgress as UserProgressType } from "@/lib/gamification";
-import { calculateLevel, calculateProgress, LEVELS } from "@/lib/gamification";
+import { UserProgress as UserProgressType, calculateLevel, calculateProgress, LEVELS } from "@/lib/gamification";
 
 interface UserProgressProps {
   progress: UserProgressType;
@@ -54,7 +53,7 @@ export function UserProgress({ progress }: UserProgressProps) {
           <h4 className="font-medium">Recent Achievements</h4>
           <ScrollArea className="h-[200px] pr-4">
             <div className="space-y-3">
-              {progress.achievements.map((achievement) => (
+              {progress.achievements.map((achievement: UserProgressType['achievements'][0]) => (
                 <div
                   key={achievement.id}
                   className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg animate-fadeIn"
@@ -96,8 +95,8 @@ export function UserProgress({ progress }: UserProgressProps) {
           <div className="space-y-2">
             <h4 className="font-medium">Current Level Rewards</h4>
             <div className="flex flex-wrap gap-2">
-              {currentLevel.rewards.map((reward, index) => (
-                <Badge key={index} variant="outline">
+              {currentLevel.rewards.map((reward: string, index: number) => (
+                <Badge key={`reward-${index}`} variant="outline">
                   {reward}
                 </Badge>
               ))}

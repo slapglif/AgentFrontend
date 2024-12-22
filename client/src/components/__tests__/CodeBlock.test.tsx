@@ -22,23 +22,37 @@ jest.mock('prismjs/components/prism-python', () => ({}), { virtual: true });
 describe('CodeBlock', () => {
   const mockCode = 'console.log("test")';
   
-  beforeAll(() => {
-    // Mock clipboard API once before all tests
-    Object.defineProperty(global.navigator, 'clipboard', {
-      value: {
-        writeText: jest.fn(() => Promise.resolve())
-      },
-      configurable: true
-    });
-  });
-
+  let originalClipboard: any;
+  
   beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
+    // Mock clipboard API
+    const mockClipboard = {
+      writeText: jest.fn(() => Promise.resolve())
+    };
+    
+    // Safely define clipboard if it doesn't exist
+    if (!global.navigator.clipboard) {
+      global.navigator.clipboard = mockClipboard;
+    } else {
+      // Otherwise just mock the writeText method
+      global.navigator.clipboard.writeText = mockClipboard.writeText;
+    }
+    
+    originalClipboard = mockClipboard;
     
     // Mock Prism highlight function
     const prismMock = require('prismjs');
-    prismMock.highlight.mockImplementation((code) => `<span>${code}</span>`);
+    prismMock.highlight.mockImplementation((code: string) => `<span>${code}</span>`);
+  });
+
+  afterEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+    
+    // Restore original clipboard functionality
+    if (originalClipboard && global.navigator.clipboard) {
+      global.navigator.clipboard.writeText = originalClipboard.writeText;
+    }
   });
 
   it('renders code with syntax highlighting', () => {

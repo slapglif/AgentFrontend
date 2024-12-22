@@ -5,21 +5,22 @@ import '@testing-library/jest-dom';
 import { CollaborationPanel } from '../CollaborationPanel';
 import { mockCollaborations } from '@/lib/mockCollaborations';
 
-// Create a new QueryClient for each test
-const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      cacheTime: 0,
-      staleTime: 0,
+// Create a new QueryClient for tests
+const createTestQueryClient = () => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+      },
     },
-  },
-  logger: {
-    log: console.log,
-    warn: console.warn,
-    error: () => {},
-  },
-});
+  });
+  return client;
+};
+
+// Initialize mockQueryClient
+const mockQueryClient = createTestQueryClient();
 
 // Mock UI components and hooks
 const mockToast = jest.fn();
@@ -28,17 +29,6 @@ jest.mock('@/hooks/use-toast', () => ({
     toast: mockToast,
   }),
 }));
-
-// Mock tanstack query hooks and client
-const defaultQueryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    },
-  },
-});
 
 const mockQueryData = {
   data: mockCollaborations,
@@ -59,8 +49,8 @@ const mockSetQueryData = jest.fn();
 // Mock the entire module
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQuery: (options: any) => mockUseQuery(options),
-  useMutation: (options: any) => mockUseMutation(options),
+  useQuery: (options: unknown) => mockUseQuery(options),
+  useMutation: (options: unknown) => mockUseMutation(options),
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
     setQueryData: mockSetQueryData,
@@ -70,7 +60,7 @@ jest.mock('@tanstack/react-query', () => ({
 // Mock collaboration events
 jest.mock('@/lib/mockCollaborations', () => ({
   ...jest.requireActual('@/lib/mockCollaborations'),
-  simulateRealTimeEvents: (callback) => {
+  simulateRealTimeEvents: (callback: () => void) => {
     // Return cleanup function
     return () => {};
   },
@@ -78,8 +68,9 @@ jest.mock('@/lib/mockCollaborations', () => ({
 
 // Wrap component with necessary providers
 const renderWithQueryClient = (component: React.ReactNode) => {
+  const testClient = createTestQueryClient();
   return render(
-    <QueryClientProvider client={mockQueryClient}>
+    <QueryClientProvider client={testClient}>
       {component}
     </QueryClientProvider>
   );
@@ -88,12 +79,12 @@ const renderWithQueryClient = (component: React.ReactNode) => {
 describe('CollaborationPanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseQuery.mockReturnValue(mockQueryData);
   });
 
-  const mockToast = jest.fn();
-  jest.mock('@/hooks/use-toast', () => ({
-    useToast: () => ({ toast: mockToast })
-  }));
+  afterEach(() => {
+    jest.resetModules();
+  });
 
   it('renders collaboration list', async () => {
     renderWithQueryClient(<CollaborationPanel />);
@@ -105,8 +96,7 @@ describe('CollaborationPanel', () => {
   });
 
   it('shows loading state', async () => {
-    const useQueryMock = jest.requireMock('@tanstack/react-query').useQuery;
-    useQueryMock.mockImplementationOnce(() => ({
+    mockUseQuery.mockImplementationOnce(() => ({
       isLoading: true,
       data: null,
       error: null,

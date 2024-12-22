@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { DotPattern } from "@/components/DotPattern";
+import { AgentSkillTree } from "@/components/AgentSkillTree";
+import { MOCK_AGENT_SKILLS } from "@/lib/gamification";
 // Removed unused import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -377,6 +379,17 @@ export default function AgentDetails() {
                       adaptabilityScore: 75
                     }} 
                   />
+                  
+                  <Card className="p-4">
+                    <h3 className="font-medium mb-4">Skill Tree</h3>
+                    <AgentSkillTree
+                      skills={MOCK_AGENT_SKILLS}
+                      onSkillSelect={(skillId) => {
+                        console.log('Selected skill:', skillId);
+                        // TODO: Implement skill upgrade/details panel
+                      }}
+                    />
+                  </Card>
                 </ErrorBoundary>
               </div>
             </TabsContent>

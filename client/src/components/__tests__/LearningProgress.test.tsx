@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor, within } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import { LearningProgress } from '../LearningProgress';
 
 const mockDate = new Date('2024-12-10T12:00:00Z');
