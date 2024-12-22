@@ -23,8 +23,15 @@ import {
   ChevronLeft,
   AlertCircle,
   Loader2,
-  ListTodo
+  ListTodo,
+  HelpCircle
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function AgentDetails() {
   const { id } = useParams();
@@ -191,60 +198,104 @@ export default function AgentDetails() {
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Performance Metrics</h3>
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">Success Rate</span>
-                        <span className="text-sm font-medium">
-                          {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
-                        </span>
+                    <TooltipProvider>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm">Success Rate</span>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[200px]">
+                                <p>Percentage of tasks successfully completed by the agent. Higher rates indicate better performance and reliability.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {(agent.performance_metrics.success_rate * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        <Progress 
+                          value={agent.performance_metrics.success_rate * 100} 
+                          className="animate-progress" 
+                        />
                       </div>
-                      <Progress 
-                        value={agent.performance_metrics.success_rate * 100} 
-                        className="animate-progress" 
-                      />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">Tasks Completed</span>
-                        <span className="text-sm font-medium">
-                          {agent.performance_metrics.tasks_completed}
-                        </span>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm">Tasks Completed</span>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[200px]">
+                                <p>Total number of tasks this agent has completed. Shows the agent's workload and productivity over time.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {agent.performance_metrics.tasks_completed}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={(agent.performance_metrics.tasks_completed / 100) * 100}
+                          className="animate-progress" 
+                        />
                       </div>
-                      <Progress 
-                        value={(agent.performance_metrics.tasks_completed / 100) * 100}
-                        className="animate-progress" 
-                      />
-                    </div>
+                    </TooltipProvider>
                   </div>
                 </Card>
 
                 <Card className="p-4">
                   <h3 className="font-medium mb-4">Resource Usage</h3>
                   <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">CPU Usage</span>
-                        <span className="text-sm font-medium">
-                          {mockPerformanceData.resource_usage.cpu}%
-                        </span>
+                    <TooltipProvider>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm">CPU Usage</span>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[200px]">
+                                <p>Current CPU utilization by the agent. High usage may indicate intensive processing tasks or potential optimization needs.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {mockPerformanceData.resource_usage.cpu}%
+                          </span>
+                        </div>
+                        <Progress 
+                          value={mockPerformanceData.resource_usage.cpu}
+                          className="animate-progress" 
+                        />
                       </div>
-                      <Progress 
-                        value={mockPerformanceData.resource_usage.cpu}
-                        className="animate-progress" 
-                      />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm">Memory Usage</span>
-                        <span className="text-sm font-medium">
-                          {mockPerformanceData.resource_usage.memory}%
-                        </span>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm">Memory Usage</span>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[200px]">
+                                <p>Current memory consumption by the agent. Shows how efficiently the agent manages its memory resources.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {mockPerformanceData.resource_usage.memory}%
+                          </span>
+                        </div>
+                        <Progress 
+                          value={mockPerformanceData.resource_usage.memory}
+                          className="animate-progress" 
+                        />
                       </div>
-                      <Progress 
-                        value={mockPerformanceData.resource_usage.memory}
-                        className="animate-progress" 
-                      />
-                    </div>
+                    </TooltipProvider>
                   </div>
                 </Card>
 
